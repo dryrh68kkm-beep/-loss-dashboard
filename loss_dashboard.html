@@ -91,9 +91,9 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 <header><div class="htop"><div class="logo"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="htext"><h1>Loss Performance <span class="hstore">Big C Sainoi</span></h1><div class="hbadge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> by Loss Prevention</div></div></div></header>
 <div class="wrap">
 <div class="sec" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-<label for="fileIn" class="upbtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> อัปโหลด CSV Loss</label>
-<input type="file" id="fileIn" accept=".csv,text/csv" style="display:none">
-<label for="saleIn" class="upbtn" style="background:#2E7D5B"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> อัปโหลด CSV ยอดขาย</label>
+<label for="adjIn" class="upbtn" style="background:#1F497D"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> อัปโหลดไฟล์ ADJ (Loss + GP)</label>
+<input type="file" id="adjIn" accept=".csv,text/csv" style="display:none">
+<label for="saleIn" class="upbtn" style="background:#6b7a8f;font-size:12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> ยอดขายแยก</label>
 <input type="file" id="saleIn" accept=".csv,text/csv" style="display:none">
 <span id="upStatus" style="font-size:12px;color:#888"></span>
 </div>
@@ -114,10 +114,19 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 <div class="tab" data-t="RTC">RTC</div>
 </div>
 <div class="cards" id="cards"></div>
+<div id="codeTop"></div>
 <div class="sec"><h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2E6CA4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Loss แยกตามแผนก (Top 12)</h2><div id="deptBars"></div></div>
 <div class="sec"><h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2E6CA4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.5 4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> สินค้า Loss สูงสุด (Top 20) · DAMAGE+RTC+SHRINK</h2><div style="overflow-x:auto"><table id="itemTbl"><thead><tr><th>Barcode</th><th>สินค้า</th><th class="num">จำนวน</th><th class="num" id="amtHdr" style="cursor:pointer;user-select:none">รวม Loss (฿) <span id="amtArrow">↑</span></th></tr></thead><tbody></tbody></table></div></div>
 </div>
 <div id="pageTree" style="display:none">
+<div class="sec" style="padding:16px">
+<h2 style="font-size:15px;margin:0 0 12px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2E6CA4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> ยอดรวม Loss รายเดือน · เทียบปีก่อน (LY)</h2>
+<div id="chartLoss" style="overflow-x:auto"></div>
+</div>
+<div class="sec" style="padding:16px">
+<h2 style="font-size:15px;margin:0 0 12px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2E7D5B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> ยอดขายรายเดือน · เทียบปีก่อน (LY)</h2>
+<div id="chartSale" style="overflow-x:auto"></div>
+</div>
 <div class="sec" style="padding:16px">
 <div id="treeCrumb" class="crumb"></div>
 <div id="donutWrap" style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start">
@@ -143,8 +152,9 @@ let SALES=[];
 // ====== GitHub auto-sync config ======
 // วางลิงก์ raw ของไฟล์ CSV บน GitHub ตรงนี้ (กด Raw บนหน้าไฟล์ใน GitHub แล้วคัดลอก URL)
 // รูปแบบ: https://raw.githubusercontent.com/<user>/<repo>/main/loss.csv
-const GH_LOSS_URL = "https://raw.githubusercontent.com/dryrh68kkm-beep/-loss-dashboard/main/loss.csv";  // <-- ใส่ลิงก์ raw ของ loss.csv
-const GH_SALE_URL = "https://raw.githubusercontent.com/dryrh68kkm-beep/-loss-dashboard/main/sale.csv";  // <-- ใส่ลิงก์ raw ของ sale.csv
+// ปิดการดึงจาก GitHub เพื่อความปลอดภัย — ใช้อัปโหลดไฟล์ในเครื่องเท่านั้น
+const GH_LOSS_URL = "";
+const GH_SALE_URL = "";
 let curType="ALL";
 let itemSortDir="asc";
 let itemArr=[];
@@ -212,6 +222,7 @@ function render(){
   let totA=0, totALY=0;
   // full (unfiltered-by-type) set for this month/div/dept to compute LY correctly, esp RTC negative-only
   const scope=DATA.filter(d=>(mMatch(d.period))&&(dv=="ALL"||d.div==dv)&&(dp=="ALL"||d.dept==dp));
+  const codeMap={DAMAGE:["13","21","25"],SHRINKAGE:["22","23","923","924"]};
   types.forEach(t=>{
     const tr=rows.filter(r=>r.type==t);
     const a=tr.reduce((s,r)=>s+r.amt,0);
@@ -220,8 +231,38 @@ function render(){
     const aLY=lyRows.reduce((s,r)=>s+r.amtLY,0);
     totA+=a; totALY+=aLY;
     const icBg={DAMAGE:'#fdecea',SHRINKAGE:'#eaf1fb',RTC:'#fff5e6'},icSt={DAMAGE:'#C0504D',SHRINKAGE:'#2E6CA4',RTC:'#E08A1E'};
-    const g=yoy(a,aLY,true);
-    cardsH+='<div class="card clickable" data-card="'+t+'">'+icw(t,icBg[t],icSt[t])+'<div class="lbl">'+t+'</div><div class="val" style="color:'+scol(a)+'">'+fmt(a)+' ฿</div>'+g.html+'<div class="tap">แตะดูรายการ ›</div></div>';
+    if(curType===t){
+      // การ์ดสรุปรวมของประเภทนี้ (พร้อม LY) วางไว้ข้างหน้า
+      if(t==="RTC"){
+        const gR=yoy(a,aLY,true);
+        cardsH+='<div class="card">'+icw('RTC',icBg[t],icSt[t])+'<div class="lbl">RTC · รวม</div><div class="val" style="color:'+scol(a)+'">'+fmt(a)+' ฿</div>'+gR.html+'</div>';
+        const rtcRows=scope.filter(r=>r.type==="RTC");
+        const pos=rtcRows.filter(r=>r.amt>0).reduce((s,r)=>s+r.amt,0);
+        const neg=rtcRows.filter(r=>r.amt<0).reduce((s,r)=>s+r.amt,0);
+        cardsH+='<div class="card clickable" data-code="RTC" data-dir="neg">'+icw('RTC',icBg[t],icSt[t])+'<div class="lbl">RTC · ยอดลบรวม</div><div class="val" style="color:'+scol(neg)+'">'+fmt(neg)+' ฿</div><div class="tap">แตะดู Top 10 ›</div></div>';
+        cardsH+='<div class="card clickable" data-code="RTC" data-dir="pos">'+icw('RTC',icBg[t],icSt[t])+'<div class="lbl">RTC · ยอดบวกรวม</div><div class="val" style="color:'+scol(pos)+'">'+fmt(pos)+' ฿</div><div class="tap">แตะดู Top 10 ›</div></div>';
+      }else{
+        const gS=yoy(a,aLY,true);
+        cardsH+='<div class="card">'+icw(t,icBg[t],icSt[t])+'<div class="lbl">'+t+' · รวม</div><div class="val" style="color:'+scol(a)+'">'+fmt(a)+' ฿</div>'+gS.html+'</div>';
+        const codes=codeMap[t]||[];
+        // aggregate by code within this type
+        const cAgg={};
+        tr.forEach(r=>{const c=String(r.code||"").replace(/^0+/,"")||r.code||"–";cAgg[c]=(cAgg[c]||0)+r.amt;});
+        codes.forEach(c=>{
+          const key=String(c).replace(/^0+/,"")||c;
+          const v=cAgg[key]||0;
+          cardsH+='<div class="card clickable" data-code="'+key+'" data-type="'+t+'">'+icw(t,icBg[t],icSt[t])+'<div class="lbl">'+t+' · code '+c+'</div><div class="val" style="color:'+scol(v)+'">'+fmt(v)+' ฿</div><div class="tap">แตะดู Top 10 ›</div></div>';
+        });
+        // code อื่นๆ ที่ไม่อยู่ในรายการ (ถ้ามี)
+        const known=codes.map(c=>String(c).replace(/^0+/,""));
+        const others=Object.keys(cAgg).filter(k=>!known.includes(k));
+        if(others.length){const ov=others.reduce((s,k)=>s+cAgg[k],0);cardsH+='<div class="card">'+icw(t,icBg[t],icSt[t])+'<div class="lbl">'+t+' · code อื่นๆ</div><div class="val" style="color:'+scol(ov)+'">'+fmt(ov)+' ฿</div></div>';}
+      }
+    }else if(curType==="ALL"){
+      const g=yoy(a,aLY,true);
+      cardsH+='<div class="card clickable" data-card="'+t+'">'+icw(t,icBg[t],icSt[t])+'<div class="lbl">'+t+'</div><div class="val" style="color:'+scol(a)+'">'+fmt(a)+' ฿</div>'+g.html+'<div class="tap">แตะดูรายการ ›</div></div>';
+    }
+    // ถ้าเลือกประเภทอื่นอยู่ (curType!==t และ !==ALL) ไม่สร้างการ์ดของประเภทนี้
   });
   const saleRows=SALES.filter(d=>(mMatch(d.period))&&(dv=="ALL"||d.div==dv)&&(dp=="ALL"||d.dept==dp));
   const totSale=saleRows.reduce((s,r)=>s+r.samt,0);
@@ -241,9 +282,15 @@ function render(){
   }
   let pctCard='<div class="card">'+icw('PCT','#f0eef7','#7B5EA7')+'<div class="lbl">% Loss / ยอดขาย</div><div class="val" style="color:'+(lossPct!=null?scol(lossPct):"#7B5EA7")+'">'+(lossPct!=null?lossPct.toFixed(2)+'%':'-')+'</div>'+pctHtml+'</div>';
   const gTot=yoy(totA,totALY,true);
-  cardsH=cardsH+'<div class="card">'+icw('TOTAL','#eaf1fb','#1F497D')+'<div class="lbl">รวมยอด Loss</div><div class="val" style="color:'+scol(totA)+'">'+fmt(totA)+' ฿</div>'+gTot.html+'</div>'+saleCard+pctCard;
+  if(curType==="ALL"){
+    cardsH=cardsH+'<div class="card">'+icw('TOTAL','#eaf1fb','#1F497D')+'<div class="lbl">รวมยอด Loss</div><div class="val" style="color:'+scol(totA)+'">'+fmt(totA)+' ฿</div>'+gTot.html+'</div>'+saleCard+pctCard;
+  }
   document.getElementById("cards").innerHTML=cardsH;
-  document.querySelectorAll(".card.clickable").forEach(c=>c.onclick=()=>openModal(c.dataset.card));
+  document.getElementById("codeTop").innerHTML="";
+  document.querySelectorAll(".card.clickable").forEach(c=>c.onclick=()=>{
+    if(c.dataset.code)openCodeModal(c.dataset.code,c.dataset.type||"RTC",c.dataset.dir||"neg");
+    else openModal(c.dataset.card);
+  });
   const dmap={};
   rows.forEach(r=>{dmap[r.dept]=(dmap[r.dept]||0)+r.amt});
   const darr=Object.entries(dmap).sort((a,b)=>a[1]-b[1]).slice(0,12);
@@ -296,10 +343,24 @@ function parseRows(rows){
   const idx={};hdr.forEach((h,i)=>idx[h]=i);
   const need=["ADJ_GROUP_NAME","DIVISION_NAME","DEPT_GROUP_NAME"];
   if(need.some(n=>!(n in idx)))return null;
+  // SME dept label map (non-SME depts) for Fresh merge
+  const code2label={};
+  for(let r=1;r<rows.length;r++){
+    const dept=norm(rows[r][idx["DEPT_GROUP_NAME"]]);const m=dept.match(/^(\d{4})\s/);
+    if(m&&!dept.toUpperCase().replace(/\s+$/,"").endsWith("_SME"))code2label[m[1]]=dept;
+  }
+  function canonLoss(dept,div){
+    const m=String(dept).match(/^(\d{4})\s+(.*)$/);if(!m)return dept;
+    if(m[2].toUpperCase().endsWith("_SME")){
+      const D=String(div).toUpperCase();
+      if(D.startsWith("05")||D.indexOf("FRESH")>=0){const base=String(+m[1]-2).padStart(4,"0");return code2label[base]||dept;}
+    }
+    return dept;
+  }
   const out=[];
   for(let r=1;r<rows.length;r++){
     const row=rows[r];if(!row||row.length<2)continue;
-    const g=norm(row[idx["ADJ_GROUP_NAME"]]),div=norm(row[idx["DIVISION_NAME"]]),dept=norm(row[idx["DEPT_GROUP_NAME"]]);
+    const g=norm(row[idx["ADJ_GROUP_NAME"]]),div=norm(row[idx["DIVISION_NAME"]]),dept=canonLoss(norm(row[idx["DEPT_GROUP_NAME"]]),div);
     if(!g||!div||!dept)continue;
     let amt,qty,amtLY,qtyLY;
     if(g==="RTC"){amt=row[idx["RTC_AMT"]];qty=row[idx["RTC_QTY"]];amtLY=row[idx["RTC_AMT_LY"]];qtyLY=row[idx["RTC_QTY_LY"]];}
@@ -309,40 +370,57 @@ function parseRows(rows){
   return out;
 }
 const upStatus=document.getElementById("upStatus");
-document.getElementById("fileIn").onchange=e=>{
-  const f=e.target.files[0];if(!f)return;
-  upStatus.textContent="กำลังอ่านไฟล์...";
-  const rd=new FileReader();
-  rd.onload=ev=>{
-    try{
-      const parsed=parseRows(parseCSV(ev.target.result));
-      if(parsed===null){upStatus.textContent="⚠️ ไม่พบคอลัมน์ที่ต้องการ (ADJ_GROUP_NAME, DIVISION_NAME, DEPT_GROUP_NAME)";return;}
-      if(!parsed.length){upStatus.textContent="⚠️ ไม่พบข้อมูลในไฟล์";return;}
-      const newMonths=[...new Set(parsed.map(p=>p.period).filter(Boolean))];
-      DATA=DATA.filter(d=>!newMonths.includes(d.period)).concat(parsed);
-      buildMonths();
-      if(newMonths.length===1)fMonth.value=newMonths[0];
-      buildDivs();fillDept();render();
-      upStatus.textContent="✅ เพิ่มข้อมูลแล้ว เดือน "+(newMonths.map(thMonth).join(", ")||"-")+" ("+parsed.length+" รายการ)";
-    }catch(err){upStatus.textContent="⚠️ อ่านไฟล์ไม่ได้: "+err.message;}
-  };
-  rd.readAsText(f,"UTF-8");
-};
 
 function parseSaleRows(rows){
   if(!rows.length)return null;
   const hdr=rows[0].map(h=>norm(h).toUpperCase());
   const idx={};hdr.forEach((h,i)=>idx[h]=i);
   if(!("DIVISION_NAME" in idx)||!("DEPT_GROUP_NAME" in idx)||!("SALE_AMT" in idx))return null;
+  // SME dept label map (non-SME depts) for Fresh merge
+  const code2label={};
+  for(let r=1;r<rows.length;r++){
+    const dept=norm(rows[r][idx["DEPT_GROUP_NAME"]]);const m=dept.match(/^(\d{4})\s/);
+    if(m&&!dept.toUpperCase().replace(/\s+$/,"").endsWith("_SME"))code2label[m[1]]=dept;
+  }
+  function canonSale(dept,div){
+    const m=String(dept).match(/^(\d{4})\s+(.*)$/);if(!m)return dept;
+    if(m[2].toUpperCase().endsWith("_SME")){
+      const D=String(div).toUpperCase();
+      if(D.startsWith("05")||D.indexOf("FRESH")>=0){const base=String(+m[1]-2).padStart(4,"0");return code2label[base]||dept;}
+    }
+    return dept;
+  }
   const out=[];
   for(let r=1;r<rows.length;r++){
     const row=rows[r];if(!row||row.length<2)continue;
-    const div=norm(row[idx["DIVISION_NAME"]]),dept=norm(row[idx["DEPT_GROUP_NAME"]]);
+    const div=norm(row[idx["DIVISION_NAME"]]),dept=canonSale(norm(row[idx["DEPT_GROUP_NAME"]]),div);
     if(!div||!dept)continue;
-    out.push({period:("PERIOD" in idx)?norm(row[idx["PERIOD"]]):"",div,dept,samt:Math.round((+row[idx["SALE_AMT"]]||0)*100)/100,sqty:("SALE_QTY" in idx)?Math.round((+row[idx["SALE_QTY"]]||0)*100)/100:0,samtLY:("SALE_AMT_LY" in idx)?Math.round((+row[idx["SALE_AMT_LY"]]||0)*100)/100:0,sqtyLY:("SALE_QTY_LY" in idx)?Math.round((+row[idx["SALE_QTY_LY"]]||0)*100)/100:0});
+    out.push({period:("PERIOD" in idx)?norm(row[idx["PERIOD"]]):"",div,dept,samt:Math.round((+row[idx["SALE_AMT"]]||0)*100)/100,sqty:("SALE_QTY" in idx)?Math.round((+row[idx["SALE_QTY"]]||0)*100)/100:0,samtLY:("SALE_AMT_LY" in idx)?Math.round((+row[idx["SALE_AMT_LY"]]||0)*100)/100:0,sqtyLY:("SALE_QTY_LY" in idx)?Math.round((+row[idx["SALE_QTY_LY"]]||0)*100)/100:0,gp:("GP_AMT" in idx)?Math.round((+row[idx["GP_AMT"]]||0)*100)/100:0});
   }
   return out;
 }
+// อัปโหลดไฟล์ ADJ — คำนวณ Loss
+document.getElementById("adjIn").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  upStatus.textContent="⏳ กำลังอ่านไฟล์ ADJ และคำนวณ...";
+  const rd=new FileReader();
+  rd.onload=ev=>{
+    try{
+      const rows=parseCSV(ev.target.result);
+      const lossParsed=parseRows(rows);
+      let msg=[];
+      if(lossParsed&&lossParsed.length){
+        const mos=[...new Set(lossParsed.map(p=>p.period).filter(Boolean))];
+        DATA=DATA.filter(d=>!mos.includes(d.period)).concat(lossParsed);
+        msg.push(lossParsed.length+" Loss");
+      }
+      buildMonths();buildDivs();fillDept();render();
+      if(curPage==="tree")renderTree();
+      upStatus.textContent="✅ อัปโหลด ADJ สำเร็จ — "+(msg.join(" · ")||"ไม่พบข้อมูล")+" · (ยอดขายอัปโหลดแยกที่ปุ่ม \"ยอดขายแยก\")";
+    }catch(err){upStatus.textContent="⚠️ อ่านไฟล์ ADJ ไม่ได้: "+err.message;}
+  };
+  rd.readAsText(f,"UTF-8");
+};
 document.getElementById("saleIn").onchange=e=>{
   const f=e.target.files[0];if(!f)return;
   upStatus.textContent="กำลังอ่านไฟล์ยอดขาย...";
@@ -376,6 +454,31 @@ function openModal(type){
   document.getElementById("mHead").innerHTML='<tr><th>Barcode</th><th>สินค้า</th><th>แผนก</th><th class="num">จำนวน</th><th class="num">ยอด (฿)</th></tr>';
   document.getElementById("mSum").textContent="ทั้งหมด "+arr.length+" รายการ · รวมจำนวน "+totQ.toLocaleString("th-TH",{maximumFractionDigits:2})+" · รวมยอด "+fmt(totA)+" ฿";
   document.getElementById("mBody").innerHTML=top.length?top.map(r=>'<tr><td style="font-variant-numeric:tabular-nums;color:#888">'+r.bc+'</td><td>'+r.name+'</td><td style="font-size:11px;color:#999">'+r.dept+'</td><td class="num">'+r.qty.toLocaleString("th-TH",{maximumFractionDigits:2})+'</td><td class="num '+(r.amt<0?'neg':'pos')+'">'+fmt(r.amt)+'</td></tr>').join(""):'<tr><td colspan=5 class=muted>ไม่มีข้อมูล</td></tr>';
+  overlay.classList.add("show");
+}
+function openCodeModal(code,type,dir){
+  const mo=fMonth.value,dv=fDiv.value,dp=fDept.value;
+  let rows=DATA.filter(d=>(mMatch(d.period))&&(dv=="ALL"||d.div==dv)&&(dp=="ALL"||d.dept==dp));
+  let title;
+  if(code==="RTC"){
+    rows=rows.filter(r=>r.type==="RTC"&&(dir==="pos"?r.amt>0:r.amt<0));
+    title="RTC · "+(dir==="pos"?"ยอดบวก":"ยอดลบ")+" — Top 10";
+  }else{
+    rows=rows.filter(r=>r.type===type&&String(r.code||"").replace(/^0+/,"")===String(code).replace(/^0+/,""));
+    // ตรวจทิศทาง: ถ้ายอดรวมเป็นบวก (เช่น code 923 ปรับสต็อกเจอเพิ่ม) เรียงยอดบวกสูงสุด
+    const totCode=rows.reduce((s,r)=>s+r.amt,0);
+    if(totCode>0)dir="pos";
+    title=type+" · code "+code+" — Top 10"+(totCode>0?" (ยอดบวกสูงสุด)":"");
+  }
+  const imap={};
+  rows.forEach(r=>{const k=r.name;if(!imap[k])imap[k]={bc:r.bc,name:r.name,dept:r.dept,amt:0,qty:0};imap[k].amt+=r.amt;imap[k].qty+=r.qty});
+  let arr=Object.values(imap).sort((a,b)=>dir==="pos"?b.amt-a.amt:a.amt-b.amt);
+  const top=arr.slice(0,10);
+  const totA=arr.reduce((s,r)=>s+r.amt,0),totQ=arr.reduce((s,r)=>s+r.qty,0);
+  document.getElementById("mTitle").textContent=title;
+  document.getElementById("mHead").innerHTML='<tr><th style="width:34px">#</th><th>สินค้า</th><th>แผนก</th><th class="num">จำนวน</th><th class="num">ยอด (฿)</th></tr>';
+  document.getElementById("mSum").textContent="ทั้งหมด "+arr.length+" รายการ · รวมจำนวน "+totQ.toLocaleString("th-TH",{maximumFractionDigits:2})+" · รวมยอด "+fmt(totA)+" ฿";
+  document.getElementById("mBody").innerHTML=top.length?top.map((r,i)=>'<tr><td style="text-align:center;font-weight:700;color:'+(i<3?"#C0504D":"#90a4ae")+'">'+(i+1)+'</td><td>'+r.name+'</td><td style="font-size:11px;color:#999">'+r.dept+'</td><td class="num">'+r.qty.toLocaleString("th-TH",{maximumFractionDigits:2})+'</td><td class="num '+(r.amt<0?'neg':'pos')+'">'+fmt(r.amt)+'</td></tr>').join(""):'<tr><td colspan=5 class=muted>ไม่มีข้อมูล</td></tr>';
   overlay.classList.add("show");
 }
 function openSalesModal(mo,dv,dp){
@@ -479,7 +582,42 @@ function arcPath(cx,cy,rO,rI,a0,a1){
   const large=(a1-a0)>Math.PI?1:0;
   return"M"+x0+" "+y0+" A"+rO+" "+rO+" 0 "+large+" 1 "+x1+" "+y1+" L"+x2+" "+y2+" A"+rI+" "+rI+" 0 "+large+" 0 "+x3+" "+y3+" Z";
 }
+function renderMonthBars(){
+  const th={"01":"ม.ค.","02":"ก.พ.","03":"มี.ค.","04":"เม.ย.","05":"พ.ค.","06":"มิ.ย.","07":"ก.ค.","08":"ส.ค.","09":"ก.ย.","10":"ต.ค.","11":"พ.ย.","12":"ธ.ค."};
+  const months=[...new Set(DATA.map(d=>d.period).filter(Boolean))].sort();
+  // Loss per month TY/LY (RTC neg only)
+  const lossTY={},lossLY={};
+  DATA.forEach(r=>{
+    if(r.type==="RTC"){if(r.amt<0)lossTY[r.period]=(lossTY[r.period]||0)+r.amt;if(r.amtLY<0)lossLY[r.period]=(lossLY[r.period]||0)+r.amtLY;}
+    else{lossTY[r.period]=(lossTY[r.period]||0)+r.amt;lossLY[r.period]=(lossLY[r.period]||0)+r.amtLY;}
+  });
+  const saleTY={},saleLY={};
+  SALES.forEach(r=>{saleTY[r.period]=(saleTY[r.period]||0)+r.samt;saleLY[r.period]=(saleLY[r.period]||0)+(r.samtLY||0);});
+  function barChart(title,tyMap,lyMap,cTY,cLY,useAbs){
+    const data=months.map(m=>({m,ty:Math.abs(tyMap[m]||0),ly:Math.abs(lyMap[m]||0),rawTY:tyMap[m]||0,rawLY:lyMap[m]||0}));
+    if(!data.length)return '<div class="muted">ไม่มีข้อมูล</div>';
+    const maxV=Math.max(...data.map(d=>Math.max(d.ty,d.ly)),1);
+    const W=Math.max(months.length*90,320),H=250,pad=44,bh=H-pad-20,gw=W/months.length;
+    const fmtK=n=>{const a=Math.abs(n);return a>=1e6?(n/1e6).toFixed(1)+"M":a>=1e3?Math.round(n/1e3)+"K":Math.round(n)};
+    let bars="",labels="";
+    data.forEach((d,i)=>{
+      const cx=i*gw+gw/2, bw=Math.min(gw*0.32,26);
+      const hTY=d.ty/maxV*bh, hLY=d.ly/maxV*bh;
+      const x1=cx-bw-2, x2=cx+2;
+      bars+='<rect x="'+x1+'" y="'+(pad+bh-hTY)+'" width="'+bw+'" height="'+hTY+'" rx="3" fill="'+cTY+'"><title>ปีนี้ '+th[d.m.slice(4,6)]+': '+fmtK(d.rawTY)+'</title></rect>';
+      bars+='<rect x="'+x2+'" y="'+(pad+bh-hLY)+'" width="'+bw+'" height="'+hLY+'" rx="3" fill="'+cLY+'"><title>ปีก่อน '+th[d.m.slice(4,6)]+': '+fmtK(d.rawLY)+'</title></rect>';
+      bars+='<text x="'+(x1+bw/2)+'" y="'+(pad+bh-hTY-4)+'" text-anchor="middle" font-size="8.5" font-weight="700" fill="'+cTY+'">'+fmtK(d.rawTY)+'</text>';
+      bars+='<text x="'+(x2+bw/2)+'" y="'+(pad+bh-hLY-4)+'" text-anchor="middle" font-size="8.5" font-weight="700" fill="'+cLY+'">'+fmtK(d.rawLY)+'</text>';
+      labels+='<text x="'+cx+'" y="'+(H-6)+'" text-anchor="middle" font-size="11" fill="#455a64">'+th[d.m.slice(4,6)]+'</text>';
+    });
+    return '<div style="min-width:'+W+'px"><svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'+bars+labels+'</svg></div>'
+      +'<div style="display:flex;gap:16px;font-size:11px;color:#607080;margin-top:4px"><span><span style="display:inline-block;width:10px;height:10px;background:'+cTY+';border-radius:2px;vertical-align:-1px"></span> ปีนี้ (TY)</span><span><span style="display:inline-block;width:10px;height:10px;background:'+cLY+';border-radius:2px;vertical-align:-1px"></span> ปีก่อน (LY)</span></div>';
+  }
+  document.getElementById("chartLoss").innerHTML=barChart("Loss",lossTY,lossLY,"#C0504D","#8fa3b0",true);
+  document.getElementById("chartSale").innerHTML=barChart("Sales",saleTY,saleLY,"#2E7D5B","#8fa3b0",false);
+}
 function renderTree(){
+  renderMonthBars();
   const nodes=buildTreeNodes();
   const cb=document.getElementById("treeCrumb");
   const levelName=["ฝ่าย","แผนก","สินค้า"];
@@ -522,6 +660,8 @@ function renderTree(){
 window.addEventListener("resize",()=>{if(curPage==="tree")renderTree()});
 
 function initRender(){buildMonths();buildDivs();fillDept();render();if(curPage==="tree")renderTree();}
+initRender();
+if(!DATA.length){document.getElementById("upStatus").textContent="👋 เริ่มต้น: กดปุ่ม \"อัปโหลดไฟล์ ADJ (Loss + GP)\" แล้วตามด้วย \"ยอดขายแยก\" (ถ้าต้องการดู % Loss)";}
 
 async function loadFromGitHub(){
   if(!GH_LOSS_URL && !GH_SALE_URL){initRender();return;}
@@ -542,7 +682,7 @@ async function loadFromGitHub(){
   if(okL||okS)status.textContent="✅ ข้อมูลล่าสุดจาก GitHub ("+DATA.length+" รายการ Loss · "+SALES.length+" ยอดขาย)";
   else status.textContent="⚠️ ยังไม่มีข้อมูล — ตรวจสอบว่าไฟล์ loss.csv / sale.csv อยู่บน GitHub แล้ว หรือกดปุ่มอัปโหลด CSV ด้านบน";
 }
-loadFromGitHub();
+// ไม่เรียก loadFromGitHub() แล้ว — ใช้อัปโหลดไฟล์ในเครื่องเท่านั้น เพื่อความปลอดภัยของข้อมูล
 </script>
 </body>
 </html>
