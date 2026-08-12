@@ -447,12 +447,12 @@ document.getElementById("saleIn").onchange=e=>{
   rd.readAsText(f,"UTF-8");
 };
 
-// ยอดขายรายวัน: ต้องการคอลัมน์วันที่ (SALE_DATE/DATE) + ยอด (SALE_AMT/AMOUNT)
+// ยอดขายรายวัน: ต้องการคอลัมน์วันที่ (PERIOD แบบ YYYYMMDD เหมือนไฟล์ ADJ, หรือ SALE_DATE/DATE) + ยอด (SALE_AMT/AMOUNT)
 function parseDailyRows(rows){
   if(!rows.length)return null;
   const hdr=rows[0].map(h=>norm(h).toUpperCase());
   const idx={};hdr.forEach((h,i)=>idx[h]=i);
-  const dateCol=["SALE_DATE","DATE","TRAN_DATE","BUSINESS_DATE"].find(c=>c in idx);
+  const dateCol=["PERIOD","SALE_DATE","DATE","TRAN_DATE","BUSINESS_DATE"].find(c=>c in idx);
   const amtCol=["SALE_AMT","AMOUNT","SALE_AMOUNT","AMT"].find(c=>c in idx);
   if(!dateCol||!amtCol)return null;
   const out=[];
@@ -472,7 +472,7 @@ document.getElementById("dailyIn").onchange=e=>{
   rd.onload=ev=>{
     try{
       const parsed=parseDailyRows(parseCSV(ev.target.result));
-      if(parsed===null){upStatus.textContent="⚠️ ไม่พบคอลัมน์วันที่/ยอดขาย (ต้องการ SALE_DATE และ SALE_AMT รูปแบบวันที่ YYYYMMDD)";return;}
+      if(parsed===null){upStatus.textContent="⚠️ ไม่พบคอลัมน์วันที่/ยอดขาย (ต้องการ PERIOD และ SALE_AMT รูปแบบวันที่ YYYYMMDD)";return;}
       if(!parsed.length){upStatus.textContent="⚠️ ไม่พบข้อมูลในไฟล์ยอดขายรายวัน";return;}
       const dates=new Set(parsed.map(p=>p.date));
       DAILY=DAILY.filter(d=>!dates.has(d.date)).concat(parsed);
