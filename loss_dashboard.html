@@ -172,7 +172,7 @@ const fMonth=document.getElementById("fMonth"),fDiv=document.getElementById("fDi
 function mMatch(period){
   const mo=fMonth.value;
   if(mo==="ALL")return true;
-  if(mo==="H1"){const mm=String(period).slice(4,6);return mm>="01"&&mm<="06";}
+  if(mo==="H1"){const mm=String(period).slice(4,6);return mm>="01"&&mm<="07";}
   return period===mo;
 }
 function thMonth(p){  const m={"01":"ม.ค.","02":"ก.พ.","03":"มี.ค.","04":"เม.ย.","05":"พ.ค.","06":"มิ.ย.","07":"ก.ค.","08":"ส.ค.","09":"ก.ย.","10":"ต.ค.","11":"พ.ย.","12":"ธ.ค."};
@@ -182,7 +182,7 @@ function thMonth(p){  const m={"01":"ม.ค.","02":"ก.พ.","03":"มี.ค.
 function buildMonths(){
   const ms=[...new Set(DATA.map(d=>d.period).filter(Boolean))].sort();
   let opts="<option value=ALL>ทุกเดือน</option>";
-  opts+='<option value="H1">YTD ครึ่งปีแรก (ม.ค.–มิ.ย.)</option>';
+  opts+='<option value="H1">YTD (ม.ค.–ก.ค.)</option>';
   opts+=ms.map(m=>'<option value="'+m+'">'+thMonth(m)+'</option>').join("");
   fMonth.innerHTML=opts;
 }
@@ -674,7 +674,7 @@ function renderTree(){
   function drill(i){const s=segs[i];if(s&&s.drill&&drillable){treePath.push(s.name);renderTree();}}
   lg.querySelectorAll(".lgrow").forEach(el=>el.onclick=()=>drill(+el.dataset.i));
   svgBox.querySelectorAll(".dseg").forEach(el=>{el.style.cursor=drillable&&segs[+el.dataset.i].drill?"pointer":"default";el.onclick=()=>drill(+el.dataset.i);});
-  document.getElementById("treeLegend").innerHTML='ขนาดวง = สัดส่วนยอด Loss · เดือน: '+(fMonth.value==="ALL"?"ทุกเดือน":(fMonth.value==="H1"?"ม.ค.–มิ.ย.":thMonth(fMonth.value)))+' · RTC เฉพาะยอดลบ · แสดง Top 20'+(rest.length?' + รวมที่เหลือเป็น "อื่นๆ"':'');
+  document.getElementById("treeLegend").innerHTML='ขนาดวง = สัดส่วนยอด Loss · เดือน: '+(fMonth.value==="ALL"?"ทุกเดือน":(fMonth.value==="H1"?"ม.ค.–ก.ค.":thMonth(fMonth.value)))+' · RTC เฉพาะยอดลบ · แสดง Top 20'+(rest.length?' + รวมที่เหลือเป็น "อื่นๆ"':'');
 }
 window.addEventListener("resize",()=>{if(curPage==="tree")renderTree()});
 
