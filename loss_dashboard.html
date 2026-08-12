@@ -44,7 +44,7 @@ table{width:100%;border-collapse:collapse;font-size:12.5px}
 th,td{text-align:left;padding:10px 8px;border-bottom:1px solid #eef1f4}
 th{color:#90a4ae;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.3px}
 tbody tr:hover{background:#fafbfc}
-td.num{text-align:right;font-variant-numeric:tabular-nums}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .neg{color:#C0504D;font-weight:600}.pos{color:#2E7D5B;font-weight:600}
 .pagenav{display:flex;gap:8px;margin-bottom:16px;background:#e3e9f0;padding:5px;border-radius:12px;width:fit-content}
 .pgbtn{display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;color:#5a708a;transition:all .15s}
@@ -97,17 +97,17 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 <input type="file" id="saleIn" accept=".csv,text/csv" style="display:none">
 <span id="upStatus" style="font-size:12px;color:#888"></span>
 </div>
+<div class="controls">
+<div class="ctl"><label>เดือน (Period)</label><select id="fMonth"></select></div>
+<div class="ctl"><label>ฝ่าย (Division)</label><select id="fDiv"></select></div>
+<div class="ctl"><label>แผนก (Department)</label><select id="fDept"></select></div>
+</div>
 <div class="pagenav" id="pagenav">
 <div class="pgbtn active" data-pg="dash"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg> แดชบอร์ด</div>
 <div class="pgbtn" data-pg="tree"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg> กราฟวงกลมเจาะลึก</div>
 <div class="pgbtn" data-pg="sale"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> ยอดขาย</div>
 </div>
 <div id="pageDash">
-<div class="controls">
-<div class="ctl"><label>เดือน (Period)</label><select id="fMonth"></select></div>
-<div class="ctl"><label>ฝ่าย (Division)</label><select id="fDiv"></select></div>
-<div class="ctl"><label>แผนก (Department)</label><select id="fDept"></select></div>
-</div>
 <div class="tabs" id="tabs">
 <div class="tab active" data-t="ALL">ทั้งหมด</div>
 <div class="tab" data-t="DAMAGE">DAMAGE</div>
