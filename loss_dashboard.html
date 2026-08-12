@@ -95,8 +95,6 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 <input type="file" id="adjIn" accept=".csv,text/csv" style="display:none">
 <label for="saleIn" class="upbtn" style="background:#6b7a8f;font-size:12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> ยอดขายแยก</label>
 <input type="file" id="saleIn" accept=".csv,text/csv" style="display:none">
-<label for="dailyIn" class="upbtn" style="background:#2E7D5B;font-size:12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> ยอดขายรายวัน</label>
-<input type="file" id="dailyIn" accept=".csv,text/csv" style="display:none">
 <span id="upStatus" style="font-size:12px;color:#888"></span>
 </div>
 <div class="pagenav" id="pagenav">
@@ -130,11 +128,6 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 <div id="chartSale" style="overflow-x:auto"></div>
 </div>
 <div class="sec" style="padding:16px">
-<h2 style="font-size:15px;margin:0 0 12px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2E7D5B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M8 3 3 21h18L14 3l-3 6-3-6z"/></svg> ยอดขายรายวัน (กราฟภูเขา)</h2>
-<div id="dailyChart" style="overflow-x:auto"></div>
-<div style="overflow-x:auto;margin-top:14px"><table id="dailyTbl"><thead><tr><th>วันที่</th><th class="num">ยอดขาย (฿)</th></tr></thead><tbody></tbody></table></div>
-</div>
-<div class="sec" style="padding:16px">
 <div id="treeCrumb" class="crumb"></div>
 <div id="donutWrap" style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start">
 <div id="donutSvg" style="flex-shrink:0"></div>
@@ -156,7 +149,6 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 <script>
 let DATA=[];
 let SALES=[];
-let DAILY=[];
 // ====== GitHub auto-sync config ======
 // วางลิงก์ raw ของไฟล์ CSV บน GitHub ตรงนี้ (กด Raw บนหน้าไฟล์ใน GitHub แล้วคัดลอก URL)
 // รูปแบบ: https://raw.githubusercontent.com/<user>/<repo>/main/loss.csv
@@ -447,42 +439,6 @@ document.getElementById("saleIn").onchange=e=>{
   rd.readAsText(f,"UTF-8");
 };
 
-// ยอดขายรายวัน: ต้องการคอลัมน์วันที่ (SALE_DATE/DATE) + ยอด (SALE_AMT/AMOUNT)
-function parseDailyRows(rows){
-  if(!rows.length)return null;
-  const hdr=rows[0].map(h=>norm(h).toUpperCase());
-  const idx={};hdr.forEach((h,i)=>idx[h]=i);
-  const dateCol=["SALE_DATE","DATE","TRAN_DATE","BUSINESS_DATE"].find(c=>c in idx);
-  const amtCol=["SALE_AMT","AMOUNT","SALE_AMOUNT","AMT"].find(c=>c in idx);
-  if(!dateCol||!amtCol)return null;
-  const out=[];
-  for(let r=1;r<rows.length;r++){
-    const row=rows[r];if(!row||row.length<2)continue;
-    const d=norm(row[idx[dateCol]]).replace(/[^0-9]/g,"");
-    if(d.length!==8)continue;
-    const amt=Math.round((+row[idx[amtCol]]||0)*100)/100;
-    out.push({date:d,period:d.slice(0,6),amt});
-  }
-  return out;
-}
-document.getElementById("dailyIn").onchange=e=>{
-  const f=e.target.files[0];if(!f)return;
-  upStatus.textContent="กำลังอ่านไฟล์ยอดขายรายวัน...";
-  const rd=new FileReader();
-  rd.onload=ev=>{
-    try{
-      const parsed=parseDailyRows(parseCSV(ev.target.result));
-      if(parsed===null){upStatus.textContent="⚠️ ไม่พบคอลัมน์วันที่/ยอดขาย (ต้องการ SALE_DATE และ SALE_AMT รูปแบบวันที่ YYYYMMDD)";return;}
-      if(!parsed.length){upStatus.textContent="⚠️ ไม่พบข้อมูลในไฟล์ยอดขายรายวัน";return;}
-      const dates=new Set(parsed.map(p=>p.date));
-      DAILY=DAILY.filter(d=>!dates.has(d.date)).concat(parsed);
-      if(curPage==="tree")renderDailyChart();
-      upStatus.textContent="✅ เพิ่มยอดขายรายวันแล้ว "+parsed.length+" รายการ ("+dates.size+" วัน)";
-    }catch(err){upStatus.textContent="⚠️ อ่านไฟล์ยอดขายรายวันไม่ได้: "+err.message;}
-  };
-  rd.readAsText(f,"UTF-8");
-};
-
 const overlay=document.getElementById("overlay");
 function openModal(type){
   const mo=fMonth.value,dv=fDiv.value,dp=fDept.value;
@@ -660,44 +616,8 @@ function renderMonthBars(){
   document.getElementById("chartLoss").innerHTML=barChart("Loss",lossTY,lossLY,"#C0504D","#8fa3b0",true);
   document.getElementById("chartSale").innerHTML=barChart("Sales",saleTY,saleLY,"#2E7D5B","#8fa3b0",false);
 }
-function renderDailyChart(){
-  const box=document.getElementById("dailyChart"),tbl=document.querySelector("#dailyTbl tbody");
-  const dmap={};
-  DAILY.filter(d=>mMatch(d.period)).forEach(d=>{dmap[d.date]=(dmap[d.date]||0)+d.amt;});
-  const dates=Object.keys(dmap).sort();
-  if(!dates.length){
-    box.innerHTML='<div class="muted">ไม่มีข้อมูลยอดขายรายวัน — กดปุ่ม "ยอดขายรายวัน" เพื่ออัปโหลด CSV (ต้องมีคอลัมน์ SALE_DATE และ SALE_AMT)</div>';
-    tbl.innerHTML='';
-    return;
-  }
-  const data=dates.map(d=>({date:d,amt:dmap[d]}));
-  const maxV=Math.max(...data.map(d=>d.amt),1);
-  const W=Math.max(data.length*46,320),H=220,pad=30,bh=H-pad-24,gw=W/data.length;
-  const fmtK=n=>{const a=Math.abs(n);return a>=1e6?(n/1e6).toFixed(1)+"M":a>=1e3?Math.round(n/1e3)+"K":Math.round(n)};
-  let pts="";
-  data.forEach((d,i)=>{
-    const x=i*gw+gw/2, y=pad+bh-(d.amt/maxV*bh);
-    pts+=x+","+y+" ";
-  });
-  const first=pad, last=W-pad;
-  const areaPts="M"+(0)+","+(pad+bh)+" L"+pts.trim().split(" ").join(" L")+" L"+W+","+(pad+bh)+" Z";
-  let labels="",dots="";
-  data.forEach((d,i)=>{
-    const x=i*gw+gw/2, y=pad+bh-(d.amt/maxV*bh);
-    const dd=d.date.slice(6,8);
-    if(data.length<=31||i%Math.ceil(data.length/31)===0)labels+='<text x="'+x+'" y="'+(H-6)+'" text-anchor="middle" font-size="10" fill="#607080">'+dd+'</text>';
-    dots+='<circle cx="'+x+'" cy="'+y+'" r="2.5" fill="#2E7D5B"><title>'+d.date+': '+fmt(d.amt)+' ฿</title></circle>';
-  });
-  box.innerHTML='<div style="min-width:'+W+'px"><svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'
-    +'<path d="'+areaPts+'" fill="rgba(46,125,91,.18)" stroke="#2E7D5B" stroke-width="2"/>'
-    +dots+labels+'</svg></div>';
-  const totAmt=data.reduce((s,d)=>s+d.amt,0);
-  tbl.innerHTML=data.slice().reverse().map(d=>'<tr><td>'+d.date.slice(0,4)+'-'+d.date.slice(4,6)+'-'+d.date.slice(6,8)+'</td><td class="num" style="color:#2E7D5B">'+fmt(d.amt)+'</td></tr>').join("")
-    +'<tr style="border-top:2px solid #eceff1;font-weight:800"><td>รวม '+data.length+' วัน</td><td class="num">'+fmt(totAmt)+'</td></tr>';
-}
 function renderTree(){
   renderMonthBars();
-  renderDailyChart();
   const nodes=buildTreeNodes();
   const cb=document.getElementById("treeCrumb");
   const levelName=["ฝ่าย","แผนก","สินค้า"];
