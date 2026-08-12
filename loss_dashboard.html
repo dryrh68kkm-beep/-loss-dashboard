@@ -121,7 +121,7 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 </div>
 <div id="pageSale" style="display:none">
 <div class="cards" id="saleCards"></div>
-<div class="sec"><h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2E7D5B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> ยอดขายแยกตามแผนก (Top 12)</h2><div id="saleDeptBars"></div></div>
+<div class="sec"><h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2E7D5B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> ยอดขายแยกตามฝ่าย/แผนก (Top 12)</h2><div id="saleDeptCrumb" class="crumb"></div><div id="saleDeptBars"></div></div>
 <div class="sec"><h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2E7D5B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> ยอดขายแยกตามสินค้า (Top 20) · เทียบปีก่อน (LY)<select id="saleItemFilter" style="margin-left:auto;width:auto;padding:6px 10px;font-size:12px;font-weight:600;border:1.5px solid #dde3e8;border-radius:8px;background:#fff;color:#455a64"><option value="ALL">ทั้งหมด</option><option value="UP">สูงกว่าปีก่อน</option><option value="DOWN">ต่ำกว่าปีก่อน</option></select></h2><div style="overflow-x:auto"><table id="saleItemTbl"><thead><tr>
 <th class="sortHdr" data-f="bc" style="cursor:pointer;user-select:none">Barcode <span class="arrow"></span></th>
 <th class="sortHdr" data-f="name" style="cursor:pointer;user-select:none">สินค้า <span class="arrow"></span></th>
@@ -170,6 +170,7 @@ const GH_LOSS_URL = "";
 const GH_SALE_URL = "";
 let curType="ALL";
 let itemSortDir="asc";
+let saleBarPath=[]; // [] = divisions, [div] = depts of div
 let saleSortField="samt";
 let saleSortDir="desc";
 let itemArr=[];
@@ -333,22 +334,7 @@ function renderSalePage(){
   const g=yoy(totSale,totSaleLY,false);
   document.getElementById("saleCards").innerHTML='<div class="card q clickable" data-card="SALES">'+icw('SALES','#e7f4ee','#2E7D5B')+'<div class="lbl">ยอดขายรวม</div><div class="val" style="color:'+scol(totSale)+'">'+fmt(totSale)+' ฿</div>'+g.html+'<div class="tap">แตะดูแยกฝ่าย ›</div></div>';
   document.querySelectorAll("#saleCards .card.clickable").forEach(c=>c.onclick=()=>openSalesModal(fMonth.value,dv,dp));
-  const dmap={};
-  saleRows.forEach(r=>{
-    if(!dmap[r.dept])dmap[r.dept]={ty:0,ly:0};
-    dmap[r.dept].ty+=r.samt; dmap[r.dept].ly+=r.samtLY;
-  });
-  const darr=Object.entries(dmap).sort((a,b)=>b[1].ty-a[1].ty).slice(0,12);
-  const maxAbs=Math.max(...darr.map(d=>Math.max(Math.abs(d[1].ty),Math.abs(d[1].ly))),1);
-  document.getElementById("saleDeptBars").innerHTML=darr.length?darr.map(d=>{
-    const ty=d[1].ty,ly=d[1].ly,diff=ty-ly;
-    const pct=ly!==0?(diff/Math.abs(ly)*100):(ty!==0?null:0);
-    const pctTxt=pct==null?"n/a":(pct>=0?"+":"")+pct.toFixed(1)+"%";
-    const dCol=diff===0?"#90a4ae":(diff>=0?"#2E7D5B":"#C0504D");
-    return '<div class="bar-row"><div class="br-top"><span class="nm">'+d[0]+'</span><span class="amt" style="color:#2E7D5B">'+fmt(ty)+' ฿</span></div>'
-      +'<div class="bar-bg"><div class="bar-fill" style="width:'+(Math.abs(ty)/maxAbs*100)+'%;background:linear-gradient(90deg,#2E7D5B,#4F81BD)"></div></div>'
-      +'<div style="display:flex;justify-content:space-between;margin-top:3px"><span class="lyline">ปีก่อน: '+fmt(ly)+' ฿</span><span class="lyline" style="color:'+dCol+';font-weight:700">'+(diff>=0?"+":"")+fmt(diff)+' ('+pctTxt+')</span></div></div>';
-  }).join(""):'<div class=muted>ไม่มีข้อมูล</div>';
+  renderSaleDeptBars(saleRows);
   const imap={};
   saleRows.forEach(r=>{
     const k=(r.bc||"")+"|"+(r.name||"(ไม่มีชื่อ)");
@@ -381,6 +367,36 @@ function renderSalePage(){
     const pctTxt=r.pct==null?"n/a":(r.pct>=0?"+":"")+r.pct.toFixed(1)+"%";
     return '<tr><td style="font-variant-numeric:tabular-nums;color:#888">'+r.bc+'</td><td>'+r.name+'</td><td class="num" style="color:#2E7D5B">'+fmt(r.samt)+'</td><td class="num" style="color:#90a4ae">'+fmt(r.samtLY)+'</td><td class="num '+(diff<0?'neg':'pos')+'">'+(diff>=0?"+":"")+fmt(diff)+'</td><td class="num '+(diff<0?'neg':'pos')+'">'+pctTxt+'</td></tr>';
   }).join(""):'<tr><td colspan=6 class=muted>ไม่มีข้อมูล</td></tr>';
+}
+function renderSaleDeptBars(saleRows){
+  const cb=document.getElementById("saleDeptCrumb");
+  let cH='<span class="cb" data-lvl="0">ทุกฝ่าย</span>';
+  saleBarPath.forEach((p,i)=>{cH+='<span class="sep">›</span>'+((i<saleBarPath.length-1)?('<span class="cb" data-lvl="'+(i+1)+'">'+p+'</span>'):('<span class="cur">'+p+'</span>'));});
+  cb.innerHTML=cH;
+  cb.querySelectorAll(".cb").forEach(el=>el.onclick=()=>{saleBarPath=saleBarPath.slice(0,+el.dataset.lvl);renderSaleDeptBars(saleRows);});
+  const drillable=saleBarPath.length<1;
+  const groupKey=saleBarPath.length===0?"div":"dept";
+  const rows=saleBarPath.length===0?saleRows:saleRows.filter(r=>r.div===saleBarPath[0]);
+  const dmap={};
+  rows.forEach(r=>{
+    const k=r[groupKey];
+    if(!dmap[k])dmap[k]={ty:0,ly:0};
+    dmap[k].ty+=r.samt; dmap[k].ly+=r.samtLY;
+  });
+  const darr=Object.entries(dmap).sort((a,b)=>b[1].ty-a[1].ty).slice(0,12);
+  const maxAbs=Math.max(...darr.map(d=>Math.max(Math.abs(d[1].ty),Math.abs(d[1].ly))),1);
+  document.getElementById("saleDeptBars").innerHTML=darr.length?darr.map(d=>{
+    const ty=d[1].ty,ly=d[1].ly,diff=ty-ly;
+    const pct=ly!==0?(diff/Math.abs(ly)*100):(ty!==0?null:0);
+    const pctTxt=pct==null?"n/a":(pct>=0?"+":"")+pct.toFixed(1)+"%";
+    const dCol=diff===0?"#90a4ae":(diff>=0?"#2E7D5B":"#C0504D");
+    return '<div class="bar-row" data-k="'+d[0]+'" style="'+(drillable?'cursor:pointer':'')+'"><div class="br-top"><span class="nm">'+d[0]+(drillable?' <span style="color:#2E6CA4;font-size:10px">›</span>':'')+'</span><span class="amt" style="color:#2E7D5B">'+fmt(ty)+' ฿</span></div>'
+      +'<div class="bar-bg"><div class="bar-fill" style="width:'+(Math.abs(ty)/maxAbs*100)+'%;background:linear-gradient(90deg,#2E7D5B,#4F81BD)"></div></div>'
+      +'<div style="display:flex;justify-content:space-between;margin-top:3px"><span class="lyline">ปีก่อน: '+fmt(ly)+' ฿</span><span class="lyline" style="color:'+dCol+';font-weight:700">'+(diff>=0?"+":"")+fmt(diff)+' ('+pctTxt+')</span></div></div>';
+  }).join(""):'<div class=muted>ไม่มีข้อมูล</div>';
+  if(drillable){
+    document.querySelectorAll("#saleDeptBars .bar-row").forEach(el=>el.onclick=()=>{saleBarPath=[el.dataset.k];renderSaleDeptBars(saleRows);});
+  }
 }
 fMonth.onchange=()=>{buildDivs();fillDept();render();if(curPage==="tree")renderTree()};
 fDiv.onchange=()=>{fillDept();render()};
