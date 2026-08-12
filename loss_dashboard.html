@@ -122,7 +122,7 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 <div id="pageSale" style="display:none">
 <div class="cards" id="saleCards"></div>
 <div class="sec"><h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2E7D5B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> ยอดขายแยกตามแผนก (Top 12)</h2><div id="saleDeptBars"></div></div>
-<div class="sec"><h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2E7D5B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> ยอดขายแยกตามสินค้า (Top 20) · เทียบปีก่อน (LY)</h2><div style="overflow-x:auto"><table id="saleItemTbl"><thead><tr><th>Barcode</th><th>สินค้า</th><th class="num">ยอดขาย (฿)</th><th class="num">ปีก่อน (฿)</th><th class="num">ผลต่าง</th><th class="num">%</th></tr></thead><tbody></tbody></table></div></div>
+<div class="sec"><h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2E7D5B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> ยอดขายแยกตามสินค้า (Top 20) · เทียบปีก่อน (LY)<select id="saleItemFilter" style="margin-left:auto;width:auto;padding:6px 10px;font-size:12px;font-weight:600;border:1.5px solid #dde3e8;border-radius:8px;background:#fff;color:#455a64"><option value="ALL">ทั้งหมด</option><option value="UP">สูงกว่าปีก่อน</option><option value="DOWN">ต่ำกว่าปีก่อน</option></select></h2><div style="overflow-x:auto"><table id="saleItemTbl"><thead><tr><th>Barcode</th><th>สินค้า</th><th class="num">ยอดขาย (฿)</th><th class="num">ปีก่อน (฿)</th><th class="num">ผลต่าง</th><th class="num">%</th></tr></thead><tbody></tbody></table></div></div>
 </div>
 <div id="pageTree" style="display:none">
 <div class="sec" style="padding:16px">
@@ -322,7 +322,8 @@ function renderSalePage(){
   const totSale=saleRows.reduce((s,r)=>s+r.samt,0);
   const totSaleLY=saleRows.reduce((s,r)=>s+r.samtLY,0);
   const g=yoy(totSale,totSaleLY,false);
-  document.getElementById("saleCards").innerHTML='<div class="card q">'+icw('SALES','#e7f4ee','#2E7D5B')+'<div class="lbl">ยอดขายรวม</div><div class="val" style="color:'+scol(totSale)+'">'+fmt(totSale)+' ฿</div>'+g.html+'</div>';
+  document.getElementById("saleCards").innerHTML='<div class="card q clickable" data-card="SALES">'+icw('SALES','#e7f4ee','#2E7D5B')+'<div class="lbl">ยอดขายรวม</div><div class="val" style="color:'+scol(totSale)+'">'+fmt(totSale)+' ฿</div>'+g.html+'<div class="tap">แตะดูแยกฝ่าย ›</div></div>';
+  document.querySelectorAll("#saleCards .card.clickable").forEach(c=>c.onclick=()=>openSalesModal(fMonth.value,dv,dp));
   const dmap={};
   saleRows.forEach(r=>{dmap[r.dept]=(dmap[r.dept]||0)+r.samt;});
   const darr=Object.entries(dmap).sort((a,b)=>b[1]-a[1]).slice(0,12);
@@ -334,7 +335,11 @@ function renderSalePage(){
     if(!imap[k])imap[k]={bc:r.bc,name:r.name||"(ไม่มีชื่อ)",samt:0,samtLY:0};
     imap[k].samt+=r.samt; imap[k].samtLY+=r.samtLY;
   });
-  const iarr=Object.values(imap).sort((a,b)=>b.samt-a.samt).slice(0,20);
+  const itemFilter=document.getElementById("saleItemFilter").value;
+  let iarr=Object.values(imap);
+  if(itemFilter==="UP")iarr=iarr.filter(r=>r.samt>r.samtLY);
+  else if(itemFilter==="DOWN")iarr=iarr.filter(r=>r.samt<r.samtLY);
+  iarr=iarr.sort((a,b)=>b.samt-a.samt).slice(0,20);
   document.querySelector("#saleItemTbl tbody").innerHTML=iarr.length?iarr.map(r=>{
     const diff=r.samt-r.samtLY;
     const pct=r.samtLY!==0?(diff/Math.abs(r.samtLY)*100):(r.samt!==0?null:0);
@@ -345,6 +350,7 @@ function renderSalePage(){
 fMonth.onchange=()=>{buildDivs();fillDept();render();if(curPage==="tree")renderTree()};
 fDiv.onchange=()=>{fillDept();render()};
 fDept.onchange=render;
+document.getElementById("saleItemFilter").onchange=renderSalePage;
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");curType=t.dataset.t;render()});
 
 function norm(s){return String(s==null?"":s).trim()}
