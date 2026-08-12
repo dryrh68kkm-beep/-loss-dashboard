@@ -100,6 +100,7 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 <div class="pagenav" id="pagenav">
 <div class="pgbtn active" data-pg="dash"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg> แดชบอร์ด</div>
 <div class="pgbtn" data-pg="tree"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg> กราฟวงกลมเจาะลึก</div>
+<div class="pgbtn" data-pg="sale"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> ยอดขาย</div>
 </div>
 <div id="pageDash">
 <div class="controls">
@@ -117,6 +118,10 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 <div id="codeTop"></div>
 <div class="sec"><h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2E6CA4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Loss แยกตามแผนก (Top 12)</h2><div id="deptBars"></div></div>
 <div class="sec"><h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2E6CA4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.5 4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> สินค้า Loss สูงสุด (Top 20) · DAMAGE+RTC+SHRINK</h2><div style="overflow-x:auto"><table id="itemTbl"><thead><tr><th>Barcode</th><th>สินค้า</th><th class="num">จำนวน</th><th class="num" id="amtHdr" style="cursor:pointer;user-select:none">รวม Loss (฿) <span id="amtArrow">↑</span></th></tr></thead><tbody></tbody></table></div></div>
+</div>
+<div id="pageSale" style="display:none">
+<div class="cards" id="saleCards"></div>
+<div class="sec"><h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2E7D5B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> ยอดขายแยกตามแผนก (Top 12)</h2><div id="saleDeptBars"></div></div>
 <div class="sec"><h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2E7D5B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> ยอดขายแยกตามสินค้า (Top 20) · เทียบปีก่อน (LY)</h2><div style="overflow-x:auto"><table id="saleItemTbl"><thead><tr><th>Barcode</th><th>สินค้า</th><th class="num">ยอดขาย (฿)</th><th class="num">ปีก่อน (฿)</th><th class="num">ผลต่าง</th><th class="num">%</th></tr></thead><tbody></tbody></table></div></div>
 </div>
 <div id="pageTree" style="display:none">
@@ -270,8 +275,6 @@ function render(){
   const totSaleLY=saleRows.reduce((s,r)=>s+r.samtLY,0);
   const lossPct=totSale!==0?(totA/totSale*100):null; // keep sign: loss is negative -> negative %
   const lossPctLY=totSaleLY!==0?(totALY/totSaleLY*100):null;
-  const gSale=yoy(totSale,totSaleLY,false);
-  let saleCard='<div class="card q clickable" data-card="SALES">'+icw('SALES','#e7f4ee','#2E7D5B')+'<div class="lbl">ยอดขาย (Sales)</div><div class="val" style="color:'+scol(totSale)+'">'+fmt(totSale)+' ฿</div>'+gSale.html+'<div class="tap">แตะดูแยกแผนก ›</div></div>';
   // % Loss card with YoY (percentage points)
   let pctHtml="";
   if(lossPct!=null){
@@ -284,7 +287,7 @@ function render(){
   let pctCard='<div class="card">'+icw('PCT','#f0eef7','#7B5EA7')+'<div class="lbl">% Loss / ยอดขาย</div><div class="val" style="color:'+(lossPct!=null?scol(lossPct):"#7B5EA7")+'">'+(lossPct!=null?lossPct.toFixed(2)+'%':'-')+'</div>'+pctHtml+'</div>';
   const gTot=yoy(totA,totALY,true);
   if(curType==="ALL"){
-    cardsH=cardsH+'<div class="card">'+icw('TOTAL','#eaf1fb','#1F497D')+'<div class="lbl">รวมยอด Loss</div><div class="val" style="color:'+scol(totA)+'">'+fmt(totA)+' ฿</div>'+gTot.html+'</div>'+saleCard+pctCard;
+    cardsH=cardsH+'<div class="card">'+icw('TOTAL','#eaf1fb','#1F497D')+'<div class="lbl">รวมยอด Loss</div><div class="val" style="color:'+scol(totA)+'">'+fmt(totA)+' ฿</div>'+gTot.html+'</div>'+pctCard;
   }
   document.getElementById("cards").innerHTML=cardsH;
   document.getElementById("codeTop").innerHTML="";
@@ -311,19 +314,28 @@ function render(){
   itemArr=Object.values(imap).sort((a,b)=>itemSortDir==="asc"?a.amt-b.amt:b.amt-a.amt).slice(0,20);
   document.querySelector("#itemTbl tbody").innerHTML=itemArr.length?itemArr.map((r,i)=>'<tr class="itemRow" data-i="'+i+'" style="cursor:pointer"><td style="font-variant-numeric:tabular-nums;color:#888">'+r.bc+'</td><td>'+r.name+' <span style="color:#2E6CA4;font-size:10px">›</span></td><td class="num">'+r.qty.toLocaleString('th-TH',{maximumFractionDigits:2})+'</td><td class="num '+(r.amt<0?'neg':'pos')+'">'+fmt(r.amt)+'</td></tr>').join(""):'<tr><td colspan=4 class=muted>ไม่มีข้อมูล</td></tr>';
   document.querySelectorAll(".itemRow").forEach(el=>el.onclick=()=>openItemModal(itemArr[+el.dataset.i]));
-  renderSaleItems();
+  renderSalePage();
 }
-function renderSaleItems(){
-  const mo=fMonth.value,dv=fDiv.value,dp=fDept.value;
-  const rows=SALES.filter(d=>(mMatch(d.period))&&(dv=="ALL"||d.div==dv)&&(dp=="ALL"||d.dept==dp));
-  const smap={};
-  rows.forEach(r=>{
+function renderSalePage(){
+  const dv=fDiv.value,dp=fDept.value;
+  const saleRows=SALES.filter(d=>(mMatch(d.period))&&(dv=="ALL"||d.div==dv)&&(dp=="ALL"||d.dept==dp));
+  const totSale=saleRows.reduce((s,r)=>s+r.samt,0);
+  const totSaleLY=saleRows.reduce((s,r)=>s+r.samtLY,0);
+  const g=yoy(totSale,totSaleLY,false);
+  document.getElementById("saleCards").innerHTML='<div class="card q">'+icw('SALES','#e7f4ee','#2E7D5B')+'<div class="lbl">ยอดขายรวม</div><div class="val" style="color:'+scol(totSale)+'">'+fmt(totSale)+' ฿</div>'+g.html+'</div>';
+  const dmap={};
+  saleRows.forEach(r=>{dmap[r.dept]=(dmap[r.dept]||0)+r.samt;});
+  const darr=Object.entries(dmap).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const maxAbs=Math.max(...darr.map(d=>Math.abs(d[1])),1);
+  document.getElementById("saleDeptBars").innerHTML=darr.length?darr.map(d=>'<div class="bar-row"><div class="br-top"><span class="nm">'+d[0]+'</span><span class="amt" style="color:#2E7D5B">'+fmt(d[1])+' ฿</span></div><div class="bar-bg"><div class="bar-fill" style="width:'+(Math.abs(d[1])/maxAbs*100)+'%;background:linear-gradient(90deg,#2E7D5B,#4F81BD)"></div></div></div>').join(""):'<div class=muted>ไม่มีข้อมูล</div>';
+  const imap={};
+  saleRows.forEach(r=>{
     const k=(r.bc||"")+"|"+(r.name||"(ไม่มีชื่อ)");
-    if(!smap[k])smap[k]={bc:r.bc,name:r.name||"(ไม่มีชื่อ)",samt:0,samtLY:0};
-    smap[k].samt+=r.samt; smap[k].samtLY+=r.samtLY;
+    if(!imap[k])imap[k]={bc:r.bc,name:r.name||"(ไม่มีชื่อ)",samt:0,samtLY:0};
+    imap[k].samt+=r.samt; imap[k].samtLY+=r.samtLY;
   });
-  const arr=Object.values(smap).sort((a,b)=>b.samt-a.samt).slice(0,20);
-  document.querySelector("#saleItemTbl tbody").innerHTML=arr.length?arr.map(r=>{
+  const iarr=Object.values(imap).sort((a,b)=>b.samt-a.samt).slice(0,20);
+  document.querySelector("#saleItemTbl tbody").innerHTML=iarr.length?iarr.map(r=>{
     const diff=r.samt-r.samtLY;
     const pct=r.samtLY!==0?(diff/Math.abs(r.samtLY)*100):(r.samt!==0?null:0);
     const pctTxt=pct==null?"n/a":(pct>=0?"+":"")+pct.toFixed(1)+"%";
@@ -564,6 +576,7 @@ document.querySelectorAll(".pgbtn").forEach(b=>b.onclick=()=>{
   b.classList.add("active");
   curPage=b.dataset.pg;
   document.getElementById("pageDash").style.display=curPage==="dash"?"":"none";
+  document.getElementById("pageSale").style.display=curPage==="sale"?"":"none";
   document.getElementById("pageTree").style.display=curPage==="tree"?"":"none";
   document.getElementById("tabs").style.display=curPage==="dash"?"":"none";
   if(curPage==="tree")renderTree();
