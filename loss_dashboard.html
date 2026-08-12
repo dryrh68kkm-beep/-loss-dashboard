@@ -117,6 +117,7 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 <div id="codeTop"></div>
 <div class="sec"><h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2E6CA4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Loss แยกตามแผนก (Top 12)</h2><div id="deptBars"></div></div>
 <div class="sec"><h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2E6CA4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.5 4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> สินค้า Loss สูงสุด (Top 20) · DAMAGE+RTC+SHRINK</h2><div style="overflow-x:auto"><table id="itemTbl"><thead><tr><th>Barcode</th><th>สินค้า</th><th class="num">จำนวน</th><th class="num" id="amtHdr" style="cursor:pointer;user-select:none">รวม Loss (฿) <span id="amtArrow">↑</span></th></tr></thead><tbody></tbody></table></div></div>
+<div class="sec"><h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2E7D5B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> ยอดขายแยกตามสินค้า (Top 20) · เทียบปีก่อน (LY)</h2><div style="overflow-x:auto"><table id="saleItemTbl"><thead><tr><th>Barcode</th><th>สินค้า</th><th class="num">ยอดขาย (฿)</th><th class="num">ปีก่อน (฿)</th><th class="num">ผลต่าง</th><th class="num">%</th></tr></thead><tbody></tbody></table></div></div>
 </div>
 <div id="pageTree" style="display:none">
 <div class="sec" style="padding:16px">
@@ -310,6 +311,24 @@ function render(){
   itemArr=Object.values(imap).sort((a,b)=>itemSortDir==="asc"?a.amt-b.amt:b.amt-a.amt).slice(0,20);
   document.querySelector("#itemTbl tbody").innerHTML=itemArr.length?itemArr.map((r,i)=>'<tr class="itemRow" data-i="'+i+'" style="cursor:pointer"><td style="font-variant-numeric:tabular-nums;color:#888">'+r.bc+'</td><td>'+r.name+' <span style="color:#2E6CA4;font-size:10px">›</span></td><td class="num">'+r.qty.toLocaleString('th-TH',{maximumFractionDigits:2})+'</td><td class="num '+(r.amt<0?'neg':'pos')+'">'+fmt(r.amt)+'</td></tr>').join(""):'<tr><td colspan=4 class=muted>ไม่มีข้อมูล</td></tr>';
   document.querySelectorAll(".itemRow").forEach(el=>el.onclick=()=>openItemModal(itemArr[+el.dataset.i]));
+  renderSaleItems();
+}
+function renderSaleItems(){
+  const mo=fMonth.value,dv=fDiv.value,dp=fDept.value;
+  const rows=SALES.filter(d=>(mMatch(d.period))&&(dv=="ALL"||d.div==dv)&&(dp=="ALL"||d.dept==dp));
+  const smap={};
+  rows.forEach(r=>{
+    const k=(r.bc||"")+"|"+(r.name||"(ไม่มีชื่อ)");
+    if(!smap[k])smap[k]={bc:r.bc,name:r.name||"(ไม่มีชื่อ)",samt:0,samtLY:0};
+    smap[k].samt+=r.samt; smap[k].samtLY+=r.samtLY;
+  });
+  const arr=Object.values(smap).sort((a,b)=>b.samt-a.samt).slice(0,20);
+  document.querySelector("#saleItemTbl tbody").innerHTML=arr.length?arr.map(r=>{
+    const diff=r.samt-r.samtLY;
+    const pct=r.samtLY!==0?(diff/Math.abs(r.samtLY)*100):(r.samt!==0?null:0);
+    const pctTxt=pct==null?"n/a":(pct>=0?"+":"")+pct.toFixed(1)+"%";
+    return '<tr><td style="font-variant-numeric:tabular-nums;color:#888">'+r.bc+'</td><td>'+r.name+'</td><td class="num" style="color:#2E7D5B">'+fmt(r.samt)+'</td><td class="num" style="color:#90a4ae">'+fmt(r.samtLY)+'</td><td class="num '+(diff<0?'neg':'pos')+'">'+(diff>=0?"+":"")+fmt(diff)+'</td><td class="num '+(diff<0?'neg':'pos')+'">'+pctTxt+'</td></tr>';
+  }).join(""):'<tr><td colspan=6 class=muted>ไม่มีข้อมูล</td></tr>';
 }
 fMonth.onchange=()=>{buildDivs();fillDept();render();if(curPage==="tree")renderTree()};
 fDiv.onchange=()=>{fillDept();render()};
@@ -395,7 +414,7 @@ function parseSaleRows(rows){
     const row=rows[r];if(!row||row.length<2)continue;
     const div=norm(row[idx["DIVISION_NAME"]]),dept=canonSale(norm(row[idx["DEPT_GROUP_NAME"]]),div);
     if(!div||!dept)continue;
-    out.push({period:("PERIOD" in idx)?norm(row[idx["PERIOD"]]):"",div,dept,samt:Math.round((+row[idx["SALE_AMT"]]||0)*100)/100,sqty:("SALE_QTY" in idx)?Math.round((+row[idx["SALE_QTY"]]||0)*100)/100:0,samtLY:("SALE_AMT_LY" in idx)?Math.round((+row[idx["SALE_AMT_LY"]]||0)*100)/100:0,sqtyLY:("SALE_QTY_LY" in idx)?Math.round((+row[idx["SALE_QTY_LY"]]||0)*100)/100:0,gp:("GP_AMT" in idx)?Math.round((+row[idx["GP_AMT"]]||0)*100)/100:0});
+    out.push({period:("PERIOD" in idx)?norm(row[idx["PERIOD"]]):"",div,dept,bc:("BARCODE" in idx)?norm(row[idx["BARCODE"]]):"",name:("ART_SV_NAME" in idx)?norm(row[idx["ART_SV_NAME"]]):"",samt:Math.round((+row[idx["SALE_AMT"]]||0)*100)/100,sqty:("SALE_QTY" in idx)?Math.round((+row[idx["SALE_QTY"]]||0)*100)/100:0,samtLY:("SALE_AMT_LY" in idx)?Math.round((+row[idx["SALE_AMT_LY"]]||0)*100)/100:0,sqtyLY:("SALE_QTY_LY" in idx)?Math.round((+row[idx["SALE_QTY_LY"]]||0)*100)/100:0,gp:("GP_AMT" in idx)?Math.round((+row[idx["GP_AMT"]]||0)*100)/100:0});
   }
   return out;
 }
