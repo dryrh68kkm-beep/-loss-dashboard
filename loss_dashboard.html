@@ -330,8 +330,17 @@ function renderSalePage(){
   const saleRows=SALES.filter(d=>(mMatch(d.period))&&(dv=="ALL"||d.div==dv)&&(dp=="ALL"||d.dept==dp));
   const totSale=saleRows.reduce((s,r)=>s+r.samt,0);
   const totSaleLY=saleRows.reduce((s,r)=>s+r.samtLY,0);
+  const totQty=saleRows.reduce((s,r)=>s+r.sqty,0);
+  const totQtyLY=saleRows.reduce((s,r)=>s+r.sqtyLY,0);
   const g=yoy(totSale,totSaleLY,false);
-  document.getElementById("saleCards").innerHTML='<div class="card q clickable" data-card="SALES">'+icw('SALES','#e7f4ee','#2E7D5B')+'<div class="lbl">ยอดขายรวม</div><div class="val" style="color:'+scol(totSale)+'">'+fmt(totSale)+' ฿</div>'+g.html+'<div class="tap">แตะดูแยกฝ่าย ›</div></div>';
+  const qDiff=totQty-totQtyLY;
+  const qPct=totQtyLY!==0?(qDiff/Math.abs(totQtyLY)*100):(totQty!==0?null:0);
+  const qArrow=qDiff>0?"▲":(qDiff<0?"▼":"–");
+  const qCol=qDiff===0?"#90a4ae":(qDiff>=0?"#2E7D5B":"#C0504D");
+  const qPctTxt=qPct==null?"n/a":(qPct>=0?"+":"")+qPct.toFixed(1)+"%";
+  const qHtml='<div class="yoyline" style="color:'+qCol+'">'+qArrow+' '+(qDiff>=0?"+":"")+fmt(qDiff)+' ชิ้น <span class="yoypct">('+qPctTxt+')</span></div><div class="lyline">ปีก่อน: '+fmt(totQtyLY)+' ชิ้น</div>';
+  document.getElementById("saleCards").innerHTML='<div class="card q clickable" data-card="SALES">'+icw('SALES','#e7f4ee','#2E7D5B')+'<div class="lbl">ยอดขายรวม</div><div class="val" style="color:'+scol(totSale)+'">'+fmt(totSale)+' ฿</div>'+g.html+'<div class="tap">แตะดูแยกฝ่าย ›</div></div>'
+    +'<div class="card q">'+icw('TOTAL','#eaf1fb','#1F497D')+'<div class="lbl">จำนวนขาย</div><div class="val" style="color:#37474f">'+fmt(totQty)+' ชิ้น</div>'+qHtml+'</div>';
   document.querySelectorAll("#saleCards .card.clickable").forEach(c=>c.onclick=()=>openSalesModal(fMonth.value,dv,dp));
   const dmap={};
   saleRows.forEach(r=>{dmap[r.dept]=(dmap[r.dept]||0)+r.samt;});
