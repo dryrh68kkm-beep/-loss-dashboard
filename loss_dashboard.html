@@ -122,7 +122,14 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 <div id="pageSale" style="display:none">
 <div class="cards" id="saleCards"></div>
 <div class="sec"><h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2E7D5B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> ยอดขายแยกตามแผนก (Top 12)</h2><div id="saleDeptBars"></div></div>
-<div class="sec"><h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2E7D5B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> ยอดขายแยกตามสินค้า (Top 20) · เทียบปีก่อน (LY)<select id="saleItemFilter" style="margin-left:auto;width:auto;padding:6px 10px;font-size:12px;font-weight:600;border:1.5px solid #dde3e8;border-radius:8px;background:#fff;color:#455a64"><option value="ALL">ทั้งหมด</option><option value="UP">สูงกว่าปีก่อน</option><option value="DOWN">ต่ำกว่าปีก่อน</option></select></h2><div style="overflow-x:auto"><table id="saleItemTbl"><thead><tr><th>Barcode</th><th>สินค้า</th><th class="num">ยอดขาย (฿)</th><th class="num">ปีก่อน (฿)</th><th class="num" id="diffHdr" style="cursor:pointer;user-select:none">ผลต่าง <span id="diffArrow"></span></th><th class="num">%</th></tr></thead><tbody></tbody></table></div></div>
+<div class="sec"><h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2E7D5B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> ยอดขายแยกตามสินค้า (Top 20) · เทียบปีก่อน (LY)<select id="saleItemFilter" style="margin-left:auto;width:auto;padding:6px 10px;font-size:12px;font-weight:600;border:1.5px solid #dde3e8;border-radius:8px;background:#fff;color:#455a64"><option value="ALL">ทั้งหมด</option><option value="UP">สูงกว่าปีก่อน</option><option value="DOWN">ต่ำกว่าปีก่อน</option></select></h2><div style="overflow-x:auto"><table id="saleItemTbl"><thead><tr>
+<th class="sortHdr" data-f="bc" style="cursor:pointer;user-select:none">Barcode <span class="arrow"></span></th>
+<th class="sortHdr" data-f="name" style="cursor:pointer;user-select:none">สินค้า <span class="arrow"></span></th>
+<th class="num sortHdr" data-f="samt" style="cursor:pointer;user-select:none">ยอดขาย (฿) <span class="arrow"></span></th>
+<th class="num sortHdr" data-f="samtLY" style="cursor:pointer;user-select:none">ปีก่อน (฿) <span class="arrow"></span></th>
+<th class="num sortHdr" data-f="diff" style="cursor:pointer;user-select:none">ผลต่าง <span class="arrow"></span></th>
+<th class="num sortHdr" data-f="pct" style="cursor:pointer;user-select:none">% <span class="arrow"></span></th>
+</tr></thead><tbody></tbody></table></div></div>
 </div>
 <div id="pageTree" style="display:none">
 <div class="sec" style="padding:16px">
@@ -338,15 +345,29 @@ function renderSalePage(){
     imap[k].samt+=r.samt; imap[k].samtLY+=r.samtLY;
   });
   const itemFilter=document.getElementById("saleItemFilter").value;
-  let iarr=Object.values(imap).map(r=>({...r,diff:r.samt-r.samtLY}));
+  let iarr=Object.values(imap).map(r=>{
+    const diff=r.samt-r.samtLY;
+    const pct=r.samtLY!==0?(diff/Math.abs(r.samtLY)*100):(r.samt!==0?null:0);
+    return {...r,diff,pct};
+  });
   if(itemFilter==="UP")iarr=iarr.filter(r=>r.samt>r.samtLY);
   else if(itemFilter==="DOWN")iarr=iarr.filter(r=>r.samt<r.samtLY);
-  iarr=iarr.sort((a,b)=>saleSortDir==="asc"?a[saleSortField]-b[saleSortField]:b[saleSortField]-a[saleSortField]).slice(0,20);
-  document.getElementById("diffArrow").textContent=saleSortField==="diff"?(saleSortDir==="asc"?"↑":"↓"):"";
+  const textFields=["bc","name"];
+  iarr=iarr.sort((a,b)=>{
+    let av=a[saleSortField],bv=b[saleSortField];
+    if(textFields.includes(saleSortField)){
+      av=String(av||""); bv=String(bv||"");
+      return saleSortDir==="asc"?av.localeCompare(bv,"th"):bv.localeCompare(av,"th");
+    }
+    av=av==null?-Infinity:av; bv=bv==null?-Infinity:bv;
+    return saleSortDir==="asc"?av-bv:bv-av;
+  }).slice(0,20);
+  document.querySelectorAll("#saleItemTbl .sortHdr .arrow").forEach(el=>el.textContent="");
+  const activeHdr=document.querySelector('#saleItemTbl .sortHdr[data-f="'+saleSortField+'"] .arrow');
+  if(activeHdr)activeHdr.textContent=saleSortDir==="asc"?"↑":"↓";
   document.querySelector("#saleItemTbl tbody").innerHTML=iarr.length?iarr.map(r=>{
     const diff=r.diff;
-    const pct=r.samtLY!==0?(diff/Math.abs(r.samtLY)*100):(r.samt!==0?null:0);
-    const pctTxt=pct==null?"n/a":(pct>=0?"+":"")+pct.toFixed(1)+"%";
+    const pctTxt=r.pct==null?"n/a":(r.pct>=0?"+":"")+r.pct.toFixed(1)+"%";
     return '<tr><td style="font-variant-numeric:tabular-nums;color:#888">'+r.bc+'</td><td>'+r.name+'</td><td class="num" style="color:#2E7D5B">'+fmt(r.samt)+'</td><td class="num" style="color:#90a4ae">'+fmt(r.samtLY)+'</td><td class="num '+(diff<0?'neg':'pos')+'">'+(diff>=0?"+":"")+fmt(diff)+'</td><td class="num '+(diff<0?'neg':'pos')+'">'+pctTxt+'</td></tr>';
   }).join(""):'<tr><td colspan=6 class=muted>ไม่มีข้อมูล</td></tr>';
 }
@@ -354,11 +375,12 @@ fMonth.onchange=()=>{buildDivs();fillDept();render();if(curPage==="tree")renderT
 fDiv.onchange=()=>{fillDept();render()};
 fDept.onchange=render;
 document.getElementById("saleItemFilter").onchange=renderSalePage;
-document.getElementById("diffHdr").onclick=()=>{
-  if(saleSortField==="diff")saleSortDir=saleSortDir==="asc"?"desc":"asc";
-  else{saleSortField="diff";saleSortDir="desc";}
+document.querySelectorAll("#saleItemTbl .sortHdr").forEach(th=>th.onclick=()=>{
+  const f=th.dataset.f;
+  if(saleSortField===f)saleSortDir=saleSortDir==="asc"?"desc":"asc";
+  else{saleSortField=f;saleSortDir=(f==="bc"||f==="name")?"asc":"desc";}
   renderSalePage();
-};
+});
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");curType=t.dataset.t;render()});
 
 function norm(s){return String(s==null?"":s).trim()}
