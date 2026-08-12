@@ -330,23 +330,25 @@ function renderSalePage(){
   const saleRows=SALES.filter(d=>(mMatch(d.period))&&(dv=="ALL"||d.div==dv)&&(dp=="ALL"||d.dept==dp));
   const totSale=saleRows.reduce((s,r)=>s+r.samt,0);
   const totSaleLY=saleRows.reduce((s,r)=>s+r.samtLY,0);
-  const totQty=saleRows.reduce((s,r)=>s+r.sqty,0);
-  const totQtyLY=saleRows.reduce((s,r)=>s+r.sqtyLY,0);
   const g=yoy(totSale,totSaleLY,false);
-  const qDiff=totQty-totQtyLY;
-  const qPct=totQtyLY!==0?(qDiff/Math.abs(totQtyLY)*100):(totQty!==0?null:0);
-  const qArrow=qDiff>0?"▲":(qDiff<0?"▼":"–");
-  const qCol=qDiff===0?"#90a4ae":(qDiff>=0?"#2E7D5B":"#C0504D");
-  const qPctTxt=qPct==null?"n/a":(qPct>=0?"+":"")+qPct.toFixed(1)+"%";
-  const qHtml='<div class="yoyline" style="color:'+qCol+'">'+qArrow+' '+(qDiff>=0?"+":"")+fmt(qDiff)+' ชิ้น <span class="yoypct">('+qPctTxt+')</span></div><div class="lyline">ปีก่อน: '+fmt(totQtyLY)+' ชิ้น</div>';
-  document.getElementById("saleCards").innerHTML='<div class="card q clickable" data-card="SALES">'+icw('SALES','#e7f4ee','#2E7D5B')+'<div class="lbl">ยอดขายรวม</div><div class="val" style="color:'+scol(totSale)+'">'+fmt(totSale)+' ฿</div>'+g.html+'<div class="tap">แตะดูแยกฝ่าย ›</div></div>'
-    +'<div class="card q">'+icw('TOTAL','#eaf1fb','#1F497D')+'<div class="lbl">จำนวนขาย</div><div class="val" style="color:#37474f">'+fmt(totQty)+' ชิ้น</div>'+qHtml+'</div>';
+  document.getElementById("saleCards").innerHTML='<div class="card q clickable" data-card="SALES">'+icw('SALES','#e7f4ee','#2E7D5B')+'<div class="lbl">ยอดขายรวม</div><div class="val" style="color:'+scol(totSale)+'">'+fmt(totSale)+' ฿</div>'+g.html+'<div class="tap">แตะดูแยกฝ่าย ›</div></div>';
   document.querySelectorAll("#saleCards .card.clickable").forEach(c=>c.onclick=()=>openSalesModal(fMonth.value,dv,dp));
   const dmap={};
-  saleRows.forEach(r=>{dmap[r.dept]=(dmap[r.dept]||0)+r.samt;});
-  const darr=Object.entries(dmap).sort((a,b)=>b[1]-a[1]).slice(0,12);
-  const maxAbs=Math.max(...darr.map(d=>Math.abs(d[1])),1);
-  document.getElementById("saleDeptBars").innerHTML=darr.length?darr.map(d=>'<div class="bar-row"><div class="br-top"><span class="nm">'+d[0]+'</span><span class="amt" style="color:#2E7D5B">'+fmt(d[1])+' ฿</span></div><div class="bar-bg"><div class="bar-fill" style="width:'+(Math.abs(d[1])/maxAbs*100)+'%;background:linear-gradient(90deg,#2E7D5B,#4F81BD)"></div></div></div>').join(""):'<div class=muted>ไม่มีข้อมูล</div>';
+  saleRows.forEach(r=>{
+    if(!dmap[r.dept])dmap[r.dept]={ty:0,ly:0};
+    dmap[r.dept].ty+=r.samt; dmap[r.dept].ly+=r.samtLY;
+  });
+  const darr=Object.entries(dmap).sort((a,b)=>b[1].ty-a[1].ty).slice(0,12);
+  const maxAbs=Math.max(...darr.map(d=>Math.max(Math.abs(d[1].ty),Math.abs(d[1].ly))),1);
+  document.getElementById("saleDeptBars").innerHTML=darr.length?darr.map(d=>{
+    const ty=d[1].ty,ly=d[1].ly,diff=ty-ly;
+    const pct=ly!==0?(diff/Math.abs(ly)*100):(ty!==0?null:0);
+    const pctTxt=pct==null?"n/a":(pct>=0?"+":"")+pct.toFixed(1)+"%";
+    const dCol=diff===0?"#90a4ae":(diff>=0?"#2E7D5B":"#C0504D");
+    return '<div class="bar-row"><div class="br-top"><span class="nm">'+d[0]+'</span><span class="amt" style="color:#2E7D5B">'+fmt(ty)+' ฿</span></div>'
+      +'<div class="bar-bg"><div class="bar-fill" style="width:'+(Math.abs(ty)/maxAbs*100)+'%;background:linear-gradient(90deg,#2E7D5B,#4F81BD)"></div></div>'
+      +'<div style="display:flex;justify-content:space-between;margin-top:3px"><span class="lyline">ปีก่อน: '+fmt(ly)+' ฿</span><span class="lyline" style="color:'+dCol+';font-weight:700">'+(diff>=0?"+":"")+fmt(diff)+' ('+pctTxt+')</span></div></div>';
+  }).join(""):'<div class=muted>ไม่มีข้อมูล</div>';
   const imap={};
   saleRows.forEach(r=>{
     const k=(r.bc||"")+"|"+(r.name||"(ไม่มีชื่อ)");
