@@ -192,12 +192,64 @@ const TARGET={
 "PERISHABLE":[-43848,-45825,-48937,-48229,-54455,-52726,-50980,-52437,-63950,-57854,-42618,-46677],
 "FROZEN":[-3340,-3392,-4223,-3609,-4085,-4497,-3939,-3723,-10877,-5006,-3073,-3508]
 };
+// เป้าหมายแยกตามประเภท Loss (บาท) — ม.ค.–ธ.ค.
+const TARGET_TYPE={
+DAMAGE:{
+"HARD LINE":[-1245,-736,-716,-1210,-1013,-981,-1779,-991,-1477,-1576,-1518,-1565],
+"HOME LINE":[-2637,-2367,-2432,-2791,-2916,-2785,-3265,-2642,-3297,-3232,-2760,-3014],
+"SOFT LINE":[-824,-779,-814,-883,-952,-907,-992,-855,-1032,-999,-833,-924],
+"DRY FOOD":[-45652,-46654,-49918,-49781,-56131,-53410,-52298,-49797,-57197,-54302,-43485,-49031],
+"FRESH FOOD":[-177486,-182141,-195148,-193724,-219147,-208533,-202534,-194206,-222211,-210719,-168328,-190087],
+"PHARMACY":[-698,-717,-767,-760,-861,-817,-794,-764,-874,-828,-661,-748],
+"ALL DIVISION":[-228542,-233393,-249794,-249149,-281019,-267432,-261661,-249255,-286088,-271655,-217584,-245369],
+"BUTCHERY":[-16460,-16920,-18097,-17971,-20341,-19353,-18792,-18028,-20633,-19572,-15624,-17639],
+"SEAFOOD":[-20914,-21438,-22924,-22629,-25557,-24341,-23652,-22657,-25898,-24554,-19629,-22167],
+"PRODUCE":[-68754,-70531,-75532,-75068,-84928,-80835,-78545,-75320,-86203,-81778,-65311,-73769],
+"DELICA":[-21662,-22234,-23883,-23670,-26781,-25458,-24690,-23679,-27071,-25671,-20517,-23163],
+"BAKERY":[-24387,-25043,-26854,-26674,-30186,-28706,-27866,-26729,-30595,-28999,-23154,-26147],
+"PERISHABLE":[-23315,-23922,-25662,-25549,-28903,-27500,-26711,-25608,-29313,-27776,-22201,-25066],
+"FROZEN":[-1995,-2053,-2196,-2164,-2451,-2340,-2278,-2185,-2497,-2368,-1892,-2136]
+},
+SHRINKAGE:{
+"HARD LINE":[-439,-464,-464,-471,-470,-883,-480,-788,-1840,-994,-626,-479],
+"HOME LINE":[-2152,-2278,-2272,-2312,-2265,-5184,-2354,-3864,-17417,-4872,-2589,-2343],
+"SOFT LINE":[-231,-4333,-245,-2197,-252,-252,-4380,-417,-8790,-526,-390,-254],
+"DRY FOOD":[-26650,-24326,-32443,-24645,-27944,-24919,-25120,-44109,-53261,-133232,-26707,-24982],
+"FRESH FOOD":[-24887,-25049,-26621,-25825,-25980,-26430,-25902,-31478,-44793,-35041,-26416,-28841],
+"PHARMACY":[-145,-153,-964,-155,-156,-156,-157,-259,-335,-3198,-370,-156],
+"ALL DIVISION":[-54504,-56604,-63009,-55604,-57066,-57825,-58393,-80916,-126437,-177863,-57097,-57054],
+"BUTCHERY":[-4221,-4159,-4382,-4350,-4359,-4306,-4298,-4939,-6227,-5347,-4421,-4952],
+"SEAFOOD":[-2919,-2832,-2960,-2994,-2992,-2887,-2927,-3207,-3572,-3385,-3030,-3460],
+"PRODUCE":[-9718,-9347,-9731,-9944,-9922,-9449,-9662,-10304,-10573,-10708,-10040,-11586],
+"DELICA":[-2522,-2428,-2529,-2581,-2576,-2458,-2510,-2687,-2792,-2799,-2607,-3004],
+"BAKERY":[-4295,-4121,-4285,-4392,-4380,-4156,-4260,-4507,-4510,-4663,-4431,-5128],
+"PERISHABLE":[-900,-1881,-1835,-1237,-1380,-2223,-1766,-5420,-10032,-6727,-1690,-450],
+"FROZEN":[-313,-282,-898,-327,-371,-951,-479,-413,-7088,-1412,-198,-261]
+},
+RTC:{
+"HARD LINE":[-146,-149,-159,-159,-179,-170,-167,-159,-182,-173,-139,-157],
+"HOME LINE":[-357,-364,-390,-389,-440,-418,-409,-389,-447,-424,-340,-384],
+"SOFT LINE":[-51,-52,-55,-55,-62,-59,-58,-55,-64,-60,-48,-55],
+"DRY FOOD":[-23403,-23896,-25605,-25508,-28755,-27363,-26790,-25490,-29267,-27798,-22274,-25172],
+"FRESH FOOD":[-48874,-49906,-53386,-53266,-60062,-57169,-55931,-53224,-61144,-58069,-46546,-52602],
+"PHARMACY":[-5,-5,-5,-5,-6,-6,-6,-5,-6,-6,-5,-5],
+"ALL DIVISION":[-72836,-74372,-79600,-79383,-89504,-85185,-83360,-79322,-91109,-86530,-69351,-78376],
+"BUTCHERY":[-8289,-8478,-9054,-9037,-10195,-9703,-9491,-9035,-10383,-9863,-7901,-8926],
+"SEAFOOD":[-4768,-4863,-5192,-5151,-5799,-5525,-5408,-5141,-5901,-5603,-4494,-5079],
+"PRODUCE":[-10132,-10354,-11068,-11029,-12443,-11846,-11594,-11037,-12677,-12055,-9653,-10916],
+"DELICA":[-3851,-3937,-4224,-4210,-4749,-4515,-4411,-4199,-4819,-4577,-3671,-4147],
+"BAKERY":[-1169,-1195,-1279,-1277,-1442,-1372,-1342,-1277,-1468,-1393,-1116,-1262],
+"PERISHABLE":[-19634,-20022,-21440,-21443,-24172,-23003,-22502,-21409,-24605,-23351,-18727,-21161],
+"FROZEN":[-1032,-1057,-1129,-1118,-1262,-1206,-1182,-1125,-1291,-1226,-983,-1111]
+}
+};
 function targetKey(name){return String(name||"").replace(/^\d+\s*/,"").trim().toUpperCase();}
-function getTargetArr(dv,dp){
-  if(dp&&dp!=="ALL"){const k=targetKey(dp);if(TARGET[k])return TARGET[k];}
-  if(!dv||dv==="ALL")return TARGET["ALL DIVISION"];
+function getTargetArr(dv,dp,type){
+  const table=(type&&TARGET_TYPE[type])?TARGET_TYPE[type]:TARGET;
+  if(dp&&dp!=="ALL"){const k=targetKey(dp);if(table[k])return table[k];}
+  if(!dv||dv==="ALL")return table["ALL DIVISION"];
   const k=targetKey(dv);
-  return TARGET[k]||null;
+  return table[k]||null;
 }
 function sumTargetForMonth(arr){
   if(!arr)return null;
@@ -213,7 +265,7 @@ function sumTargetForMonth(arr){
   const mi=+String(mo).slice(4,6)-1;
   return (mi>=0&&mi<12)?arr[mi]:null;
 }
-function targetLineHtml(actual,target){
+function targetLineHtml(actual,target,ytd){
   if(target==null)return "";
   const diff=actual-target;
   const good=diff>=0;
@@ -221,7 +273,15 @@ function targetLineHtml(actual,target){
   const label=diff>0?"▼ ต่ำกว่าเป้า":(diff<0?"▲ เกินเป้า":"เท่าเป้า");
   const pct=target!==0?(diff/Math.abs(target)*100):null;
   const pctTxt=pct==null?"":" ("+(pct>=0?"+":"")+pct.toFixed(1)+"% จากเป้า)";
-  return '<div class="yoyline" style="color:'+col+'">'+label+' '+(diff>=0?"+":"")+fmtK(diff)+' ฿'+pctTxt+'</div><div class="lyline">เป้าหมาย (YTD): '+fmtK(target)+' ฿</div>';
+  return '<div class="yoyline" style="color:'+col+'">'+label+' '+(diff>=0?"+":"")+fmtK(diff)+' ฿'+pctTxt+'</div><div class="lyline">เป้าหมาย'+(ytd?" (YTD)":"")+': '+fmtK(target)+' ฿</div>';
+}
+function typeTargetCardHtml(t,dv,dp,mo,actual){
+  const arr=getTargetArr(dv,dp,t);
+  const val=sumTargetForMonth(arr);
+  if(val==null)return "";
+  const ytd=mo==="ALL";
+  const lbl=t+" · เป้าหมาย (Budget"+(ytd?" YTD":"")+")";
+  return '<div class="card">'+icw(t,'#f0eef7','#7B5EA7')+'<div class="lbl">'+lbl+'</div><div class="val" style="color:'+scol(val)+'">'+fmtK(val)+' ฿</div><div style="font-size:10px;color:#90a4ae;font-weight:700;margin-top:6px">เทียบเป้าหมาย (Budget)</div>'+targetLineHtml(actual,val,ytd)+'</div>';
 }
 const ICONS={
   DAMAGE:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
@@ -302,6 +362,7 @@ function render(){
       if(t==="RTC"){
         const gR=yoy(a,aLY,true);
         cardsH+='<div class="card">'+icw('RTC',icBg[t],icSt[t])+'<div class="lbl">RTC · รวม</div><div class="val" style="color:'+scol(a)+'">'+fmt(a)+' ฿</div>'+gR.html+'</div>';
+        cardsH+=typeTargetCardHtml("RTC",dv,dp,mo,a);
         const rtcRows=scope.filter(r=>r.type==="RTC");
         const pos=rtcRows.filter(r=>r.amt>0).reduce((s,r)=>s+r.amt,0);
         const neg=rtcRows.filter(r=>r.amt<0).reduce((s,r)=>s+r.amt,0);
@@ -310,6 +371,7 @@ function render(){
       }else{
         const gS=yoy(a,aLY,true);
         cardsH+='<div class="card">'+icw(t,icBg[t],icSt[t])+'<div class="lbl">'+t+' · รวม</div><div class="val" style="color:'+scol(a)+'">'+fmt(a)+' ฿</div>'+gS.html+'</div>';
+        cardsH+=typeTargetCardHtml(t,dv,dp,mo,a);
         const codes=codeMap[t]||[];
         // aggregate by code within this type
         const cAgg={};
@@ -352,7 +414,7 @@ function render(){
     let tgtCard="";
     if(tgtVal!=null){
       const tgtLbl="เป้าหมาย Loss (Budget"+(mo==="ALL"?" YTD":"")+")";
-      tgtCard='<div class="card">'+icw('TOTAL','#f0eef7','#7B5EA7')+'<div class="lbl">'+tgtLbl+'</div><div class="val" style="color:'+scol(tgtVal)+'">'+fmtK(tgtVal)+' ฿</div><div style="font-size:10px;color:#90a4ae;font-weight:700;margin-top:6px">เทียบเป้าหมาย (Budget)</div>'+targetLineHtml(totA,tgtVal)+'</div>';
+      tgtCard='<div class="card">'+icw('TOTAL','#f0eef7','#7B5EA7')+'<div class="lbl">'+tgtLbl+'</div><div class="val" style="color:'+scol(tgtVal)+'">'+fmtK(tgtVal)+' ฿</div><div style="font-size:10px;color:#90a4ae;font-weight:700;margin-top:6px">เทียบเป้าหมาย (Budget)</div>'+targetLineHtml(totA,tgtVal,mo==="ALL")+'</div>';
     }
     cardsH=cardsH+'<div class="card">'+icw('TOTAL','#eaf1fb','#1F497D')+'<div class="lbl">รวมยอด Loss</div><div class="val" style="color:'+scol(totA)+'">'+fmt(totA)+' ฿</div><div style="font-size:10px;color:#90a4ae;font-weight:700;margin-top:6px">เทียบปีก่อน (LY)</div>'+gTot.html+'</div>'+tgtCard+pctCard;
   }
