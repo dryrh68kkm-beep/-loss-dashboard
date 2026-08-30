@@ -215,7 +215,7 @@ function targetLineHtml(actual,target){
   const label=diff>0?"▼ ต่ำกว่าเป้า":(diff<0?"▲ เกินเป้า":"เท่าเป้า");
   const pct=target!==0?(diff/Math.abs(target)*100):null;
   const pctTxt=pct==null?"":" ("+(pct>=0?"+":"")+pct.toFixed(1)+"%)";
-  return '<div class="yoyline" style="color:'+col+'">'+label+' '+(diff>=0?"+":"")+fmt(diff)+' ฿'+pctTxt+'</div><div class="lyline">เป้าหมาย: '+fmt(target)+' ฿</div>';
+  return '<div class="yoyline" style="color:'+col+'">'+label+' '+(diff>=0?"+":"")+fmtK(diff)+' ฿'+pctTxt+'</div><div class="lyline">เป้าหมาย: '+fmtK(target)+' ฿</div>';
 }
 const ICONS={
   DAMAGE:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
@@ -255,6 +255,7 @@ function fillDept(){
   fDept.innerHTML="<option value=ALL>ทุกแผนก</option>"+ds.map(d=>"<option>"+d+"</option>").join("");
 }
 function fmt(n){return n.toLocaleString("th-TH",{maximumFractionDigits:0})}
+function fmtK(n){return Math.round(n/1000).toLocaleString("th-TH",{maximumFractionDigits:0})+"K"}
 // สีตามเครื่องหมาย: ลบ=แดง บวก=เขียว ศูนย์=เทา
 function scol(n){return n<0?"#C0504D":(n>0?"#2E7D5B":"#90a4ae");}
 function fmtc(n,withBaht){return '<span style="color:'+scol(n)+'">'+fmt(n)+(withBaht?' ฿':'')+'</span>';}
@@ -344,7 +345,7 @@ function render(){
     const tgtVal=sumTargetForMonth(tgtArr);
     let tgtCard="";
     if(tgtVal!=null){
-      tgtCard='<div class="card">'+icw('TOTAL','#f0eef7','#7B5EA7')+'<div class="lbl">เป้าหมาย Loss (Budget)</div><div class="val" style="color:'+scol(tgtVal)+'">'+fmt(tgtVal)+' ฿</div>'+targetLineHtml(totA,tgtVal)+'</div>';
+      tgtCard='<div class="card">'+icw('TOTAL','#f0eef7','#7B5EA7')+'<div class="lbl">เป้าหมาย Loss (Budget)</div><div class="val" style="color:'+scol(tgtVal)+'">'+fmtK(tgtVal)+' ฿</div>'+targetLineHtml(totA,tgtVal)+'</div>';
     }
     cardsH=cardsH+'<div class="card">'+icw('TOTAL','#eaf1fb','#1F497D')+'<div class="lbl">รวมยอด Loss</div><div class="val" style="color:'+scol(totA)+'">'+fmt(totA)+' ฿</div>'+gTot.html+'</div>'+tgtCard+pctCard;
   }
@@ -762,7 +763,6 @@ function renderMonthBars(){
     if(!data.length)return '<div class="muted">ไม่มีข้อมูล</div>';
     const maxV=Math.max(...data.map(d=>Math.max(d.ty,d.ly,d.tg||0)),1);
     const W=Math.max(months.length*90,320),H=250,pad=44,bh=H-pad-20,gw=W/months.length;
-    const fmtK=n=>{const a=Math.abs(n);return a>=1e6?(n/1e6).toFixed(1)+"M":a>=1e3?Math.round(n/1e3)+"K":Math.round(n)};
     let bars="",labels="";
     const bw=tgtMap?Math.min(gw*0.24,20):Math.min(gw*0.32,26);
     data.forEach((d,i)=>{
