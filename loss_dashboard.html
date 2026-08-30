@@ -712,11 +712,12 @@ function openTargetModal(ttype){
   document.getElementById("mSum").textContent="รวม "+arr.length+" ฝ่าย · ยอดจริง "+fmt(totTY)+" ฿ · เป้าหมาย "+(totTgt?fmt(totTgt):"-")+" ฿";
   document.getElementById("mBody").innerHTML=arr.map(r=>{
     const diffT=r.tgt!=null?r.ty-r.tgt:null;
-    const overUnder=diffT==null?"<span style=\"color:#90a4ae\">ไม่มีเป้าหมาย</span>":(diffT>=0?"<span class=\"pos\">ต่ำกว่าเป้า</span>":"<span class=\"neg\">เกินเป้า</span>");
+    const overUnder=diffT==null?"<span style=\"color:#90a4ae\">ไม่มีเป้าหมาย</span>":(diffT>=0?"<span class=\"pos\">▼ ต่ำกว่าเป้า</span>":"<span class=\"neg\">▲ เกินเป้า</span>");
     const diffTTxt=diffT==null?"":" "+(diffT>=0?"+":"")+fmt(diffT)+" ฿";
     const diffLY=r.ty-r.ly;
     const diffLYPct=r.ly!==0?(diffLY/Math.abs(r.ly)*100):null;
-    const diffLYTxt=(diffLY>=0?"+":"")+fmt(diffLY)+(diffLYPct!=null?" ("+(diffLYPct>=0?"+":"")+diffLYPct.toFixed(1)+"%)":"");
+    const arrLY=diffLY>0?"▲":(diffLY<0?"▼":"–");
+    const diffLYTxt=arrLY+" "+(diffLY>=0?"+":"")+fmt(diffLY)+(diffLYPct!=null?" ("+(diffLYPct>=0?"+":"")+diffLYPct.toFixed(1)+"%)":"");
     return '<tr><td>'+r.div+'</td><td class="num '+(r.ty<0?'neg':'pos')+'">'+fmt(r.ty)+'</td><td class="num">'+(r.tgt!=null?fmt(r.tgt):'-')+'</td><td class="num">'+overUnder+'<div style="font-size:10px;color:#90a4ae">'+diffTTxt+'</div></td><td class="num" style="color:#90a4ae">'+fmt(r.ly)+'</td><td class="num '+(diffLY<0?'neg':'pos')+'">'+diffLYTxt+'</td></tr>';
   }).join("");
   overlay.classList.add("show");
