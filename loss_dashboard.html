@@ -255,9 +255,9 @@ function sumTargetForMonth(arr){
   if(!arr)return null;
   const mo=fMonth.value;
   if(mo==="ALL"){
-    // นับเป้าหมายเฉพาะถึงเดือนล่าสุดที่มีข้อมูลจริง (YTD) ไม่ใช่เต็มปี
+    // นับเป้าหมายเฉพาะถึงเดือนล่าสุดที่มีข้อมูลจริง (YTD) ไม่ใช่เต็มปี — ยังไม่มีข้อมูลอัปโหลด = ไม่โชว์เป้าหมาย
     const periods=[...new Set(DATA.map(d=>d.period).filter(Boolean))].sort();
-    if(!periods.length)return arr.reduce((s,v)=>s+v,0);
+    if(!periods.length)return null;
     const lastMi=+periods[periods.length-1].slice(4,6)-1;
     return arr.slice(0,lastMi+1).reduce((s,v)=>s+v,0);
   }
@@ -321,7 +321,12 @@ function fillDept(){
   fDept.innerHTML="<option value=ALL>ทุกแผนก</option>"+ds.map(d=>"<option>"+d+"</option>").join("");
 }
 function fmt(n){return n.toLocaleString("th-TH",{maximumFractionDigits:0})}
-function fmtK(n){return Math.round(n/1000).toLocaleString("th-TH",{maximumFractionDigits:0})+"K"}
+function fmtK(n){
+  const a=Math.abs(n);
+  if(a>=1e6)return (n/1e6).toLocaleString("th-TH",{maximumFractionDigits:2})+"M";
+  if(a>=1e3)return Math.round(n/1e3).toLocaleString("th-TH")+"K";
+  return Math.round(n).toLocaleString("th-TH");
+}
 // สีตามเครื่องหมาย: ลบ=แดง บวก=เขียว ศูนย์=เทา
 function scol(n){return n<0?"#C0504D":(n>0?"#2E7D5B":"#90a4ae");}
 function fmtc(n,withBaht){return '<span style="color:'+scol(n)+'">'+fmt(n)+(withBaht?' ฿':'')+'</span>';}
