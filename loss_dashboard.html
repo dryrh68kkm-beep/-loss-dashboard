@@ -270,10 +270,10 @@ function targetLineHtml(actual,target,ytd){
   const diff=actual-target;
   const good=diff>=0;
   const col=diff===0?"#90a4ae":(good?"#2E7D5B":"#C0504D");
-  const label=diff>0?"▼ ต่ำกว่าเป้า":(diff<0?"▲ เกินเป้า":"เท่าเป้า");
+  const arrow=diff>0?"▲":(diff<0?"▼":"–");
   const pct=target!==0?(diff/Math.abs(target)*100):null;
-  const pctTxt=pct==null?"":" ("+(pct>=0?"+":"")+pct.toFixed(1)+"% จากเป้า)";
-  return '<div class="yoyline" style="color:'+col+'">'+label+' '+(diff>=0?"+":"")+fmtK(diff)+' ฿'+pctTxt+'</div><div class="lyline">เป้าหมาย'+(ytd?" (YTD)":"")+': '+fmtK(target)+' ฿</div>';
+  const pctTxt=pct==null?"":" ("+(pct>=0?"+":"")+pct.toFixed(1)+"%)";
+  return '<div class="yoyline" style="color:'+col+';white-space:nowrap">'+arrow+' '+(diff>=0?"+":"")+fmtK(diff)+' ฿'+pctTxt+'</div><div class="lyline">'+(ytd?"YTD: ":"")+fmtK(target)+' ฿</div>';
 }
 function typeTargetCardHtml(t,dv,dp,mo,actual){
   const arr=getTargetArr(dv,dp,t);
@@ -712,13 +712,14 @@ function openTargetModal(ttype){
   document.getElementById("mSum").textContent="รวม "+arr.length+" ฝ่าย · ยอดจริง "+fmt(totTY)+" ฿ · เป้าหมาย "+(totTgt?fmt(totTgt):"-")+" ฿";
   document.getElementById("mBody").innerHTML=arr.map(r=>{
     const diffT=r.tgt!=null?r.ty-r.tgt:null;
-    const overUnder=diffT==null?"<span style=\"color:#90a4ae\">ไม่มีเป้าหมาย</span>":(diffT>=0?"<span class=\"pos\">▼ ต่ำกว่าเป้า</span>":"<span class=\"neg\">▲ เกินเป้า</span>");
-    const diffTTxt=diffT==null?"":" "+(diffT>=0?"+":"")+fmt(diffT)+" ฿";
+    const arrT=diffT==null?"":(diffT>0?"▲":(diffT<0?"▼":"–"));
+    const colT=diffT==null?"#90a4ae":(diffT>=0?"#2E7D5B":"#C0504D");
+    const diffTTxt=diffT==null?"-":arrT+" "+(diffT>=0?"+":"")+fmt(diffT)+" ฿";
     const diffLY=r.ty-r.ly;
     const diffLYPct=r.ly!==0?(diffLY/Math.abs(r.ly)*100):null;
     const arrLY=diffLY>0?"▲":(diffLY<0?"▼":"–");
     const diffLYTxt=arrLY+" "+(diffLY>=0?"+":"")+fmt(diffLY)+(diffLYPct!=null?" ("+(diffLYPct>=0?"+":"")+diffLYPct.toFixed(1)+"%)":"");
-    return '<tr><td>'+r.div+'</td><td class="num '+(r.ty<0?'neg':'pos')+'">'+fmt(r.ty)+'</td><td class="num">'+(r.tgt!=null?fmt(r.tgt):'-')+'</td><td class="num">'+overUnder+'<div style="font-size:10px;color:#90a4ae">'+diffTTxt+'</div></td><td class="num" style="color:#90a4ae">'+fmt(r.ly)+'</td><td class="num '+(diffLY<0?'neg':'pos')+'">'+diffLYTxt+'</td></tr>';
+    return '<tr><td>'+r.div+'</td><td class="num '+(r.ty<0?'neg':'pos')+'">'+fmt(r.ty)+'</td><td class="num">'+(r.tgt!=null?fmt(r.tgt):'-')+'</td><td class="num" style="color:'+colT+';font-weight:700;white-space:nowrap">'+diffTTxt+'</td><td class="num" style="color:#90a4ae">'+fmt(r.ly)+'</td><td class="num '+(diffLY<0?'neg':'pos')+'">'+diffLYTxt+'</td></tr>';
   }).join("");
   overlay.classList.add("show");
 }
