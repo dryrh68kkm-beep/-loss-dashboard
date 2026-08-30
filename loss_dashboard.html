@@ -202,7 +202,13 @@ function getTargetArr(dv,dp){
 function sumTargetForMonth(arr){
   if(!arr)return null;
   const mo=fMonth.value;
-  if(mo==="ALL")return arr.reduce((s,v)=>s+v,0);
+  if(mo==="ALL"){
+    // นับเป้าหมายเฉพาะถึงเดือนล่าสุดที่มีข้อมูลจริง (YTD) ไม่ใช่เต็มปี
+    const periods=[...new Set(DATA.map(d=>d.period).filter(Boolean))].sort();
+    if(!periods.length)return arr.reduce((s,v)=>s+v,0);
+    const lastMi=+periods[periods.length-1].slice(4,6)-1;
+    return arr.slice(0,lastMi+1).reduce((s,v)=>s+v,0);
+  }
   if(mo==="H1")return arr.slice(0,7).reduce((s,v)=>s+v,0);
   const mi=+String(mo).slice(4,6)-1;
   return (mi>=0&&mi<12)?arr[mi]:null;
@@ -214,8 +220,8 @@ function targetLineHtml(actual,target){
   const col=diff===0?"#90a4ae":(good?"#2E7D5B":"#C0504D");
   const label=diff>0?"▼ ต่ำกว่าเป้า":(diff<0?"▲ เกินเป้า":"เท่าเป้า");
   const pct=target!==0?(diff/Math.abs(target)*100):null;
-  const pctTxt=pct==null?"":" ("+(pct>=0?"+":"")+pct.toFixed(1)+"%)";
-  return '<div class="yoyline" style="color:'+col+'">'+label+' '+(diff>=0?"+":"")+fmtK(diff)+' ฿'+pctTxt+'</div><div class="lyline">เป้าหมาย: '+fmtK(target)+' ฿</div>';
+  const pctTxt=pct==null?"":" ("+(pct>=0?"+":"")+pct.toFixed(1)+"% จากเป้า)";
+  return '<div class="yoyline" style="color:'+col+'">'+label+' '+(diff>=0?"+":"")+fmtK(diff)+' ฿'+pctTxt+'</div><div class="lyline">เป้าหมาย (YTD): '+fmtK(target)+' ฿</div>';
 }
 const ICONS={
   DAMAGE:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
@@ -345,9 +351,10 @@ function render(){
     const tgtVal=sumTargetForMonth(tgtArr);
     let tgtCard="";
     if(tgtVal!=null){
-      tgtCard='<div class="card">'+icw('TOTAL','#f0eef7','#7B5EA7')+'<div class="lbl">เป้าหมาย Loss (Budget)</div><div class="val" style="color:'+scol(tgtVal)+'">'+fmtK(tgtVal)+' ฿</div>'+targetLineHtml(totA,tgtVal)+'</div>';
+      const tgtLbl="เป้าหมาย Loss (Budget"+(mo==="ALL"?" YTD":"")+")";
+      tgtCard='<div class="card">'+icw('TOTAL','#f0eef7','#7B5EA7')+'<div class="lbl">'+tgtLbl+'</div><div class="val" style="color:'+scol(tgtVal)+'">'+fmtK(tgtVal)+' ฿</div><div style="font-size:10px;color:#90a4ae;font-weight:700;margin-top:6px">เทียบเป้าหมาย (Budget)</div>'+targetLineHtml(totA,tgtVal)+'</div>';
     }
-    cardsH=cardsH+'<div class="card">'+icw('TOTAL','#eaf1fb','#1F497D')+'<div class="lbl">รวมยอด Loss</div><div class="val" style="color:'+scol(totA)+'">'+fmt(totA)+' ฿</div>'+gTot.html+'</div>'+tgtCard+pctCard;
+    cardsH=cardsH+'<div class="card">'+icw('TOTAL','#eaf1fb','#1F497D')+'<div class="lbl">รวมยอด Loss</div><div class="val" style="color:'+scol(totA)+'">'+fmt(totA)+' ฿</div><div style="font-size:10px;color:#90a4ae;font-weight:700;margin-top:6px">เทียบปีก่อน (LY)</div>'+gTot.html+'</div>'+tgtCard+pctCard;
   }
   document.getElementById("cards").innerHTML=cardsH;
   document.getElementById("codeTop").innerHTML="";
