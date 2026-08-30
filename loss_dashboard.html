@@ -281,7 +281,7 @@ function typeTargetCardHtml(t,dv,dp,mo,actual){
   if(val==null)return "";
   const ytd=mo==="ALL";
   const lbl=t+" · เป้าหมาย (Budget"+(ytd?" YTD":"")+")";
-  return '<div class="card">'+icw(t,'#f0eef7','#7B5EA7')+'<div class="lbl">'+lbl+'</div><div class="val" style="color:'+scol(val)+'">'+fmtK(val)+' ฿</div><div style="font-size:10px;color:#90a4ae;font-weight:700;margin-top:6px">เทียบเป้าหมาย (Budget)</div>'+targetLineHtml(actual,val,ytd)+'</div>';
+  return '<div class="card clickable" data-ttype="'+t+'">'+icw(t,'#f0eef7','#7B5EA7')+'<div class="lbl">'+lbl+'</div><div class="val" style="color:'+scol(val)+'">'+fmtK(val)+' ฿</div><div style="font-size:10px;color:#90a4ae;font-weight:700;margin-top:6px">เทียบเป้าหมาย (Budget)</div>'+targetLineHtml(actual,val,ytd)+'<div class="tap">แตะดูรายแผนก ›</div></div>';
 }
 const ICONS={
   DAMAGE:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
@@ -419,14 +419,15 @@ function render(){
     let tgtCard="";
     if(tgtVal!=null){
       const tgtLbl="เป้าหมาย Loss (Budget"+(mo==="ALL"?" YTD":"")+")";
-      tgtCard='<div class="card">'+icw('TOTAL','#f0eef7','#7B5EA7')+'<div class="lbl">'+tgtLbl+'</div><div class="val" style="color:'+scol(tgtVal)+'">'+fmtK(tgtVal)+' ฿</div><div style="font-size:10px;color:#90a4ae;font-weight:700;margin-top:6px">เทียบเป้าหมาย (Budget)</div>'+targetLineHtml(totA,tgtVal,mo==="ALL")+'</div>';
+      tgtCard='<div class="card clickable" data-ttype="ALL">'+icw('TOTAL','#f0eef7','#7B5EA7')+'<div class="lbl">'+tgtLbl+'</div><div class="val" style="color:'+scol(tgtVal)+'">'+fmtK(tgtVal)+' ฿</div><div style="font-size:10px;color:#90a4ae;font-weight:700;margin-top:6px">เทียบเป้าหมาย (Budget)</div>'+targetLineHtml(totA,tgtVal,mo==="ALL")+'<div class="tap">แตะดูรายแผนก ›</div></div>';
     }
     cardsH=cardsH+'<div class="card">'+icw('TOTAL','#eaf1fb','#1F497D')+'<div class="lbl">รวมยอด Loss</div><div class="val" style="color:'+scol(totA)+'">'+fmt(totA)+' ฿</div><div style="font-size:10px;color:#90a4ae;font-weight:700;margin-top:6px">เทียบปีก่อน (LY)</div>'+gTot.html+'</div>'+tgtCard+pctCard;
   }
   document.getElementById("cards").innerHTML=cardsH;
   document.getElementById("codeTop").innerHTML="";
   document.querySelectorAll(".card.clickable").forEach(c=>c.onclick=()=>{
-    if(c.dataset.code)openCodeModal(c.dataset.code,c.dataset.type||"RTC",c.dataset.dir||"neg");
+    if(c.dataset.ttype)openTargetModal(c.dataset.ttype);
+    else if(c.dataset.code)openCodeModal(c.dataset.code,c.dataset.type||"RTC",c.dataset.dir||"neg");
     else openModal(c.dataset.card);
   });
   const dmap={};
@@ -690,6 +691,34 @@ function openModal(type){
   document.getElementById("mHead").innerHTML='<tr><th>Barcode</th><th>สินค้า</th><th>แผนก</th><th class="num">จำนวน</th><th class="num">ยอด (฿)</th></tr>';
   document.getElementById("mSum").textContent="ทั้งหมด "+arr.length+" รายการ · รวมจำนวน "+totQ.toLocaleString("th-TH",{maximumFractionDigits:2})+" · รวมยอด "+fmt(totA)+" ฿";
   document.getElementById("mBody").innerHTML=top.length?top.map(r=>'<tr><td style="font-variant-numeric:tabular-nums;color:#888">'+r.bc+'</td><td>'+r.name+'</td><td style="font-size:11px;color:#999">'+r.dept+'</td><td class="num">'+r.qty.toLocaleString("th-TH",{maximumFractionDigits:2})+'</td><td class="num '+(r.amt<0?'neg':'pos')+'">'+fmt(r.amt)+'</td></tr>').join(""):'<tr><td colspan=5 class=muted>ไม่มีข้อมูล</td></tr>';
+  overlay.classList.add("show");
+}
+function openTargetModal(ttype){
+  const mo=fMonth.value;
+  const divKeys=["HARD LINE","HOME LINE","SOFT LINE","DRY FOOD","FRESH FOOD","PHARMACY"];
+  const table=(ttype!=="ALL"&&TARGET_TYPE[ttype])?TARGET_TYPE[ttype]:TARGET;
+  const scope=DATA.filter(d=>mMatch(d.period)).filter(r=>ttype==="ALL"||r.type===ttype);
+  const arr=divKeys.map(k=>{
+    const dRows=scope.filter(r=>targetKey(r.div)===k);
+    const ty=dRows.filter(r=>r.type!=="RTC"||r.amt<0).reduce((s,r)=>s+r.amt,0);
+    const ly=dRows.filter(r=>r.type!=="RTC"||r.amtLY<0).reduce((s,r)=>s+r.amtLY,0);
+    const tgt=sumTargetForMonth(table[k]);
+    return {div:k,ty,ly,tgt};
+  });
+  const title=(ttype==="ALL"?"Total Loss":ttype)+" · เป้าหมายแยกฝ่าย (Division)"+(mo==="ALL"?" YTD":"");
+  document.getElementById("mTitle").textContent=title;
+  document.getElementById("mHead").innerHTML='<tr><th>ฝ่าย</th><th class="num">ยอดจริง (฿)</th><th class="num">เป้าหมาย (฿)</th><th class="num">ผลต่างเป้า</th><th class="num">ปีก่อน (฿)</th><th class="num">ผลต่าง LY</th></tr>';
+  const totTY=arr.reduce((s,r)=>s+r.ty,0), totTgt=arr.reduce((s,r)=>s+(r.tgt||0),0);
+  document.getElementById("mSum").textContent="รวม "+arr.length+" ฝ่าย · ยอดจริง "+fmt(totTY)+" ฿ · เป้าหมาย "+(totTgt?fmt(totTgt):"-")+" ฿";
+  document.getElementById("mBody").innerHTML=arr.map(r=>{
+    const diffT=r.tgt!=null?r.ty-r.tgt:null;
+    const overUnder=diffT==null?"<span style=\"color:#90a4ae\">ไม่มีเป้าหมาย</span>":(diffT>=0?"<span class=\"pos\">ต่ำกว่าเป้า</span>":"<span class=\"neg\">เกินเป้า</span>");
+    const diffTTxt=diffT==null?"":" "+(diffT>=0?"+":"")+fmt(diffT)+" ฿";
+    const diffLY=r.ty-r.ly;
+    const diffLYPct=r.ly!==0?(diffLY/Math.abs(r.ly)*100):null;
+    const diffLYTxt=(diffLY>=0?"+":"")+fmt(diffLY)+(diffLYPct!=null?" ("+(diffLYPct>=0?"+":"")+diffLYPct.toFixed(1)+"%)":"");
+    return '<tr><td>'+r.div+'</td><td class="num '+(r.ty<0?'neg':'pos')+'">'+fmt(r.ty)+'</td><td class="num">'+(r.tgt!=null?fmt(r.tgt):'-')+'</td><td class="num">'+overUnder+'<div style="font-size:10px;color:#90a4ae">'+diffTTxt+'</div></td><td class="num" style="color:#90a4ae">'+fmt(r.ly)+'</td><td class="num '+(diffLY<0?'neg':'pos')+'">'+diffLYTxt+'</td></tr>';
+  }).join("");
   overlay.classList.add("show");
 }
 function openCodeModal(code,type,dir){
