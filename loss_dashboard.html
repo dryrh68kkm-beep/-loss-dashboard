@@ -174,6 +174,49 @@ let saleBarPath=[]; // [] = divisions, [div] = depts of div
 let saleSortField="samt";
 let saleSortDir="desc";
 let itemArr=[];
+// เป้าหมาย Loss รายเดือน (บาท, ค่าติดลบ) จาก Loss Budget Y2026 :Hyper — แยกฝ่าย + แผนกย่อยของ Fresh Food
+// ลำดับ 12 ค่า = ม.ค.–ธ.ค.
+const TARGET={
+"HARD LINE":[-1830014,-1348608,-1338746,-1839444,-1661947,-2034130,-2425909,-1938472,-3499309,-2742815,-2282334,-2200422],
+"HOME LINE":[-5145441,-5009049,-5093737,-5491877,-5620366,-8386536,-6027693,-6895475,-21160818,-8527603,-5688282,-5741655],
+"SOFT LINE":[-1105178,-5163680,-1114843,-3135547,-1265979,-1218859,-5429491,-1326604,-9885785,-1584766,-1270860,-1232689],
+"DRY FOOD":[-95705819,-94876315,-107965396,-99934254,-112829007,-105691539,-104207678,-119395828,-139725746,-215332422,-92465276,-99184817],
+"FRESH FOOD":[-251246671,-257096591,-275154473,-272815011,-305189167,-292132402,-284366575,-278907536,-328147830,-303828666,-241289455,-271529489],
+"PHARMACY":[-847650,-874742,-1735603,-920005,-1022859,-978428,-956355,-1028734,-1215508,-4031723,-1036078,-909924],
+"ALL DIVISION":[-355880773,-364368984,-392402798,-384136138,-427589325,-410441895,-403413701,-409492649,-503634996,-536047995,-344032283,-380798995],
+"BUTCHERY":[-28969798,-29557887,-31533135,-31357395,-34895151,-33361830,-32581056,-32001374,-37242947,-34782578,-27945836,-31516561],
+"SEAFOOD":[-28600419,-29132810,-31076397,-30774623,-34348793,-32753430,-31986707,-31005898,-35371257,-33541836,-27153567,-30707022],
+"PRODUCE":[-88603781,-90231637,-96330736,-96041953,-107292561,-102129662,-99801403,-96660681,-109453035,-104541333,-85004307,-96270893],
+"DELICA":[-28033836,-28598647,-30636082,-30460710,-34105977,-32430902,-31611143,-30565218,-34682287,-33047179,-26794495,-30313430],
+"BAKERY":[-29850791,-30357872,-32418277,-32342083,-36007235,-34233000,-33467291,-32514090,-36572009,-35055755,-28700623,-32536568],
+"PERISHABLE":[-43848153,-45825331,-48936637,-48228926,-54454766,-52726161,-50979978,-52437166,-63949659,-57854304,-42618053,-46676993],
+"FROZEN":[-3339893,-3392407,-4223208,-3609320,-4084684,-4497418,-3938996,-3723109,-10876636,-5005680,-3072572,-3508021]
+};
+function targetKey(name){return String(name||"").replace(/^\d+\s*/,"").trim().toUpperCase();}
+function getTargetArr(dv,dp){
+  if(dp&&dp!=="ALL"){const k=targetKey(dp);if(TARGET[k])return TARGET[k];}
+  if(!dv||dv==="ALL")return TARGET["ALL DIVISION"];
+  const k=targetKey(dv);
+  return TARGET[k]||null;
+}
+function sumTargetForMonth(arr){
+  if(!arr)return null;
+  const mo=fMonth.value;
+  if(mo==="ALL")return arr.reduce((s,v)=>s+v,0);
+  if(mo==="H1")return arr.slice(0,7).reduce((s,v)=>s+v,0);
+  const mi=+String(mo).slice(4,6)-1;
+  return (mi>=0&&mi<12)?arr[mi]:null;
+}
+function targetLineHtml(actual,target){
+  if(target==null)return "";
+  const diff=actual-target;
+  const good=diff>=0;
+  const col=diff===0?"#90a4ae":(good?"#2E7D5B":"#C0504D");
+  const label=diff>0?"▼ ต่ำกว่าเป้า":(diff<0?"▲ เกินเป้า":"เท่าเป้า");
+  const pct=target!==0?(diff/Math.abs(target)*100):null;
+  const pctTxt=pct==null?"":" ("+(pct>=0?"+":"")+pct.toFixed(1)+"%)";
+  return '<div class="yoyline" style="color:'+col+'">'+label+' '+(diff>=0?"+":"")+fmt(diff)+' ฿'+pctTxt+'</div><div class="lyline">เป้าหมาย: '+fmt(target)+' ฿</div>';
+}
 const ICONS={
   DAMAGE:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
   SHRINKAGE:'<polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/>',
@@ -297,7 +340,13 @@ function render(){
   let pctCard='<div class="card">'+icw('PCT','#f0eef7','#7B5EA7')+'<div class="lbl">% Loss / ยอดขาย</div><div class="val" style="color:'+(lossPct!=null?scol(lossPct):"#7B5EA7")+'">'+(lossPct!=null?lossPct.toFixed(2)+'%':'-')+'</div>'+pctHtml+'</div>';
   const gTot=yoy(totA,totALY,true);
   if(curType==="ALL"){
-    cardsH=cardsH+'<div class="card">'+icw('TOTAL','#eaf1fb','#1F497D')+'<div class="lbl">รวมยอด Loss</div><div class="val" style="color:'+scol(totA)+'">'+fmt(totA)+' ฿</div>'+gTot.html+'</div>'+pctCard;
+    const tgtArr=getTargetArr(dv,dp);
+    const tgtVal=sumTargetForMonth(tgtArr);
+    let tgtCard="";
+    if(tgtVal!=null){
+      tgtCard='<div class="card">'+icw('TOTAL','#f0eef7','#7B5EA7')+'<div class="lbl">เป้าหมาย Loss (Budget)</div><div class="val" style="color:'+scol(tgtVal)+'">'+fmt(tgtVal)+' ฿</div>'+targetLineHtml(totA,tgtVal)+'</div>';
+    }
+    cardsH=cardsH+'<div class="card">'+icw('TOTAL','#eaf1fb','#1F497D')+'<div class="lbl">รวมยอด Loss</div><div class="val" style="color:'+scol(totA)+'">'+fmt(totA)+' ฿</div>'+gTot.html+'</div>'+tgtCard+pctCard;
   }
   document.getElementById("cards").innerHTML=cardsH;
   document.getElementById("codeTop").innerHTML="";
@@ -706,27 +755,35 @@ function renderMonthBars(){
   });
   const saleTY={},saleLY={};
   SALES.forEach(r=>{saleTY[r.period]=(saleTY[r.period]||0)+r.samt;saleLY[r.period]=(saleLY[r.period]||0)+(r.samtLY||0);});
-  function barChart(title,tyMap,lyMap,cTY,cLY,useAbs){
-    const data=months.map(m=>({m,ty:Math.abs(tyMap[m]||0),ly:Math.abs(lyMap[m]||0),rawTY:tyMap[m]||0,rawLY:lyMap[m]||0}));
+  const tgtMap={};
+  months.forEach(m=>{const mi=+m.slice(4,6)-1;tgtMap[m]=(mi>=0&&mi<12)?TARGET["ALL DIVISION"][mi]:0;});
+  function barChart(title,tyMap,lyMap,cTY,cLY,useAbs,tgtMap,cTGT){
+    const data=months.map(m=>({m,ty:Math.abs(tyMap[m]||0),ly:Math.abs(lyMap[m]||0),tg:tgtMap?Math.abs(tgtMap[m]||0):null,rawTY:tyMap[m]||0,rawLY:lyMap[m]||0,rawTG:tgtMap?(tgtMap[m]||0):null}));
     if(!data.length)return '<div class="muted">ไม่มีข้อมูล</div>';
-    const maxV=Math.max(...data.map(d=>Math.max(d.ty,d.ly)),1);
+    const maxV=Math.max(...data.map(d=>Math.max(d.ty,d.ly,d.tg||0)),1);
     const W=Math.max(months.length*90,320),H=250,pad=44,bh=H-pad-20,gw=W/months.length;
     const fmtK=n=>{const a=Math.abs(n);return a>=1e6?(n/1e6).toFixed(1)+"M":a>=1e3?Math.round(n/1e3)+"K":Math.round(n)};
     let bars="",labels="";
+    const bw=tgtMap?Math.min(gw*0.24,20):Math.min(gw*0.32,26);
     data.forEach((d,i)=>{
-      const cx=i*gw+gw/2, bw=Math.min(gw*0.32,26);
+      const cx=i*gw+gw/2;
       const hTY=d.ty/maxV*bh, hLY=d.ly/maxV*bh;
-      const x1=cx-bw-2, x2=cx+2;
+      const x1=tgtMap?cx-bw*1.5-4:cx-bw-2, x2=tgtMap?cx-bw/2:cx+2;
       bars+='<rect x="'+x1+'" y="'+(pad+bh-hTY)+'" width="'+bw+'" height="'+hTY+'" rx="3" fill="'+cTY+'"><title>ปีนี้ '+th[d.m.slice(4,6)]+': '+fmtK(d.rawTY)+'</title></rect>';
       bars+='<rect x="'+x2+'" y="'+(pad+bh-hLY)+'" width="'+bw+'" height="'+hLY+'" rx="3" fill="'+cLY+'"><title>ปีก่อน '+th[d.m.slice(4,6)]+': '+fmtK(d.rawLY)+'</title></rect>';
       bars+='<text x="'+(x1+bw/2)+'" y="'+(pad+bh-hTY-4)+'" text-anchor="middle" font-size="8.5" font-weight="700" fill="'+cTY+'">'+fmtK(d.rawTY)+'</text>';
       bars+='<text x="'+(x2+bw/2)+'" y="'+(pad+bh-hLY-4)+'" text-anchor="middle" font-size="8.5" font-weight="700" fill="'+cLY+'">'+fmtK(d.rawLY)+'</text>';
+      if(tgtMap){
+        const hTG=d.tg/maxV*bh, x3=cx+bw/2+4;
+        bars+='<rect x="'+x3+'" y="'+(pad+bh-hTG)+'" width="'+bw+'" height="'+hTG+'" rx="3" fill="'+cTGT+'"><title>เป้าหมาย '+th[d.m.slice(4,6)]+': '+fmtK(d.rawTG)+'</title></rect>';
+        bars+='<text x="'+(x3+bw/2)+'" y="'+(pad+bh-hTG-4)+'" text-anchor="middle" font-size="8.5" font-weight="700" fill="'+cTGT+'">'+fmtK(d.rawTG)+'</text>';
+      }
       labels+='<text x="'+cx+'" y="'+(H-6)+'" text-anchor="middle" font-size="11" fill="#455a64">'+th[d.m.slice(4,6)]+'</text>';
     });
     return '<div style="min-width:'+W+'px"><svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'+bars+labels+'</svg></div>'
-      +'<div style="display:flex;gap:16px;font-size:11px;color:#607080;margin-top:4px"><span><span style="display:inline-block;width:10px;height:10px;background:'+cTY+';border-radius:2px;vertical-align:-1px"></span> ปีนี้ (TY)</span><span><span style="display:inline-block;width:10px;height:10px;background:'+cLY+';border-radius:2px;vertical-align:-1px"></span> ปีก่อน (LY)</span></div>';
+      +'<div style="display:flex;gap:16px;font-size:11px;color:#607080;margin-top:4px"><span><span style="display:inline-block;width:10px;height:10px;background:'+cTY+';border-radius:2px;vertical-align:-1px"></span> ปีนี้ (TY)</span><span><span style="display:inline-block;width:10px;height:10px;background:'+cLY+';border-radius:2px;vertical-align:-1px"></span> ปีก่อน (LY)</span>'+(tgtMap?'<span><span style="display:inline-block;width:10px;height:10px;background:'+cTGT+';border-radius:2px;vertical-align:-1px"></span> เป้าหมาย (Budget)</span>':'')+'</div>';
   }
-  document.getElementById("chartLoss").innerHTML=barChart("Loss",lossTY,lossLY,"#C0504D","#8fa3b0",true);
+  document.getElementById("chartLoss").innerHTML=barChart("Loss",lossTY,lossLY,"#C0504D","#8fa3b0",true,tgtMap,"#7B5EA7");
   document.getElementById("chartSale").innerHTML=barChart("Sales",saleTY,saleLY,"#2E7D5B","#8fa3b0",false);
 }
 function renderTree(){
