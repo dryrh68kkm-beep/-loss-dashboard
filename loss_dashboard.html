@@ -243,6 +243,46 @@ RTC:{
 "FROZEN":[-1032,-1057,-1129,-1118,-1262,-1206,-1182,-1125,-1291,-1226,-983,-1111]
 }
 };
+// เป้าหมาย % Loss ต่อยอดขาย (Total Loss) — ม.ค.–ธ.ค. หน่วย % (ค่าติดลบ)
+const TARGET_PCT={
+"HARD LINE":[-0.11,-0.08,-0.06,-0.09,-0.09,-0.11,-0.14,-0.11,-0.21,-0.16,-0.12,-0.09],
+"HOME LINE":[-0.31,-0.38,-0.34,-0.35,-0.36,-0.59,-0.45,-0.54,-1.79,-0.75,-0.43,-0.30],
+"SOFT LINE":[-0.13,-0.75,-0.12,-0.25,-0.08,-0.18,-0.74,-0.19,-1.81,-0.21,-0.17,-0.13],
+"DRY FOOD":[-0.61,-0.65,-0.62,-0.61,-0.63,-0.60,-0.67,-0.69,-0.85,-1.27,-0.54,-0.47],
+"FRESH FOOD":[-6.30,-6.45,-6.19,-6.02,-7.21,-7.30,-6.60,-6.86,-8.37,-7.58,-5.93,-5.91],
+"PHARMACY":[-8.03,-8.03,-25.82,-11.58,-13.80,-16.44,-17.10,-20.17,-16.45,-68.80,-15.60,-13.30],
+"ALL DIVISION":[-1.48,-1.64,-1.48,-1.50,-1.58,-1.60,-1.70,-1.64,-2.12,-2.18,-1.37,-1.23],
+"BUTCHERY":[-1.81,-1.95,-1.77,-1.71,-1.98,-2.05,-1.85,-1.99,-2.52,-2.34,-1.71,-1.72],
+"SEAFOOD":[-9.93,-10.21,-9.55,-8.88,-11.37,-11.26,-9.98,-9.79,-10.92,-9.95,-8.83,-8.72],
+"PRODUCE":[-19.42,-19.29,-19.09,-18.23,-21.56,-21.09,-19.46,-19.71,-22.19,-22.38,-17.64,-18.28],
+"DELICA":[-10.69,-10.86,-11.40,-10.42,-12.45,-12.78,-11.20,-11.55,-12.69,-11.75,-10.21,-10.05],
+"BAKERY":[-15.85,-17.40,-15.79,-15.83,-18.19,-18.32,-16.37,-16.66,-19.80,-18.75,-14.89,-16.72],
+"PERISHABLE":[-4.32,-4.07,-4.12,-4.33,-5.25,-5.24,-4.76,-5.02,-6.30,-5.31,-4.14,-3.87],
+"FROZEN":[-1.87,-2.26,-2.40,-1.70,-2.51,-3.03,-2.49,-2.55,-7.24,-3.15,-1.90,-1.93]
+};
+function getTargetPctArr(dv,dp){
+  if(dp&&dp!=="ALL"){const k=targetKey(dp);if(TARGET_PCT[k])return TARGET_PCT[k];}
+  if(!dv||dv==="ALL")return TARGET_PCT["ALL DIVISION"];
+  const k=targetKey(dv);
+  return TARGET_PCT[k]||null;
+}
+function avgTargetPctForMonth(arr){
+  if(!arr)return null;
+  const mo=fMonth.value;
+  let slice;
+  if(mo==="ALL"){
+    const periods=[...new Set(DATA.map(d=>d.period).filter(Boolean))].sort();
+    if(!periods.length)return null;
+    const lastMi=+periods[periods.length-1].slice(4,6)-1;
+    slice=arr.slice(0,lastMi+1);
+  }else if(mo==="H1"){
+    slice=arr.slice(0,7);
+  }else{
+    const mi=+String(mo).slice(4,6)-1;
+    return (mi>=0&&mi<12)?arr[mi]:null;
+  }
+  return slice.length?slice.reduce((s,v)=>s+v,0)/slice.length:null;
+}
 function targetKey(name){return String(name||"").replace(/^\d+\s*/,"").trim().toUpperCase();}
 function getTargetArr(dv,dp,type){
   const table=(type&&TARGET_TYPE[type])?TARGET_TYPE[type]:TARGET;
@@ -411,7 +451,16 @@ function render(){
     const parrow=ppDiff==null?"":(ppDiff>0?"▲":(ppDiff<0?"▼":"–"));
     pctHtml='<div class="yoyline" style="color:'+pcol+'">'+parrow+' '+(ppDiff!=null?((ppDiff>=0?"+":"")+ppDiff.toFixed(2)+" pp"):"n/a")+'</div><div class="lyline">ปีก่อน: '+(lossPctLY!=null?lossPctLY.toFixed(2)+"%":"n/a")+'</div>';
   }
-  let pctCard='<div class="card">'+icw('PCT','#f0eef7','#7B5EA7')+'<div class="lbl">% Loss / ยอดขาย</div><div class="val" style="color:'+(lossPct!=null?scol(lossPct):"#7B5EA7")+'">'+(lossPct!=null?lossPct.toFixed(2)+'%':'-')+'</div>'+pctHtml+'</div>';
+  const tgtPctArr=getTargetPctArr(dv,dp);
+  const tgtPct=avgTargetPctForMonth(tgtPctArr);
+  let tgtPctHtml="";
+  if(tgtPct!=null&&lossPct!=null){
+    const ppT=lossPct-tgtPct;
+    const pcolT=ppT===0?"#90a4ae":(ppT>=0?"#2E7D5B":"#C0504D");
+    const parrowT=ppT>0?"▲":(ppT<0?"▼":"–");
+    tgtPctHtml='<div class="yoyline" style="color:'+pcolT+'">'+parrowT+' '+(ppT>=0?"+":"")+ppT.toFixed(2)+" pp"+'</div><div class="lyline">Target: '+tgtPct.toFixed(2)+"%"+'</div>';
+  }
+  let pctCard='<div class="card">'+icw('PCT','#f0eef7','#7B5EA7')+'<div class="lbl">% Loss / ยอดขาย</div><div class="val" style="color:'+(lossPct!=null?scol(lossPct):"#7B5EA7")+'">'+(lossPct!=null?lossPct.toFixed(2)+'%':'-')+'</div>'+pctHtml+tgtPctHtml+'</div>';
   const gTot=yoy(totA,totALY,true);
   if(curType==="ALL"){
     const tgtArr=getTargetArr(dv,dp);
