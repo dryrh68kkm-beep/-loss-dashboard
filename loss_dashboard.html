@@ -174,76 +174,8 @@ let saleBarPath=[]; // [] = divisions, [div] = depts of div
 let saleSortField="samt";
 let saleSortDir="desc";
 let itemArr=[];
-// เป้าหมาย Loss รายเดือน (บาท, ค่าติดลบ) จาก Loss Budget Y2026 — ร้าน Sainoi — แยกฝ่าย + แผนกย่อยของ Fresh Food
-// ลำดับ 12 ค่า = ม.ค.–ธ.ค. (ไฟล์ต้นฉบับหน่วยพันบาท คูณ 1,000 เป็นบาท)
-const TARGET={
-"HARD LINE":[-1830,-1349,-1339,-1839,-1662,-2034,-2426,-1938,-3499,-2743,-2282,-2200],
-"HOME LINE":[-5145,-5009,-5094,-5492,-5620,-8387,-6028,-6895,-21161,-8528,-5688,-5742],
-"SOFT LINE":[-1105,-5164,-1115,-3136,-1266,-1219,-5429,-1327,-9886,-1585,-1271,-1233],
-"DRY FOOD":[-95706,-94876,-107965,-99934,-112829,-105692,-104208,-119396,-139726,-215332,-92465,-99185],
-"FRESH FOOD":[-251247,-257097,-275154,-272815,-305189,-292132,-284367,-278908,-328148,-303829,-241289,-271529],
-"PHARMACY":[-848,-875,-1736,-920,-1023,-978,-956,-1029,-1216,-4032,-1036,-910],
-"ALL DIVISION":[-355881,-364369,-392403,-384136,-427589,-410442,-403414,-409493,-503635,-536048,-344032,-380799],
-"BUTCHERY":[-28970,-29558,-31533,-31357,-34895,-33362,-32581,-32001,-37243,-34783,-27946,-31517],
-"SEAFOOD":[-28600,-29133,-31076,-30775,-34349,-32753,-31987,-31006,-35371,-33542,-27154,-30707],
-"PRODUCE":[-88604,-90232,-96331,-96042,-107293,-102130,-99801,-96661,-109453,-104541,-85004,-96271],
-"DELICA":[-28034,-28599,-30636,-30461,-34106,-32431,-31611,-30565,-34682,-33047,-26794,-30313],
-"BAKERY":[-29851,-30358,-32418,-32342,-36007,-34233,-33467,-32514,-36572,-35056,-28701,-32537],
-"PERISHABLE":[-43848,-45825,-48937,-48229,-54455,-52726,-50980,-52437,-63950,-57854,-42618,-46677],
-"FROZEN":[-3340,-3392,-4223,-3609,-4085,-4497,-3939,-3723,-10877,-5006,-3073,-3508]
-};
-// เป้าหมายแยกตามประเภท Loss (บาท) — ม.ค.–ธ.ค.
-const TARGET_TYPE={
-DAMAGE:{
-"HARD LINE":[-1245,-736,-716,-1210,-1013,-981,-1779,-991,-1477,-1576,-1518,-1565],
-"HOME LINE":[-2637,-2367,-2432,-2791,-2916,-2785,-3265,-2642,-3297,-3232,-2760,-3014],
-"SOFT LINE":[-824,-779,-814,-883,-952,-907,-992,-855,-1032,-999,-833,-924],
-"DRY FOOD":[-45652,-46654,-49918,-49781,-56131,-53410,-52298,-49797,-57197,-54302,-43485,-49031],
-"FRESH FOOD":[-177486,-182141,-195148,-193724,-219147,-208533,-202534,-194206,-222211,-210719,-168328,-190087],
-"PHARMACY":[-698,-717,-767,-760,-861,-817,-794,-764,-874,-828,-661,-748],
-"ALL DIVISION":[-228542,-233393,-249794,-249149,-281019,-267432,-261661,-249255,-286088,-271655,-217584,-245369],
-"BUTCHERY":[-16460,-16920,-18097,-17971,-20341,-19353,-18792,-18028,-20633,-19572,-15624,-17639],
-"SEAFOOD":[-20914,-21438,-22924,-22629,-25557,-24341,-23652,-22657,-25898,-24554,-19629,-22167],
-"PRODUCE":[-68754,-70531,-75532,-75068,-84928,-80835,-78545,-75320,-86203,-81778,-65311,-73769],
-"DELICA":[-21662,-22234,-23883,-23670,-26781,-25458,-24690,-23679,-27071,-25671,-20517,-23163],
-"BAKERY":[-24387,-25043,-26854,-26674,-30186,-28706,-27866,-26729,-30595,-28999,-23154,-26147],
-"PERISHABLE":[-23315,-23922,-25662,-25549,-28903,-27500,-26711,-25608,-29313,-27776,-22201,-25066],
-"FROZEN":[-1995,-2053,-2196,-2164,-2451,-2340,-2278,-2185,-2497,-2368,-1892,-2136]
-},
-SHRINKAGE:{
-"HARD LINE":[-439,-464,-464,-471,-470,-883,-480,-788,-1840,-994,-626,-479],
-"HOME LINE":[-2152,-2278,-2272,-2312,-2265,-5184,-2354,-3864,-17417,-4872,-2589,-2343],
-"SOFT LINE":[-231,-4333,-245,-2197,-252,-252,-4380,-417,-8790,-526,-390,-254],
-"DRY FOOD":[-26650,-24326,-32443,-24645,-27944,-24919,-25120,-44109,-53261,-133232,-26707,-24982],
-"FRESH FOOD":[-24887,-25049,-26621,-25825,-25980,-26430,-25902,-31478,-44793,-35041,-26416,-28841],
-"PHARMACY":[-145,-153,-964,-155,-156,-156,-157,-259,-335,-3198,-370,-156],
-"ALL DIVISION":[-54504,-56604,-63009,-55604,-57066,-57825,-58393,-80916,-126437,-177863,-57097,-57054],
-"BUTCHERY":[-4221,-4159,-4382,-4350,-4359,-4306,-4298,-4939,-6227,-5347,-4421,-4952],
-"SEAFOOD":[-2919,-2832,-2960,-2994,-2992,-2887,-2927,-3207,-3572,-3385,-3030,-3460],
-"PRODUCE":[-9718,-9347,-9731,-9944,-9922,-9449,-9662,-10304,-10573,-10708,-10040,-11586],
-"DELICA":[-2522,-2428,-2529,-2581,-2576,-2458,-2510,-2687,-2792,-2799,-2607,-3004],
-"BAKERY":[-4295,-4121,-4285,-4392,-4380,-4156,-4260,-4507,-4510,-4663,-4431,-5128],
-"PERISHABLE":[-900,-1881,-1835,-1237,-1380,-2223,-1766,-5420,-10032,-6727,-1690,-450],
-"FROZEN":[-313,-282,-898,-327,-371,-951,-479,-413,-7088,-1412,-198,-261]
-},
-RTC:{
-"HARD LINE":[-146,-149,-159,-159,-179,-170,-167,-159,-182,-173,-139,-157],
-"HOME LINE":[-357,-364,-390,-389,-440,-418,-409,-389,-447,-424,-340,-384],
-"SOFT LINE":[-51,-52,-55,-55,-62,-59,-58,-55,-64,-60,-48,-55],
-"DRY FOOD":[-23403,-23896,-25605,-25508,-28755,-27363,-26790,-25490,-29267,-27798,-22274,-25172],
-"FRESH FOOD":[-48874,-49906,-53386,-53266,-60062,-57169,-55931,-53224,-61144,-58069,-46546,-52602],
-"PHARMACY":[-5,-5,-5,-5,-6,-6,-6,-5,-6,-6,-5,-5],
-"ALL DIVISION":[-72836,-74372,-79600,-79383,-89504,-85185,-83360,-79322,-91109,-86530,-69351,-78376],
-"BUTCHERY":[-8289,-8478,-9054,-9037,-10195,-9703,-9491,-9035,-10383,-9863,-7901,-8926],
-"SEAFOOD":[-4768,-4863,-5192,-5151,-5799,-5525,-5408,-5141,-5901,-5603,-4494,-5079],
-"PRODUCE":[-10132,-10354,-11068,-11029,-12443,-11846,-11594,-11037,-12677,-12055,-9653,-10916],
-"DELICA":[-3851,-3937,-4224,-4210,-4749,-4515,-4411,-4199,-4819,-4577,-3671,-4147],
-"BAKERY":[-1169,-1195,-1279,-1277,-1442,-1372,-1342,-1277,-1468,-1393,-1116,-1262],
-"PERISHABLE":[-19634,-20022,-21440,-21443,-24172,-23003,-22502,-21409,-24605,-23351,-18727,-21161],
-"FROZEN":[-1032,-1057,-1129,-1118,-1262,-1206,-1182,-1125,-1291,-1226,-983,-1111]
-}
-};
-// เป้าหมาย % Loss ต่อยอดขาย (Total Loss) — ม.ค.–ธ.ค. หน่วย % (ค่าติดลบ)
+// เป้าหมาย % Loss ต่อยอดขาย (Total Loss) จาก Loss Budget Y2026 — ร้าน Sainoi — ม.ค.–ธ.ค. หน่วย % (ค่าติดลบ)
+// เป้าหมายบาทคำนวณจาก % นี้ คูณยอดขายจริงของแต่ละเดือน (แม่นยำกว่าใช้เลขบาทคงที่จากไฟล์)
 const TARGET_PCT={
 "HARD LINE":[-0.11,-0.08,-0.06,-0.09,-0.09,-0.11,-0.14,-0.11,-0.21,-0.16,-0.12,-0.09],
 "HOME LINE":[-0.31,-0.38,-0.34,-0.35,-0.36,-0.59,-0.45,-0.54,-1.79,-0.75,-0.43,-0.30],
@@ -260,11 +192,89 @@ const TARGET_PCT={
 "PERISHABLE":[-4.32,-4.07,-4.12,-4.33,-5.25,-5.24,-4.76,-5.02,-6.30,-5.31,-4.14,-3.87],
 "FROZEN":[-1.87,-2.26,-2.40,-1.70,-2.51,-3.03,-2.49,-2.55,-7.24,-3.15,-1.90,-1.93]
 };
-function getTargetPctArr(dv,dp){
-  if(dp&&dp!=="ALL"){const k=targetKey(dp);if(TARGET_PCT[k])return TARGET_PCT[k];}
-  if(!dv||dv==="ALL")return TARGET_PCT["ALL DIVISION"];
+// เป้าหมาย % Loss ต่อยอดขาย แยกตามประเภท — ม.ค.–ธ.ค.
+const TARGET_PCT_TYPE={
+DAMAGE:{
+"HARD LINE":[-0.07,-0.05,-0.03,-0.06,-0.05,-0.05,-0.10,-0.06,-0.09,-0.09,-0.08,-0.07],
+"HOME LINE":[-0.16,-0.18,-0.16,-0.18,-0.19,-0.19,-0.25,-0.21,-0.28,-0.29,-0.21,-0.16],
+"SOFT LINE":[-0.10,-0.11,-0.09,-0.07,-0.06,-0.13,-0.13,-0.12,-0.19,-0.13,-0.11,-0.10],
+"DRY FOOD":[-0.29,-0.32,-0.29,-0.30,-0.32,-0.30,-0.34,-0.29,-0.35,-0.32,-0.26,-0.23],
+"FRESH FOOD":[-4.45,-4.57,-4.39,-4.28,-5.18,-5.21,-4.70,-4.78,-5.67,-5.26,-4.14,-4.14],
+"PHARMACY":[-6.61,-6.57,-11.40,-9.57,-11.61,-13.72,-14.19,-14.98,-11.83,-14.12,-9.95,-10.94],
+"ALL DIVISION":[-0.95,-1.05,-0.94,-0.97,-1.04,-1.04,-1.10,-1.00,-1.21,-1.10,-0.87,-0.80],
+"BUTCHERY":[-1.03,-1.12,-1.02,-0.98,-1.16,-1.19,-1.07,-1.12,-1.39,-1.32,-0.96,-0.96],
+"SEAFOOD":[-7.26,-7.51,-7.04,-6.53,-8.46,-8.37,-7.38,-7.16,-8.00,-7.28,-6.38,-6.29],
+"PRODUCE":[-15.07,-15.08,-14.97,-14.25,-17.07,-16.70,-15.31,-15.36,-17.48,-17.51,-13.56,-14.01],
+"DELICA":[-8.26,-8.44,-8.89,-8.10,-9.78,-10.03,-8.75,-8.94,-9.91,-9.13,-7.82,-7.68],
+"BAKERY":[-12.95,-14.36,-13.08,-13.05,-15.25,-15.36,-13.63,-13.69,-16.57,-15.51,-12.01,-13.43],
+"PERISHABLE":[-2.30,-2.12,-2.16,-2.29,-2.79,-2.73,-2.49,-2.45,-2.89,-2.55,-2.16,-2.08],
+"FROZEN":[-1.12,-1.37,-1.25,-1.02,-1.50,-1.58,-1.44,-1.50,-1.66,-1.49,-1.17,-1.18]
+},
+SHRINKAGE:{
+"HARD LINE":[-0.03,-0.03,-0.02,-0.02,-0.03,-0.05,-0.03,-0.05,-0.11,-0.06,-0.03,-0.02],
+"HOME LINE":[-0.13,-0.17,-0.15,-0.15,-0.14,-0.36,-0.18,-0.30,-1.47,-0.43,-0.20,-0.12],
+"SOFT LINE":[-0.03,-0.63,-0.03,-0.18,-0.02,-0.04,-0.60,-0.06,-1.61,-0.07,-0.05,-0.03],
+"DRY FOOD":[-0.17,-0.17,-0.19,-0.15,-0.16,-0.14,-0.16,-0.26,-0.32,-0.78,-0.16,-0.12],
+"FRESH FOOD":[-0.62,-0.63,-0.60,-0.57,-0.61,-0.66,-0.60,-0.77,-1.14,-0.87,-0.65,-0.63],
+"PHARMACY":[-1.37,-1.41,-14.34,-1.95,-2.11,-2.62,-2.81,-5.09,-4.54,-54.58,-5.58,-2.28],
+"ALL DIVISION":[-0.23,-0.25,-0.24,-0.22,-0.21,-0.23,-0.25,-0.32,-0.53,-0.72,-0.23,-0.18],
+"BUTCHERY":[-0.26,-0.27,-0.25,-0.24,-0.25,-0.26,-0.24,-0.31,-0.42,-0.36,-0.27,-0.27],
+"SEAFOOD":[-1.01,-0.99,-0.91,-0.86,-0.99,-0.99,-0.91,-1.01,-1.10,-1.00,-0.98,-0.98],
+"PRODUCE":[-2.13,-2.00,-1.93,-1.89,-1.99,-1.95,-1.88,-2.10,-2.14,-2.29,-2.08,-2.20],
+"DELICA":[-0.96,-0.92,-0.94,-0.88,-0.94,-0.97,-0.89,-1.02,-1.02,-1.00,-0.99,-1.00],
+"BAKERY":[-2.28,-2.36,-2.09,-2.15,-2.21,-2.22,-2.08,-2.31,-2.44,-2.49,-2.30,-2.63],
+"PERISHABLE":[-0.09,-0.17,-0.15,-0.11,-0.13,-0.22,-0.16,-0.52,-0.99,-0.62,-0.16,-0.04],
+"FROZEN":[-0.18,-0.19,-0.51,-0.15,-0.23,-0.64,-0.30,-0.28,-4.72,-0.89,-0.12,-0.14]
+},
+RTC:{
+"HARD LINE":[-0.01,-0.01,-0.01,-0.01,-0.01,-0.01,-0.01,-0.01,-0.01,-0.01,-0.01,-0.01],
+"HOME LINE":[-0.02,-0.03,-0.03,-0.03,-0.03,-0.03,-0.03,-0.03,-0.04,-0.04,-0.03,-0.02],
+"SOFT LINE":[-0.01,-0.01,-0.01,0.00,0.00,-0.01,-0.01,-0.01,-0.01,-0.01,-0.01,-0.01],
+"DRY FOOD":[-0.15,-0.16,-0.15,-0.16,-0.16,-0.15,-0.17,-0.15,-0.18,-0.16,-0.13,-0.12],
+"FRESH FOOD":[-1.22,-1.25,-1.20,-1.18,-1.42,-1.43,-1.30,-1.31,-1.56,-1.45,-1.14,-1.15],
+"PHARMACY":[-0.05,-0.05,-0.08,-0.07,-0.08,-0.09,-0.10,-0.10,-0.08,-0.10,-0.07,-0.08],
+"ALL DIVISION":[-0.30,-0.33,-0.30,-0.31,-0.33,-0.33,-0.35,-0.32,-0.38,-0.35,-0.28,-0.25],
+"BUTCHERY":[-0.52,-0.56,-0.51,-0.49,-0.58,-0.60,-0.54,-0.56,-0.70,-0.66,-0.48,-0.49],
+"SEAFOOD":[-1.65,-1.70,-1.60,-1.49,-1.92,-1.90,-1.69,-1.62,-1.82,-1.66,-1.46,-1.44],
+"PRODUCE":[-2.22,-2.21,-2.19,-2.09,-2.50,-2.45,-2.26,-2.25,-2.57,-2.58,-2.00,-2.07],
+"DELICA":[-1.47,-1.49,-1.57,-1.44,-1.73,-1.78,-1.56,-1.59,-1.76,-1.63,-1.40,-1.38],
+"BAKERY":[-0.62,-0.68,-0.62,-0.62,-0.73,-0.73,-0.66,-0.65,-0.79,-0.75,-0.58,-0.65],
+"PERISHABLE":[-1.93,-1.78,-1.81,-1.92,-2.33,-2.29,-2.10,-2.05,-2.42,-2.14,-1.82,-1.76],
+"FROZEN":[-0.58,-0.70,-0.64,-0.53,-0.77,-0.81,-0.75,-0.77,-0.86,-0.77,-0.61,-0.61]
+}
+};
+function getTargetPctArr(dv,dp,type){
+  const table=(type&&TARGET_PCT_TYPE[type])?TARGET_PCT_TYPE[type]:TARGET_PCT;
+  if(dp&&dp!=="ALL"){const k=targetKey(dp);if(table[k])return table[k];}
+  if(!dv||dv==="ALL")return table["ALL DIVISION"];
   const k=targetKey(dv);
-  return TARGET_PCT[k]||null;
+  return table[k]||null;
+}
+// คำนวณเป้าหมาย (บาท) จาก % เป้าหมาย คูณยอดขายจริงรายเดือน (แม่นยำกว่าเลขบาทคงที่จากไฟล์เดิม)
+function computeTargetFromPctRows(pctArr,saleRows){
+  if(!pctArr)return null;
+  const mo=fMonth.value;
+  const salesByPeriod={};
+  saleRows.forEach(r=>{salesByPeriod[r.period]=(salesByPeriod[r.period]||0)+r.samt;});
+  let periods;
+  if(mo==="ALL")periods=[...new Set(DATA.map(d=>d.period).filter(Boolean))].sort();
+  else if(mo==="H1")periods=[...new Set(DATA.map(d=>d.period).filter(Boolean))].filter(p=>{const mm=String(p).slice(4,6);return mm>="01"&&mm<="07";}).sort();
+  else periods=[mo];
+  if(!periods.length)return null;
+  let total=0,any=false;
+  periods.forEach(p=>{
+    const mi=+String(p).slice(4,6)-1;
+    if(mi<0||mi>=12)return;
+    const sales=salesByPeriod[p]||0;
+    if(sales===0)return;
+    total+=(pctArr[mi]/100)*sales;
+    any=true;
+  });
+  return any?total:null;
+}
+function computeTargetFromPct(pctArr,dv,dp){
+  const saleRows=SALES.filter(d=>(dv=="ALL"||d.div==dv)&&(dp=="ALL"||d.dept==dp));
+  return computeTargetFromPctRows(pctArr,saleRows);
 }
 function avgTargetPctForMonth(arr){
   if(!arr)return null;
@@ -284,27 +294,6 @@ function avgTargetPctForMonth(arr){
   return slice.length?slice.reduce((s,v)=>s+v,0)/slice.length:null;
 }
 function targetKey(name){return String(name||"").replace(/^\d+\s*/,"").trim().toUpperCase();}
-function getTargetArr(dv,dp,type){
-  const table=(type&&TARGET_TYPE[type])?TARGET_TYPE[type]:TARGET;
-  if(dp&&dp!=="ALL"){const k=targetKey(dp);if(table[k])return table[k];}
-  if(!dv||dv==="ALL")return table["ALL DIVISION"];
-  const k=targetKey(dv);
-  return table[k]||null;
-}
-function sumTargetForMonth(arr){
-  if(!arr)return null;
-  const mo=fMonth.value;
-  if(mo==="ALL"){
-    // นับเป้าหมายเฉพาะถึงเดือนล่าสุดที่มีข้อมูลจริง (YTD) ไม่ใช่เต็มปี — ยังไม่มีข้อมูลอัปโหลด = ไม่โชว์เป้าหมาย
-    const periods=[...new Set(DATA.map(d=>d.period).filter(Boolean))].sort();
-    if(!periods.length)return null;
-    const lastMi=+periods[periods.length-1].slice(4,6)-1;
-    return arr.slice(0,lastMi+1).reduce((s,v)=>s+v,0);
-  }
-  if(mo==="H1")return arr.slice(0,7).reduce((s,v)=>s+v,0);
-  const mi=+String(mo).slice(4,6)-1;
-  return (mi>=0&&mi<12)?arr[mi]:null;
-}
 function targetLineHtml(actual,target,ytd){
   if(target==null)return "";
   const diff=actual-target;
@@ -316,8 +305,8 @@ function targetLineHtml(actual,target,ytd){
   return '<div class="yoyline" style="color:'+col+';white-space:nowrap">'+arrow+' '+(diff>=0?"+":"")+fmtK(diff)+' ฿'+pctTxt+'</div><div class="lyline">'+(ytd?"YTD: ":"")+fmtK(target)+' ฿</div>';
 }
 function typeTargetCardHtml(t,dv,dp,mo,actual){
-  const arr=getTargetArr(dv,dp,t);
-  const val=sumTargetForMonth(arr);
+  const pctArr=getTargetPctArr(dv,dp,t);
+  const val=computeTargetFromPct(pctArr,dv,dp);
   if(val==null)return "";
   const ytd=mo==="ALL";
   const lbl=t+" · เป้าหมาย (Budget"+(ytd?" YTD":"")+")";
@@ -463,8 +452,8 @@ function render(){
   let pctCard='<div class="card">'+icw('PCT','#f0eef7','#7B5EA7')+'<div class="lbl">% Loss / ยอดขาย</div><div class="val" style="color:'+(lossPct!=null?scol(lossPct):"#7B5EA7")+'">'+(lossPct!=null?lossPct.toFixed(2)+'%':'-')+'</div>'+pctHtml+tgtPctHtml+'</div>';
   const gTot=yoy(totA,totALY,true);
   if(curType==="ALL"){
-    const tgtArr=getTargetArr(dv,dp);
-    const tgtVal=sumTargetForMonth(tgtArr);
+    const tgtPctArrTotal=getTargetPctArr(dv,dp);
+    const tgtVal=computeTargetFromPct(tgtPctArrTotal,dv,dp);
     let tgtCard="";
     if(tgtVal!=null){
       const tgtLbl="เป้าหมาย Loss (Budget"+(mo==="ALL"?" YTD":"")+")";
@@ -745,13 +734,14 @@ function openModal(type){
 function openTargetModal(ttype){
   const mo=fMonth.value;
   const divKeys=["HARD LINE","HOME LINE","SOFT LINE","DRY FOOD","FRESH FOOD","PHARMACY"];
-  const table=(ttype!=="ALL"&&TARGET_TYPE[ttype])?TARGET_TYPE[ttype]:TARGET;
+  const pctTable=(ttype!=="ALL"&&TARGET_PCT_TYPE[ttype])?TARGET_PCT_TYPE[ttype]:TARGET_PCT;
   const scope=DATA.filter(d=>mMatch(d.period)).filter(r=>ttype==="ALL"||r.type===ttype);
   const arr=divKeys.map(k=>{
     const dRows=scope.filter(r=>targetKey(r.div)===k);
     const ty=dRows.filter(r=>r.type!=="RTC"||r.amt<0).reduce((s,r)=>s+r.amt,0);
     const ly=dRows.filter(r=>r.type!=="RTC"||r.amtLY<0).reduce((s,r)=>s+r.amtLY,0);
-    const tgt=sumTargetForMonth(table[k]);
+    const saleRowsDiv=SALES.filter(r=>targetKey(r.div)===k);
+    const tgt=computeTargetFromPctRows(pctTable[k],saleRowsDiv);
     return {div:k,ty,ly,tgt};
   });
   const title=(ttype==="ALL"?"Total Loss":ttype)+" · เป้าหมายแยกฝ่าย (Division)"+(mo==="ALL"?" YTD":"");
@@ -911,7 +901,7 @@ function renderMonthBars(){
   const saleTY={},saleLY={};
   SALES.forEach(r=>{saleTY[r.period]=(saleTY[r.period]||0)+r.samt;saleLY[r.period]=(saleLY[r.period]||0)+(r.samtLY||0);});
   const tgtMap={};
-  months.forEach(m=>{const mi=+m.slice(4,6)-1;tgtMap[m]=(mi>=0&&mi<12)?TARGET["ALL DIVISION"][mi]:0;});
+  months.forEach(m=>{const mi=+m.slice(4,6)-1;tgtMap[m]=(mi>=0&&mi<12&&saleTY[m])?(TARGET_PCT["ALL DIVISION"][mi]/100)*saleTY[m]:0;});
   function barChart(title,tyMap,lyMap,cTY,cLY,useAbs,tgtMap,cTGT){
     const data=months.map(m=>({m,ty:Math.abs(tyMap[m]||0),ly:Math.abs(lyMap[m]||0),tg:tgtMap?Math.abs(tgtMap[m]||0):null,rawTY:tyMap[m]||0,rawLY:lyMap[m]||0,rawTG:tgtMap?(tgtMap[m]||0):null}));
     if(!data.length)return '<div class="muted">ไม่มีข้อมูล</div>';
