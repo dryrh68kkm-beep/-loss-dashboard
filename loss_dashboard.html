@@ -7,8 +7,8 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:Tahoma,"Segoe UI",sans-serif;background:#f3f6f9;color:#263238;line-height:1.4}
-header{background:linear-gradient(118deg,#1d2a33 0%,#293a46 62%,#7f3038 145%);color:#fff;padding:26px 20px 24px;box-shadow:0 3px 16px rgba(29,42,51,.28);position:relative;overflow:hidden;border-bottom:3px solid #bc4449}
-header::after{content:"";position:absolute;top:-60px;right:-40px;width:220px;height:220px;background:radial-gradient(circle,rgba(225,78,80,.23) 0%,transparent 70%);pointer-events:none}
+header{background:linear-gradient(118deg,#075d58 0%,#087f73 58%,#25b69e 145%);color:#fff;padding:26px 20px 24px;box-shadow:0 3px 16px rgba(7,93,88,.26);position:relative;overflow:hidden;border-bottom:3px solid #7de0cc}
+header::after{content:"";position:absolute;top:-60px;right:-40px;width:220px;height:220px;background:radial-gradient(circle,rgba(196,255,240,.26) 0%,transparent 70%);pointer-events:none}
 header .htop{display:flex;align-items:center;gap:15px;max-width:1100px;margin:0 auto;position:relative;z-index:1}
 header .logo{width:50px;height:50px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,.12)}
 header .htext{flex:1}
@@ -22,7 +22,7 @@ header .hbadge{display:inline-flex;align-items:center;gap:5px;margin-top:9px;fon
 .controls label{font-size:11px;color:#78909c;display:block;margin-bottom:5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
 .ctl{flex:1;min-width:150px}
 select{width:100%;padding:11px 12px;border:1.5px solid #dde3e8;border-radius:10px;font-size:14px;background:#fff;font-family:inherit;color:#263238;transition:border-color .15s}
-select:focus{outline:none;border-color:#b73740;box-shadow:0 0 0 3px rgba(183,55,64,.11)}
+select:focus{outline:none;border-color:#0d9a87;box-shadow:0 0 0 3px rgba(13,154,135,.13)}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:18px}
 .card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(38,50,56,.06);position:relative;overflow:hidden}
 .card .ic{position:absolute;top:14px;right:14px;font-size:22px;opacity:.9}
@@ -35,9 +35,9 @@ select:focus{outline:none;border-color:#b73740;box-shadow:0 0 0 3px rgba(183,55,
 .card .lyline{font-size:10.5px;color:#b0bec5;margin-top:2px;font-variant-numeric:tabular-nums}
 .card.q .val{color:#37474f}
 .sec{background:#fff;border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 2px 8px rgba(38,50,56,.06)}
-.sec h2{font-size:15px;margin-bottom:14px;color:#37474f;font-weight:700;display:flex;align-items:center;gap:8px}.sec h2 svg{stroke:#b73740 !important}
+.sec h2{font-size:15px;margin-bottom:14px;color:#37474f;font-weight:700;display:flex;align-items:center;gap:8px}.sec h2 svg{stroke:#0d9a87 !important}
 .chart-note{font-size:11.5px;color:#78909c;margin:-7px 0 14px;padding-left:25px}
-.sec:has(.risk-chart) .chart-note{border-left:3px solid #b73740;padding:7px 10px;background:#fff8f8;border-radius:0 8px 8px 0}
+.sec:has(.risk-chart) .chart-note{border-left:3px solid #19ad99;padding:7px 10px;background:#f0fbf8;border-radius:0 8px 8px 0}
 .risk-chart{height:286px;display:flex;align-items:stretch;gap:8px;padding:18px 5px 0;border-bottom:1px solid #dfe7ee;background:repeating-linear-gradient(to top,transparent 0,transparent 58px,#edf1f5 59px,#edf1f5 60px);overflow-x:auto}
 .risk-col{min-width:54px;flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;position:relative;cursor:default}
 .risk-col::after{content:"";width:100%;height:1px;background:#dfe7ee;position:absolute;bottom:0}
@@ -53,9 +53,9 @@ th{color:#90a4ae;font-weight:700;font-size:11px;text-transform:uppercase;letter-
 tbody tr:hover{background:#fafbfc}
 td.num{text-align:right;font-variant-numeric:tabular-nums}
 .neg{color:#C0504D;font-weight:600}.pos{color:#2E7D5B;font-weight:600}
-.pagenav{display:flex;gap:8px;margin-bottom:16px;background:#e5ebee;padding:5px;border-radius:12px;width:fit-content}
-.pgbtn{display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;color:#5e7079;transition:all .15s}
-.pgbtn.active{background:#fff;color:#a5343c;box-shadow:0 1px 4px rgba(43,58,70,.16)}
+.pagenav{display:flex;gap:8px;margin-bottom:16px;background:#e0f1ed;padding:5px;border-radius:12px;width:fit-content}
+.pgbtn{display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;color:#4d7771;transition:all .15s}
+.pgbtn.active{background:#fff;color:#087d70;box-shadow:0 1px 4px rgba(15,118,106,.15)}
 .crumb{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13px;margin-bottom:12px;color:#78909c}
 .crumb .cb{cursor:pointer;color:#2E6CA4;font-weight:700;padding:3px 8px;border-radius:7px;background:#eaf1fb}
 .crumb .cb:hover{background:#d8e6f7}
@@ -76,9 +76,9 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 .tree-map{width:100%;min-width:500px;border-radius:12px;overflow:hidden;background:#edf1f4}
 .tree-map text{font-family:Tahoma,"Segoe UI",sans-serif;pointer-events:none}
 .tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}.tab{padding:8px 16px;border-radius:22px;border:1.5px solid #dde3e8;background:#fff;font-size:13px;cursor:pointer;font-family:inherit;font-weight:600;color:#546e7a;transition:all .15s;display:flex;align-items:center;gap:6px}
-.tab.active{background:#ad3940;color:#fff;border-color:#ad3940;box-shadow:0 2px 8px rgba(173,57,64,.28)}
+.tab.active{background:#0d9382;color:#fff;border-color:#0d9382;box-shadow:0 2px 8px rgba(13,147,130,.27)}
 .muted{color:#b0bec5;font-size:13px;text-align:center;padding:24px}
-.upbtn{display:inline-flex;align-items:center;gap:7px;padding:11px 18px;background:#263945;color:#fff;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:transform .1s,box-shadow .15s;box-shadow:0 2px 8px rgba(38,57,69,.22)}
+.upbtn{display:inline-flex;align-items:center;gap:7px;padding:11px 18px;background:#087d70;color:#fff;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:transform .1s,box-shadow .15s;box-shadow:0 2px 8px rgba(8,125,112,.22)}
 .upbtn:active{transform:scale(.97)}
 .import-sec{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 16px}
 .import-copy{flex:1;min-width:220px;padding-left:4px}
@@ -157,7 +157,7 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 <div class="import-copy"><strong>อัปเดตข้อมูล Dashboard</strong><span>นำเข้าไฟล์ Loss และยอดขายล่าสุด เพื่อคำนวณตัวชี้วัดและกราฟ</span></div>
 <label for="fileIn" class="upbtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> อัปโหลด CSV Loss</label>
 <input type="file" id="fileIn" accept=".csv,text/csv" style="display:none">
-<label for="saleIn" class="upbtn" style="background:#2E7D5B"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> อัปโหลด CSV ยอดขาย</label>
+<label for="saleIn" class="upbtn" style="background:#159a77"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> อัปโหลด CSV ยอดขาย</label>
 <input type="file" id="saleIn" accept=".csv,text/csv" style="display:none">
 <span id="upStatus" style="font-size:12px;color:#888"></span>
 </div>
@@ -205,11 +205,10 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 <script>
 let DATA=[];
 let SALES=[];
-// ====== GitHub auto-sync config ======
-// วางลิงก์ raw ของไฟล์ CSV บน GitHub ตรงนี้ (กด Raw บนหน้าไฟล์ใน GitHub แล้วคัดลอก URL)
-// รูปแบบ: https://raw.githubusercontent.com/<user>/<repo>/main/loss.csv
-const GH_LOSS_URL = "https://raw.githubusercontent.com/dryrh68kkm-beep/-loss-dashboard/main/loss.csv";  // <-- ใส่ลิงก์ raw ของ loss.csv
-const GH_SALE_URL = "https://raw.githubusercontent.com/dryrh68kkm-beep/-loss-dashboard/main/sale.csv";  // <-- ใส่ลิงก์ raw ของ sale.csv
+// Security mode: data is imported manually on an authorised machine only.
+// Leave these blank so no Loss or Sales data is fetched from GitHub or retained after closing the file.
+const GH_LOSS_URL = "";
+const GH_SALE_URL = "";
 let curType="ALL";
 let itemSortDir="asc";
 let itemArr=[];
@@ -284,7 +283,7 @@ function render(){
     const lyRows=scope.filter(r=>r.type==t).filter(r=>t!=="RTC"||r.amtLY<0);
     const aLY=lyRows.reduce((s,r)=>s+r.amtLY,0);
     totA+=a; totALY+=aLY;
-    const icBg={DAMAGE:'#fbe8e9',SHRINKAGE:'#edf2f4',RTC:'#fff2df'},icSt={DAMAGE:'#b73740',SHRINKAGE:'#526a77',RTC:'#d37a20'};
+    const icBg={DAMAGE:'#fbe8e9',SHRINKAGE:'#e6f6f2',RTC:'#fff2df'},icSt={DAMAGE:'#b73740',SHRINKAGE:'#0d9382',RTC:'#d37a20'};
     const g=yoy(a,aLY,true);
     cardsH+='<div class="card clickable" data-card="'+t+'">'+icw(t,icBg[t],icSt[t])+'<div class="lbl">'+t+'</div><div class="val" style="color:'+scol(a)+'">'+fmt(a)+' ฿</div>'+g.html+'<div class="tap">แตะดูรายการ ›</div></div>';
   });
@@ -302,11 +301,11 @@ function render(){
     // loss% is negative; moving toward 0 (ppDiff>0) is improvement = green
     const pcol=ppDiff==null?"#90a4ae":(ppDiff>=0?"#2E7D5B":"#C0504D");
     const parrow=ppDiff==null?"":(ppDiff>0?"▲":(ppDiff<0?"▼":"–"));
-    pctHtml='<div class="yoyline" style="color:'+pcol+'">'+parrow+' '+(ppDiff!=null?((ppDiff>=0?"+":"")+ppDiff.toFixed(2)+" pp"):"n/a")+'</div><div class="lyline">ปีก่อน: '+(lossPctLY!=null?lossPctLY.toFixed(2)+"%":"n/a")+'</div>';
+    pctHtml='<div class="yoyline" style="color:'+pcol+'">'+parrow+' '+(ppDiff!=null?((ppDiff>=0?"+":"")+ppDiff.toFixed(2)+"%"):"n/a")+'</div><div class="lyline">ปีก่อน: '+(lossPctLY!=null?lossPctLY.toFixed(2)+"%":"n/a")+'</div>';
   }
-  let pctCard='<div class="card">'+icw('PCT','#fff2df','#c97922')+'<div class="lbl">% Loss / ยอดขาย</div><div class="val" style="color:'+(lossPct!=null?scol(lossPct):"#c97922")+'">'+(lossPct!=null?lossPct.toFixed(2)+'%':'-')+'</div>'+pctHtml+'</div>';
+  let pctCard='<div class="card">'+icw('PCT','#e6f6f2','#0d9382')+'<div class="lbl">% Loss / ยอดขาย</div><div class="val" style="color:'+(lossPct!=null?scol(lossPct):"#0d9382")+'">'+(lossPct!=null?lossPct.toFixed(2)+'%':'-')+'</div>'+pctHtml+'</div>';
   const gTot=yoy(totA,totALY,true);
-  cardsH=cardsH+'<div class="card">'+icw('TOTAL','#fbe8e9','#b73740')+'<div class="lbl">รวมยอด Loss</div><div class="val" style="color:'+scol(totA)+'">'+fmt(totA)+' ฿</div>'+gTot.html+'</div>'+saleCard+pctCard;
+  cardsH=cardsH+'<div class="card">'+icw('TOTAL','#e6f6f2','#0d9382')+'<div class="lbl">รวมยอด Loss</div><div class="val" style="color:'+scol(totA)+'">'+fmt(totA)+' ฿</div>'+gTot.html+'</div>'+saleCard+pctCard;
   document.getElementById("cards").innerHTML=cardsH;
   document.querySelectorAll(".card.clickable").forEach(c=>c.onclick=()=>openModal(c.dataset.card));
   const dmap={};
@@ -608,7 +607,11 @@ window.addEventListener("resize",()=>{if(curPage==="tree")renderTree()});
 function initRender(){buildMonths();buildDivs();fillDept();render();if(curPage==="tree")renderTree();}
 
 async function loadFromGitHub(){
-  if(!GH_LOSS_URL && !GH_SALE_URL){initRender();return;}
+  if(!GH_LOSS_URL && !GH_SALE_URL){
+    initRender();
+    document.getElementById("upStatus").textContent="โหมดปลอดภัย: อัปโหลด CSV ผ่านเครื่องที่ได้รับอนุญาต · ข้อมูลจะไม่ถูกบันทึกหลังปิดไฟล์";
+    return;
+  }
   const status=document.getElementById("upStatus");
   status.textContent="⏳ กำลังดึงข้อมูลล่าสุดจาก GitHub...";
   let okL=false, okS=false;
@@ -624,7 +627,7 @@ async function loadFromGitHub(){
   }catch(e){}
   initRender();
   if(okL||okS)status.textContent="✅ ข้อมูลล่าสุดจาก GitHub ("+DATA.length+" รายการ Loss · "+SALES.length+" ยอดขาย)";
-  else status.textContent="⚠️ ยังไม่มีข้อมูล — ตรวจสอบว่าไฟล์ loss.csv / sale.csv อยู่บน GitHub แล้ว หรือกดปุ่มอัปโหลด CSV ด้านบน";
+  else status.textContent="ยังไม่มีข้อมูล · อัปโหลด CSV Loss และยอดขายเพื่อเริ่มวิเคราะห์";
 }
 loadFromGitHub();
 </script>
