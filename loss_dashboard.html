@@ -104,7 +104,9 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 </div>
 <div id="pageDash">
 <div class="controls">
-<div class="ctl"><label>เดือน (Period)</label><select id="fMonth"></select></div>
+<div class="ctl"><label>เดือน (Period)</label><select id="fMonth"></select>
+<div id="customMonthBox" style="display:none;margin-top:8px;padding:10px;background:#f7f9fa;border-radius:10px;border:1px solid #eef1f4"></div>
+</div>
 <div class="ctl"><label>ฝ่าย (Division)</label><select id="fDiv"></select></div>
 <div class="ctl"><label>แผนก (Department)</label><select id="fDept"></select></div>
 </div>
@@ -169,6 +171,7 @@ let SALES=[];
 const GH_LOSS_URL = "";
 const GH_SALE_URL = "";
 let curType="ALL";
+let customMonths=new Set();
 let itemSortDir="asc";
 let saleBarPath=[]; // [] = divisions, [div] = depts of div
 let saleSortField="samt";
@@ -253,13 +256,9 @@ function getTargetPctArr(dv,dp,type){
 // คำนวณเป้าหมาย (บาท) จาก % เป้าหมาย คูณยอดขายจริงรายเดือน (แม่นยำกว่าเลขบาทคงที่จากไฟล์เดิม)
 function computeTargetFromPctRows(pctArr,saleRows){
   if(!pctArr)return null;
-  const mo=fMonth.value;
   const salesByPeriod={};
   saleRows.forEach(r=>{salesByPeriod[r.period]=(salesByPeriod[r.period]||0)+r.samt;});
-  let periods;
-  if(mo==="ALL")periods=[...new Set(DATA.map(d=>d.period).filter(Boolean))].sort();
-  else if(mo==="H1")periods=[...new Set(DATA.map(d=>d.period).filter(Boolean))].filter(p=>{const mm=String(p).slice(4,6);return mm>="01"&&mm<="07";}).sort();
-  else periods=[mo];
+  const periods=scopePeriods();
   if(!periods.length)return null;
   let total=0,any=false;
   periods.forEach(p=>{
@@ -276,22 +275,42 @@ function computeTargetFromPct(pctArr,dv,dp){
   const saleRows=SALES.filter(d=>(dv=="ALL"||d.div==dv)&&(dp=="ALL"||d.dept==dp));
   return computeTargetFromPctRows(pctArr,saleRows);
 }
+// เป้าหมายรวมทั้งร้าน: รวมจากเป้าหมายของแต่ละฝ่ายแยกกัน (ตรงกับตาราง popup แยกฝ่าย)
+// แทนที่จะใช้ % ของแถว ALL DIVISION คูณยอดขายรวม ซึ่งอาจไม่ตรงกับสัดส่วนยอดขายจริงของร้าน
+function computeTargetTotal(pctTable,dv,dp){
+  if(dp&&dp!=="ALL"){
+    const k=targetKey(dp);
+    if(pctTable[k]){
+      const rows=SALES.filter(r=>(dv=="ALL"||r.div==dv)&&r.dept===dp);
+      return computeTargetFromPctRows(pctTable[k],rows);
+    }
+  }
+  if(dv&&dv!=="ALL"){
+    const k=targetKey(dv);
+    if(pctTable[k]){
+      const rows=SALES.filter(r=>r.div===dv&&(dp=="ALL"||r.dept===dp));
+      return computeTargetFromPctRows(pctTable[k],rows);
+    }
+    return null;
+  }
+  const divKeys=["HARD LINE","HOME LINE","SOFT LINE","DRY FOOD","FRESH FOOD","PHARMACY"];
+  let total=0,any=false;
+  divKeys.forEach(k=>{
+    if(!pctTable[k])return;
+    const rows=SALES.filter(r=>targetKey(r.div)===k);
+    const v=computeTargetFromPctRows(pctTable[k],rows);
+    if(v!=null){total+=v;any=true;}
+  });
+  return any?total:null;
+}
 function avgTargetPctForMonth(arr){
   if(!arr)return null;
-  const mo=fMonth.value;
-  let slice;
-  if(mo==="ALL"){
-    const periods=[...new Set(DATA.map(d=>d.period).filter(Boolean))].sort();
-    if(!periods.length)return null;
-    const lastMi=+periods[periods.length-1].slice(4,6)-1;
-    slice=arr.slice(0,lastMi+1);
-  }else if(mo==="H1"){
-    slice=arr.slice(0,7);
-  }else{
-    const mi=+String(mo).slice(4,6)-1;
-    return (mi>=0&&mi<12)?arr[mi]:null;
-  }
-  return slice.length?slice.reduce((s,v)=>s+v,0)/slice.length:null;
+  const periods=scopePeriods();
+  if(!periods.length)return null;
+  const idxs=[...new Set(periods.map(p=>+String(p).slice(4,6)-1))].filter(i=>i>=0&&i<12);
+  if(!idxs.length)return null;
+  const vals=idxs.map(i=>arr[i]);
+  return vals.reduce((s,v)=>s+v,0)/vals.length;
 }
 function targetKey(name){return String(name||"").replace(/^\d+\s*/,"").trim().toUpperCase();}
 function targetLineHtml(actual,target,ytd){
@@ -305,10 +324,10 @@ function targetLineHtml(actual,target,ytd){
   return '<div class="yoyline" style="color:'+col+';white-space:nowrap">'+arrow+' '+(diff>=0?"+":"")+fmtK(diff)+' ฿'+pctTxt+'</div><div class="lyline">'+(ytd?"YTD: ":"")+fmtK(target)+' ฿</div>';
 }
 function typeTargetCardHtml(t,dv,dp,mo,actual){
-  const pctArr=getTargetPctArr(dv,dp,t);
-  const val=computeTargetFromPct(pctArr,dv,dp);
+  const pctTable=(TARGET_PCT_TYPE[t])?TARGET_PCT_TYPE[t]:TARGET_PCT;
+  const val=computeTargetTotal(pctTable,dv,dp);
   if(val==null)return "";
-  const ytd=mo==="ALL";
+  const ytd=isMultiMonth();
   const lbl=t+" · เป้าหมาย (Budget"+(ytd?" YTD":"")+")";
   return '<div class="card clickable" data-ttype="'+t+'">'+icw(t,'#f0eef7','#7B5EA7')+'<div class="lbl">'+lbl+'</div><div class="val" style="color:'+scol(val)+'">'+fmtK(val)+' ฿</div><div style="font-size:10px;color:#90a4ae;font-weight:700;margin-top:6px">เทียบเป้าหมาย (Budget)</div>'+targetLineHtml(actual,val,ytd)+'<div class="tap">แตะดูรายแผนก ›</div></div>';
 }
@@ -326,18 +345,45 @@ function mMatch(period){
   const mo=fMonth.value;
   if(mo==="ALL")return true;
   if(mo==="H1"){const mm=String(period).slice(4,6);return mm>="01"&&mm<="07";}
+  if(mo==="CUSTOM")return customMonths.has(String(period));
   return period===mo;
 }
+// รายการเดือนที่อยู่ในขอบเขตตัวกรองปัจจุบัน (ใช้ร่วมกันสำหรับคำนวณ YTD/เป้าหมาย)
+function scopePeriods(){
+  const all=[...new Set(DATA.map(d=>d.period).filter(Boolean))].sort();
+  const mo=fMonth.value;
+  if(mo==="ALL")return all;
+  if(mo==="H1")return all.filter(p=>{const mm=p.slice(4,6);return mm>="01"&&mm<="07";});
+  if(mo==="CUSTOM")return all.filter(p=>customMonths.has(p));
+  return [mo];
+}
+function isMultiMonth(){return ["ALL","H1","CUSTOM"].includes(fMonth.value);}
+function multiMonthSuffix(){return fMonth.value==="CUSTOM"?" (เลือกเอง)":(isMultiMonth()?" YTD":"");}
 function thMonth(p){  const m={"01":"ม.ค.","02":"ก.พ.","03":"มี.ค.","04":"เม.ย.","05":"พ.ค.","06":"มิ.ย.","07":"ก.ค.","08":"ส.ค.","09":"ก.ย.","10":"ต.ค.","11":"พ.ย.","12":"ธ.ค."};
   const s=String(p);
   return s.length>=6?(m[s.slice(4,6)]||s):s;
 }
 function buildMonths(){
   const ms=[...new Set(DATA.map(d=>d.period).filter(Boolean))].sort();
+  const cur=fMonth.value;
   let opts="<option value=ALL>ทุกเดือน</option>";
   opts+='<option value="H1">YTD (ม.ค.–ก.ค.)</option>';
   opts+=ms.map(m=>'<option value="'+m+'">'+thMonth(m)+'</option>').join("");
+  opts+='<option value="CUSTOM">กำหนดเอง (เลือกหลายเดือน)</option>';
   fMonth.innerHTML=opts;
+  if(["ALL","H1","CUSTOM",...ms].includes(cur))fMonth.value=cur;
+  renderCustomMonthBox();
+}
+function renderCustomMonthBox(){
+  const box=document.getElementById("customMonthBox");
+  const ms=[...new Set(DATA.map(d=>d.period).filter(Boolean))].sort();
+  if(fMonth.value!=="CUSTOM"||!ms.length){box.style.display="none";return;}
+  box.style.display="block";
+  box.innerHTML=ms.map(m=>'<label style="display:inline-flex;align-items:center;gap:5px;margin:2px 10px 2px 0;font-size:12.5px;color:#455a64;cursor:pointer"><input type="checkbox" class="cmChk" value="'+m+'"'+(customMonths.has(m)?" checked":"")+'> '+thMonth(m)+'</label>').join("");
+  box.querySelectorAll(".cmChk").forEach(chk=>chk.onchange=()=>{
+    if(chk.checked)customMonths.add(chk.value); else customMonths.delete(chk.value);
+    buildDivs();fillDept();render();if(curPage==="tree")renderTree();
+  });
 }
 function buildDivs(){
   const mo=fMonth.value;
@@ -452,12 +498,11 @@ function render(){
   let pctCard='<div class="card">'+icw('PCT','#f0eef7','#7B5EA7')+'<div class="lbl">% Loss / ยอดขาย</div><div class="val" style="color:'+(lossPct!=null?scol(lossPct):"#7B5EA7")+'">'+(lossPct!=null?lossPct.toFixed(2)+'%':'-')+'</div>'+pctHtml+tgtPctHtml+'</div>';
   const gTot=yoy(totA,totALY,true);
   if(curType==="ALL"){
-    const tgtPctArrTotal=getTargetPctArr(dv,dp);
-    const tgtVal=computeTargetFromPct(tgtPctArrTotal,dv,dp);
+    const tgtVal=computeTargetTotal(TARGET_PCT,dv,dp);
     let tgtCard="";
     if(tgtVal!=null){
-      const tgtLbl="เป้าหมาย Loss (Budget"+(mo==="ALL"?" YTD":"")+")";
-      tgtCard='<div class="card clickable" data-ttype="ALL">'+icw('TOTAL','#f0eef7','#7B5EA7')+'<div class="lbl">'+tgtLbl+'</div><div class="val" style="color:'+scol(tgtVal)+'">'+fmtK(tgtVal)+' ฿</div><div style="font-size:10px;color:#90a4ae;font-weight:700;margin-top:6px">เทียบเป้าหมาย (Budget)</div>'+targetLineHtml(totA,tgtVal,mo==="ALL")+'<div class="tap">แตะดูรายแผนก ›</div></div>';
+      const tgtLbl="เป้าหมาย Loss (Budget"+multiMonthSuffix()+")";
+      tgtCard='<div class="card clickable" data-ttype="ALL">'+icw('TOTAL','#f0eef7','#7B5EA7')+'<div class="lbl">'+tgtLbl+'</div><div class="val" style="color:'+scol(tgtVal)+'">'+fmtK(tgtVal)+' ฿</div><div style="font-size:10px;color:#90a4ae;font-weight:700;margin-top:6px">เทียบเป้าหมาย (Budget)</div>'+targetLineHtml(totA,tgtVal,isMultiMonth())+'<div class="tap">แตะดูรายแผนก ›</div></div>';
     }
     cardsH=cardsH+'<div class="card">'+icw('TOTAL','#eaf1fb','#1F497D')+'<div class="lbl">รวมยอด Loss</div><div class="val" style="color:'+scol(totA)+'">'+fmt(totA)+' ฿</div><div style="font-size:10px;color:#90a4ae;font-weight:700;margin-top:6px">เทียบปีก่อน (LY)</div>'+gTot.html+'</div>'+tgtCard+pctCard;
   }
@@ -564,7 +609,13 @@ function renderSaleDeptBars(saleRows){
     document.querySelectorAll("#saleDeptBars .bar-row").forEach(el=>el.onclick=()=>{saleBarPath=[el.dataset.k];renderSaleDeptBars(saleRows);});
   }
 }
-fMonth.onchange=()=>{buildDivs();fillDept();render();if(curPage==="tree")renderTree()};
+fMonth.onchange=()=>{
+  if(fMonth.value==="CUSTOM"&&customMonths.size===0){
+    [...new Set(DATA.map(d=>d.period).filter(Boolean))].forEach(m=>customMonths.add(m));
+  }
+  renderCustomMonthBox();
+  buildDivs();fillDept();render();if(curPage==="tree")renderTree();
+};
 fDiv.onchange=()=>{fillDept();render()};
 fDept.onchange=render;
 document.getElementById("saleItemFilter").onchange=renderSalePage;
@@ -732,7 +783,6 @@ function openModal(type){
   overlay.classList.add("show");
 }
 function openTargetModal(ttype){
-  const mo=fMonth.value;
   const divKeys=["HARD LINE","HOME LINE","SOFT LINE","DRY FOOD","FRESH FOOD","PHARMACY"];
   const pctTable=(ttype!=="ALL"&&TARGET_PCT_TYPE[ttype])?TARGET_PCT_TYPE[ttype]:TARGET_PCT;
   const scope=DATA.filter(d=>mMatch(d.period)).filter(r=>ttype==="ALL"||r.type===ttype);
@@ -744,7 +794,7 @@ function openTargetModal(ttype){
     const tgt=computeTargetFromPctRows(pctTable[k],saleRowsDiv);
     return {div:k,ty,ly,tgt};
   });
-  const title=(ttype==="ALL"?"Total Loss":ttype)+" · เป้าหมายแยกฝ่าย (Division)"+(mo==="ALL"?" YTD":"");
+  const title=(ttype==="ALL"?"Total Loss":ttype)+" · เป้าหมายแยกฝ่าย (Division)"+multiMonthSuffix();
   document.getElementById("mTitle").textContent=title;
   document.getElementById("mHead").innerHTML='<tr><th>ฝ่าย</th><th class="num">ยอดจริง (฿)</th><th class="num">เป้าหมาย (฿)</th><th class="num">ผลต่างเป้า</th><th class="num">ปีก่อน (฿)</th><th class="num">ผลต่าง LY</th></tr>';
   const totTY=arr.reduce((s,r)=>s+r.ty,0), totTgt=arr.reduce((s,r)=>s+(r.tgt||0),0);
@@ -969,7 +1019,8 @@ function renderTree(){
   function drill(i){const s=segs[i];if(s&&s.drill&&drillable){treePath.push(s.name);renderTree();}}
   lg.querySelectorAll(".lgrow").forEach(el=>el.onclick=()=>drill(+el.dataset.i));
   svgBox.querySelectorAll(".dseg").forEach(el=>{el.style.cursor=drillable&&segs[+el.dataset.i].drill?"pointer":"default";el.onclick=()=>drill(+el.dataset.i);});
-  document.getElementById("treeLegend").innerHTML='ขนาดวง = สัดส่วนยอด Loss · เดือน: '+(fMonth.value==="ALL"?"ทุกเดือน":(fMonth.value==="H1"?"ม.ค.–ก.ค.":thMonth(fMonth.value)))+' · RTC เฉพาะยอดลบ · แสดง Top 20'+(rest.length?' + รวมที่เหลือเป็น "อื่นๆ"':'');
+  const moLbl=fMonth.value==="ALL"?"ทุกเดือน":(fMonth.value==="H1"?"ม.ค.–ก.ค.":(fMonth.value==="CUSTOM"?scopePeriods().map(thMonth).join(", ")||"ยังไม่เลือกเดือน":thMonth(fMonth.value)));
+  document.getElementById("treeLegend").innerHTML='ขนาดวง = สัดส่วนยอด Loss · เดือน: '+moLbl+' · RTC เฉพาะยอดลบ · แสดง Top 20'+(rest.length?' + รวมที่เหลือเป็น "อื่นๆ"':'');
 }
 window.addEventListener("resize",()=>{if(curPage==="tree")renderTree()});
 
