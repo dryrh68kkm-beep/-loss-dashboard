@@ -205,13 +205,10 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 <script>
 let DATA=[];
 let SALES=[];
-// ====== GitHub auto-sync config ======
-// วางลิงก์ raw ของไฟล์ CSV บน GitHub ตรงนี้ (กด Raw บนหน้าไฟล์ใน GitHub แล้วคัดลอก URL)
-// รูปแบบ: https://raw.githubusercontent.com/<user>/<repo>/main/loss.csv
-const GH_LOSS_URL = "https://raw.githubusercontent.com/dryrh68kkm-beep/-loss-dashboard/main/loss.csv";  // <-- ใส่ลิงก์ raw ของ loss.csv
-const GH_SALE_URL = "https://raw.githubusercontent.com/dryrh68kkm-beep/-loss-dashboard/main/sale.csv";  // <-- ใส่ลิงก์ raw ของ sale.csv
-const LOCAL_LOSS_KEY = "loss-performance.loss.v1";
-const LOCAL_SALE_KEY = "loss-performance.sale.v1";
+// Security mode: data is imported manually on an authorised machine only.
+// Leave these blank so no Loss or Sales data is fetched from GitHub or retained after closing the file.
+const GH_LOSS_URL = "";
+const GH_SALE_URL = "";
 let curType="ALL";
 let itemSortDir="asc";
 let itemArr=[];
@@ -225,22 +222,6 @@ const ICONS={
 };
 function icw(key,bg,stroke){return '<div class="icw" style="background:'+bg+'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="'+stroke+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+ICONS[key]+'</svg></div>';}
 const fMonth=document.getElementById("fMonth"),fDiv=document.getElementById("fDiv"),fDept=document.getElementById("fDept");
-function saveLocalData(){
-  try{
-    localStorage.setItem(LOCAL_LOSS_KEY,JSON.stringify(DATA));
-    localStorage.setItem(LOCAL_SALE_KEY,JSON.stringify(SALES));
-  }catch(e){}
-}
-function restoreLocalData(){
-  let restoredLoss=false,restoredSale=false;
-  try{
-    const loss=JSON.parse(localStorage.getItem(LOCAL_LOSS_KEY)||"null");
-    const sale=JSON.parse(localStorage.getItem(LOCAL_SALE_KEY)||"null");
-    if(Array.isArray(loss)&&loss.length){DATA=loss;restoredLoss=true;}
-    if(Array.isArray(sale)&&sale.length){SALES=sale;restoredSale=true;}
-  }catch(e){}
-  return {restoredLoss,restoredSale};
-}
 function mMatch(period){
   const mo=fMonth.value;
   if(mo==="ALL")return true;
@@ -320,7 +301,7 @@ function render(){
     // loss% is negative; moving toward 0 (ppDiff>0) is improvement = green
     const pcol=ppDiff==null?"#90a4ae":(ppDiff>=0?"#2E7D5B":"#C0504D");
     const parrow=ppDiff==null?"":(ppDiff>0?"▲":(ppDiff<0?"▼":"–"));
-    pctHtml='<div class="yoyline" style="color:'+pcol+'">'+parrow+' '+(ppDiff!=null?((ppDiff>=0?"+":"")+ppDiff.toFixed(2)+" pp"):"n/a")+'</div><div class="lyline">ปีก่อน: '+(lossPctLY!=null?lossPctLY.toFixed(2)+"%":"n/a")+'</div>';
+    pctHtml='<div class="yoyline" style="color:'+pcol+'">'+parrow+' '+(ppDiff!=null?((ppDiff>=0?"+":"")+ppDiff.toFixed(2)+"%"):"n/a")+'</div><div class="lyline">ปีก่อน: '+(lossPctLY!=null?lossPctLY.toFixed(2)+"%":"n/a")+'</div>';
   }
   let pctCard='<div class="card">'+icw('PCT','#e6f6f2','#0d9382')+'<div class="lbl">% Loss / ยอดขาย</div><div class="val" style="color:'+(lossPct!=null?scol(lossPct):"#0d9382")+'">'+(lossPct!=null?lossPct.toFixed(2)+'%':'-')+'</div>'+pctHtml+'</div>';
   const gTot=yoy(totA,totALY,true);
@@ -409,7 +390,6 @@ document.getElementById("fileIn").onchange=e=>{
       if(!parsed.length){upStatus.textContent="⚠️ ไม่พบข้อมูลในไฟล์";return;}
       const newMonths=[...new Set(parsed.map(p=>p.period).filter(Boolean))];
       DATA=DATA.filter(d=>!newMonths.includes(d.period)).concat(parsed);
-      saveLocalData();
       buildMonths();
       if(newMonths.length===1)fMonth.value=newMonths[0];
       buildDivs();fillDept();render();
@@ -444,7 +424,6 @@ document.getElementById("saleIn").onchange=e=>{
       if(!parsed.length){upStatus.textContent="⚠️ ไม่พบข้อมูลในไฟล์ยอดขาย";return;}
       const newMonths=[...new Set(parsed.map(p=>p.period).filter(Boolean))];
       SALES=SALES.filter(d=>!newMonths.includes(d.period)).concat(parsed);
-      saveLocalData();
       render();
       upStatus.textContent="✅ เพิ่มยอดขายแล้ว เดือน "+(newMonths.map(thMonth).join(", ")||"-")+" ("+parsed.length+" รายการ)";
     }catch(err){upStatus.textContent="⚠️ อ่านไฟล์ยอดขายไม่ได้: "+err.message;}
@@ -628,10 +607,9 @@ window.addEventListener("resize",()=>{if(curPage==="tree")renderTree()});
 function initRender(){buildMonths();buildDivs();fillDept();render();if(curPage==="tree")renderTree();}
 
 async function loadFromGitHub(){
-  const cached=restoreLocalData();
   if(!GH_LOSS_URL && !GH_SALE_URL){
     initRender();
-    if(cached.restoredLoss||cached.restoredSale)document.getElementById("upStatus").textContent="✅ ใช้ข้อมูลล่าสุดที่บันทึกไว้ในเครื่องนี้";
+    document.getElementById("upStatus").textContent="โหมดปลอดภัย: อัปโหลด CSV ผ่านเครื่องที่ได้รับอนุญาต · ข้อมูลจะไม่ถูกบันทึกหลังปิดไฟล์";
     return;
   }
   const status=document.getElementById("upStatus");
@@ -647,10 +625,8 @@ async function loadFromGitHub(){
       if(r.ok){const parsed=parseSaleRows(parseCSV(await r.text()));if(parsed&&parsed.length){SALES=parsed;okS=true;}}
     }
   }catch(e){}
-  if(okL||okS)saveLocalData();
   initRender();
   if(okL||okS)status.textContent="✅ ข้อมูลล่าสุดจาก GitHub ("+DATA.length+" รายการ Loss · "+SALES.length+" ยอดขาย)";
-  else if(cached.restoredLoss||cached.restoredSale)status.textContent="✅ ใช้ข้อมูลล่าสุดที่บันทึกไว้ในเครื่องนี้ · อัปโหลดไฟล์ใหม่เพื่ออัปเดต";
   else status.textContent="ยังไม่มีข้อมูล · อัปโหลด CSV Loss และยอดขายเพื่อเริ่มวิเคราะห์";
 }
 loadFromGitHub();
