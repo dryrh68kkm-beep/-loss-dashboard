@@ -3,17 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Loss Control Center · Big C Sai Noi</title>
+<title>Loss Performance · Big C Sai Noi</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:Tahoma,"Segoe UI",sans-serif;background:#f3f6f9;color:#263238;line-height:1.4}
-header{background:linear-gradient(135deg,#1F497D 0%,#2E6CA4 55%,#4F81BD 100%);color:#fff;padding:26px 20px 24px;box-shadow:0 2px 14px rgba(31,73,125,.28);position:relative;overflow:hidden}
-header::after{content:"";position:absolute;top:-60px;right:-40px;width:220px;height:220px;background:radial-gradient(circle,rgba(255,255,255,.14) 0%,transparent 70%);pointer-events:none}
+header{background:linear-gradient(118deg,#1d2a33 0%,#293a46 62%,#7f3038 145%);color:#fff;padding:26px 20px 24px;box-shadow:0 3px 16px rgba(29,42,51,.28);position:relative;overflow:hidden;border-bottom:3px solid #bc4449}
+header::after{content:"";position:absolute;top:-60px;right:-40px;width:220px;height:220px;background:radial-gradient(circle,rgba(225,78,80,.23) 0%,transparent 70%);pointer-events:none}
 header .htop{display:flex;align-items:center;gap:15px;max-width:1100px;margin:0 auto;position:relative;z-index:1}
 header .logo{width:50px;height:50px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,.12)}
 header .htext{flex:1}
 header .eyebrow{font-size:10px;font-weight:800;letter-spacing:1.05px;opacity:.72;margin-bottom:4px}
 header h1{font-size:25px;font-weight:800;letter-spacing:.1px;line-height:1.08}
+header h1 .hstore{display:block;font-size:17px;font-weight:400;opacity:.84;margin-top:3px}
 header .hsub{font-size:13px;opacity:.82;margin-top:5px}
 header .hbadge{display:inline-flex;align-items:center;gap:5px;margin-top:9px;font-size:10.5px;font-weight:800;letter-spacing:.55px;text-transform:uppercase;color:#eaf1fb;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);padding:4px 10px;border-radius:20px}
 .wrap{max-width:1100px;margin:0 auto;padding:16px}
@@ -21,7 +22,7 @@ header .hbadge{display:inline-flex;align-items:center;gap:5px;margin-top:9px;fon
 .controls label{font-size:11px;color:#78909c;display:block;margin-bottom:5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
 .ctl{flex:1;min-width:150px}
 select{width:100%;padding:11px 12px;border:1.5px solid #dde3e8;border-radius:10px;font-size:14px;background:#fff;font-family:inherit;color:#263238;transition:border-color .15s}
-select:focus{outline:none;border-color:#4F81BD}
+select:focus{outline:none;border-color:#b73740;box-shadow:0 0 0 3px rgba(183,55,64,.11)}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:18px}
 .card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(38,50,56,.06);position:relative;overflow:hidden}
 .card .ic{position:absolute;top:14px;right:14px;font-size:22px;opacity:.9}
@@ -34,8 +35,9 @@ select:focus{outline:none;border-color:#4F81BD}
 .card .lyline{font-size:10.5px;color:#b0bec5;margin-top:2px;font-variant-numeric:tabular-nums}
 .card.q .val{color:#37474f}
 .sec{background:#fff;border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 2px 8px rgba(38,50,56,.06)}
-.sec h2{font-size:15px;margin-bottom:14px;color:#37474f;font-weight:700;display:flex;align-items:center;gap:8px}
-.chart-note{font-size:11.5px;color:#90a4ae;margin:-7px 0 14px;padding-left:25px}
+.sec h2{font-size:15px;margin-bottom:14px;color:#37474f;font-weight:700;display:flex;align-items:center;gap:8px}.sec h2 svg{stroke:#b73740 !important}
+.chart-note{font-size:11.5px;color:#78909c;margin:-7px 0 14px;padding-left:25px}
+.sec:has(.risk-chart) .chart-note{border-left:3px solid #b73740;padding:7px 10px;background:#fff8f8;border-radius:0 8px 8px 0}
 .risk-chart{height:286px;display:flex;align-items:stretch;gap:8px;padding:18px 5px 0;border-bottom:1px solid #dfe7ee;background:repeating-linear-gradient(to top,transparent 0,transparent 58px,#edf1f5 59px,#edf1f5 60px);overflow-x:auto}
 .risk-col{min-width:54px;flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;position:relative;cursor:default}
 .risk-col::after{content:"";width:100%;height:1px;background:#dfe7ee;position:absolute;bottom:0}
@@ -51,9 +53,9 @@ th{color:#90a4ae;font-weight:700;font-size:11px;text-transform:uppercase;letter-
 tbody tr:hover{background:#fafbfc}
 td.num{text-align:right;font-variant-numeric:tabular-nums}
 .neg{color:#C0504D;font-weight:600}.pos{color:#2E7D5B;font-weight:600}
-.pagenav{display:flex;gap:8px;margin-bottom:16px;background:#e3e9f0;padding:5px;border-radius:12px;width:fit-content}
-.pgbtn{display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;color:#5a708a;transition:all .15s}
-.pgbtn.active{background:#fff;color:#1F497D;box-shadow:0 1px 4px rgba(31,73,125,.18)}
+.pagenav{display:flex;gap:8px;margin-bottom:16px;background:#e5ebee;padding:5px;border-radius:12px;width:fit-content}
+.pgbtn{display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;color:#5e7079;transition:all .15s}
+.pgbtn.active{background:#fff;color:#a5343c;box-shadow:0 1px 4px rgba(43,58,70,.16)}
 .crumb{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13px;margin-bottom:12px;color:#78909c}
 .crumb .cb{cursor:pointer;color:#2E6CA4;font-weight:700;padding:3px 8px;border-radius:7px;background:#eaf1fb}
 .crumb .cb:hover{background:#d8e6f7}
@@ -74,9 +76,9 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 .tree-map{width:100%;min-width:500px;border-radius:12px;overflow:hidden;background:#edf1f4}
 .tree-map text{font-family:Tahoma,"Segoe UI",sans-serif;pointer-events:none}
 .tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}.tab{padding:8px 16px;border-radius:22px;border:1.5px solid #dde3e8;background:#fff;font-size:13px;cursor:pointer;font-family:inherit;font-weight:600;color:#546e7a;transition:all .15s;display:flex;align-items:center;gap:6px}
-.tab.active{background:#1F497D;color:#fff;border-color:#1F497D;box-shadow:0 2px 8px rgba(31,73,125,.3)}
+.tab.active{background:#ad3940;color:#fff;border-color:#ad3940;box-shadow:0 2px 8px rgba(173,57,64,.28)}
 .muted{color:#b0bec5;font-size:13px;text-align:center;padding:24px}
-.upbtn{display:inline-flex;align-items:center;gap:7px;padding:11px 18px;background:#1F497D;color:#fff;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:transform .1s,box-shadow .15s;box-shadow:0 2px 8px rgba(31,73,125,.25)}
+.upbtn{display:inline-flex;align-items:center;gap:7px;padding:11px 18px;background:#263945;color:#fff;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:transform .1s,box-shadow .15s;box-shadow:0 2px 8px rgba(38,57,69,.22)}
 .upbtn:active{transform:scale(.97)}
 .import-sec{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 16px}
 .import-copy{flex:1;min-width:220px;padding-left:4px}
@@ -107,6 +109,7 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
   header .logo svg{width:23px;height:23px}
   header .eyebrow{font-size:8.5px;margin-bottom:3px;letter-spacing:.8px}
   header h1{font-size:20px;line-height:1.1}
+  header h1 .hstore{font-size:16px;margin-top:2px}
   header .hsub{font-size:11px;margin-top:3px}
   header .hbadge{font-size:9.5px;margin-top:7px;padding:4px 8px;letter-spacing:.25px}
   .wrap{padding:12px}
@@ -148,7 +151,7 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
-<header><div class="htop"><div class="logo"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="htext"><div class="eyebrow">BIG C HYPER · SAI NOI</div><h1>Loss Control Center</h1><div class="hsub">Performance &amp; Risk Monitoring</div><div class="hbadge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Loss Prevention</div></div></div></header>
+<header><div class="htop"><div class="logo"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="htext"><div class="eyebrow">BIG C HYPER · SAI NOI</div><h1>Loss Performance <span class="hstore">Big C Sai Noi</span></h1><div class="hsub">Loss Prevention · Performance &amp; Risk Monitoring</div><div class="hbadge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Loss Prevention</div></div></div></header>
 <div class="wrap">
 <div class="sec import-sec">
 <div class="import-copy"><strong>อัปเดตข้อมูล Dashboard</strong><span>นำเข้าไฟล์ Loss และยอดขายล่าสุด เพื่อคำนวณตัวชี้วัดและกราฟ</span></div>
@@ -281,7 +284,7 @@ function render(){
     const lyRows=scope.filter(r=>r.type==t).filter(r=>t!=="RTC"||r.amtLY<0);
     const aLY=lyRows.reduce((s,r)=>s+r.amtLY,0);
     totA+=a; totALY+=aLY;
-    const icBg={DAMAGE:'#fdecea',SHRINKAGE:'#eaf1fb',RTC:'#fff5e6'},icSt={DAMAGE:'#C0504D',SHRINKAGE:'#2E6CA4',RTC:'#E08A1E'};
+    const icBg={DAMAGE:'#fbe8e9',SHRINKAGE:'#edf2f4',RTC:'#fff2df'},icSt={DAMAGE:'#b73740',SHRINKAGE:'#526a77',RTC:'#d37a20'};
     const g=yoy(a,aLY,true);
     cardsH+='<div class="card clickable" data-card="'+t+'">'+icw(t,icBg[t],icSt[t])+'<div class="lbl">'+t+'</div><div class="val" style="color:'+scol(a)+'">'+fmt(a)+' ฿</div>'+g.html+'<div class="tap">แตะดูรายการ ›</div></div>';
   });
@@ -301,9 +304,9 @@ function render(){
     const parrow=ppDiff==null?"":(ppDiff>0?"▲":(ppDiff<0?"▼":"–"));
     pctHtml='<div class="yoyline" style="color:'+pcol+'">'+parrow+' '+(ppDiff!=null?((ppDiff>=0?"+":"")+ppDiff.toFixed(2)+" pp"):"n/a")+'</div><div class="lyline">ปีก่อน: '+(lossPctLY!=null?lossPctLY.toFixed(2)+"%":"n/a")+'</div>';
   }
-  let pctCard='<div class="card">'+icw('PCT','#f0eef7','#7B5EA7')+'<div class="lbl">% Loss / ยอดขาย</div><div class="val" style="color:'+(lossPct!=null?scol(lossPct):"#7B5EA7")+'">'+(lossPct!=null?lossPct.toFixed(2)+'%':'-')+'</div>'+pctHtml+'</div>';
+  let pctCard='<div class="card">'+icw('PCT','#fff2df','#c97922')+'<div class="lbl">% Loss / ยอดขาย</div><div class="val" style="color:'+(lossPct!=null?scol(lossPct):"#c97922")+'">'+(lossPct!=null?lossPct.toFixed(2)+'%':'-')+'</div>'+pctHtml+'</div>';
   const gTot=yoy(totA,totALY,true);
-  cardsH=cardsH+'<div class="card">'+icw('TOTAL','#eaf1fb','#1F497D')+'<div class="lbl">รวมยอด Loss</div><div class="val" style="color:'+scol(totA)+'">'+fmt(totA)+' ฿</div>'+gTot.html+'</div>'+saleCard+pctCard;
+  cardsH=cardsH+'<div class="card">'+icw('TOTAL','#fbe8e9','#b73740')+'<div class="lbl">รวมยอด Loss</div><div class="val" style="color:'+scol(totA)+'">'+fmt(totA)+' ฿</div>'+gTot.html+'</div>'+saleCard+pctCard;
   document.getElementById("cards").innerHTML=cardsH;
   document.querySelectorAll(".card.clickable").forEach(c=>c.onclick=()=>openModal(c.dataset.card));
   const dmap={};
