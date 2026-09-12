@@ -3,18 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Loss Performance · Big C Sainoi</title>
+<title>Loss Control Center · Big C Sai Noi</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:Tahoma,"Segoe UI",sans-serif;background:#eef1f4;color:#263238;line-height:1.4}
+body{font-family:Tahoma,"Segoe UI",sans-serif;background:#f3f6f9;color:#263238;line-height:1.4}
 header{background:linear-gradient(135deg,#1F497D 0%,#2E6CA4 55%,#4F81BD 100%);color:#fff;padding:26px 20px 24px;box-shadow:0 2px 14px rgba(31,73,125,.28);position:relative;overflow:hidden}
 header::after{content:"";position:absolute;top:-60px;right:-40px;width:220px;height:220px;background:radial-gradient(circle,rgba(255,255,255,.14) 0%,transparent 70%);pointer-events:none}
 header .htop{display:flex;align-items:center;gap:15px;max-width:1100px;margin:0 auto;position:relative;z-index:1}
 header .logo{width:50px;height:50px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,.12)}
 header .htext{flex:1}
-header h1{font-size:23px;font-weight:800;letter-spacing:.2px;line-height:1.15}
-header h1 .hstore{font-weight:400;opacity:.85;display:inline-block}
-header .hbadge{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#eaf1fb;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);padding:4px 11px;border-radius:20px}
+header .eyebrow{font-size:10px;font-weight:800;letter-spacing:1.05px;opacity:.72;margin-bottom:4px}
+header h1{font-size:25px;font-weight:800;letter-spacing:.1px;line-height:1.08}
+header .hsub{font-size:13px;opacity:.82;margin-top:5px}
+header .hbadge{display:inline-flex;align-items:center;gap:5px;margin-top:9px;font-size:10.5px;font-weight:800;letter-spacing:.55px;text-transform:uppercase;color:#eaf1fb;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);padding:4px 10px;border-radius:20px}
 .wrap{max-width:1100px;margin:0 auto;padding:16px}
 .controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
 .controls label{font-size:11px;color:#78909c;display:block;margin-bottom:5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
@@ -77,6 +78,11 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 .muted{color:#b0bec5;font-size:13px;text-align:center;padding:24px}
 .upbtn{display:inline-flex;align-items:center;gap:7px;padding:11px 18px;background:#1F497D;color:#fff;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:transform .1s,box-shadow .15s;box-shadow:0 2px 8px rgba(31,73,125,.25)}
 .upbtn:active{transform:scale(.97)}
+.import-sec{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 16px}
+.import-copy{flex:1;min-width:220px;padding-left:4px}
+.import-copy strong{display:block;font-size:12px;color:#455a64;margin-bottom:2px}
+.import-copy span{font-size:11px;color:#90a4ae}
+.import-sec #upStatus{width:100%;font-size:11px;color:#78909c;min-height:0}
 .card.clickable{cursor:pointer;transition:transform .12s,box-shadow .15s}
 .card.clickable:hover{box-shadow:0 4px 16px rgba(38,50,56,.12)}
 .card.clickable:active{transform:scale(.97)}
@@ -93,12 +99,59 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 .modal-b{overflow:auto;padding:16px 20px}
 .modal-sum{font-size:12px;color:#78909c;margin-bottom:12px;background:#f7f9fa;padding:10px 12px;border-radius:10px}
 .freshRow:hover{background:#fff0f1 !important}
+/* Mobile-first refinements: keep the overview visible before the user starts scrolling. */
+@media(max-width:599px){
+  header{padding:18px 18px 20px;border-radius:0 0 18px 18px;box-shadow:0 3px 12px rgba(31,73,125,.2)}
+  header .htop{gap:11px}
+  header .logo{width:42px;height:42px;border-radius:12px}
+  header .logo svg{width:23px;height:23px}
+  header .eyebrow{font-size:8.5px;margin-bottom:3px;letter-spacing:.8px}
+  header h1{font-size:20px;line-height:1.1}
+  header .hsub{font-size:11px;margin-top:3px}
+  header .hbadge{font-size:9.5px;margin-top:7px;padding:4px 8px;letter-spacing:.25px}
+  .wrap{padding:12px}
+  .sec{border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(38,50,56,.05)}
+  .import-sec{display:grid !important;grid-template-columns:1fr 1fr;gap:9px !important;padding:11px !important}
+  .import-copy{display:none}
+  .import-sec .upbtn{min-height:50px;justify-content:center;padding:10px 7px;border-radius:11px;font-size:11.5px;line-height:1.2;text-align:center;gap:5px;box-shadow:none}
+  .import-sec .upbtn svg{width:15px;height:15px;flex-shrink:0}
+  .import-sec #upStatus{grid-column:1 / -1;text-align:center;min-height:0;font-size:10.5px}
+  .pagenav{width:100%;margin-bottom:13px;gap:4px;padding:4px;border-radius:12px}
+  .pgbtn{flex:1;justify-content:center;padding:9px 6px;font-size:11.5px;gap:5px;white-space:nowrap}
+  .controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:13px}
+  .ctl{min-width:0}
+  .ctl:last-child{grid-column:1 / -1}
+  .controls label{font-size:10px;margin-bottom:4px;letter-spacing:.2px}
+  select{height:44px;padding:9px 10px;border-radius:11px;font-size:13px}
+  .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:13px}
+  .tab{justify-content:center;padding:9px 3px;border-radius:11px;font-size:11px;white-space:nowrap}
+  .cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:13px}
+  .card{border-radius:14px;padding:13px}
+  .card .icw{top:11px;right:11px;width:30px;height:30px;border-radius:9px}
+  .card .lbl{font-size:10px;padding-right:31px}
+  .card .val{font-size:17px;margin-top:7px}
+  .card .yoyline{font-size:10.5px;margin-top:5px}
+  .card .lyline,.card .tap{font-size:9.5px !important}
+  .sec h2{font-size:14px;margin-bottom:9px}
+  .chart-note{margin:0 0 10px;padding:8px 9px;border-radius:9px;background:#f5f8fb;font-size:10.5px;line-height:1.45}
+  .risk-chart{height:226px;padding:14px 4px 0;gap:6px;background-size:auto 48px}
+  .risk-col{min-width:45px}
+  .risk-bar{width:min(28px,72%)}
+  .risk-label{font-size:9px;height:29px;padding-top:6px}
+  .risk-value{font-size:9px}
+  .risk-chart.is-empty{height:126px;padding:0;background:#f8fafc;border:1px dashed #ccd8e3;border-bottom:1px dashed #ccd8e3;border-radius:11px}
+  .risk-chart.is-empty .risk-empty{height:100%;padding:16px;font-size:11.5px;line-height:1.45;text-align:center}
+  .tree-summary{align-items:flex-start;flex-wrap:wrap;gap:4px 8px;font-size:10.5px}
+  .tree-summary strong{font-size:14px}
+  .tree-map{min-width:430px}
+}
 </style>
 </head>
 <body>
-<header><div class="htop"><div class="logo"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="htext"><h1>Loss Performance <span class="hstore">Big C Sainoi</span></h1><div class="hbadge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> by Loss Prevention</div></div></div></header>
+<header><div class="htop"><div class="logo"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="htext"><div class="eyebrow">BIG C HYPER · SAI NOI</div><h1>Loss Control Center</h1><div class="hsub">Performance &amp; Risk Monitoring</div><div class="hbadge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Loss Prevention</div></div></div></header>
 <div class="wrap">
-<div class="sec" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+<div class="sec import-sec">
+<div class="import-copy"><strong>อัปเดตข้อมูล Dashboard</strong><span>นำเข้าไฟล์ Loss และยอดขายล่าสุด เพื่อคำนวณตัวชี้วัดและกราฟ</span></div>
 <label for="fileIn" class="upbtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> อัปโหลด CSV Loss</label>
 <input type="file" id="fileIn" accept=".csv,text/csv" style="display:none">
 <label for="saleIn" class="upbtn" style="background:#2E7D5B"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> อัปโหลด CSV ยอดขาย</label>
@@ -257,11 +310,13 @@ function render(){
   rows.forEach(r=>{dmap[r.dept]=(dmap[r.dept]||0)+r.amt});
   const darr=Object.entries(dmap).sort((a,b)=>a[1]-b[1]).slice(0,12);
   const maxAbs=Math.max(...darr.map(d=>Math.abs(d[1])),1);
-  document.getElementById("deptBars").innerHTML=darr.length?darr.map(d=>{
+  const deptChart=document.getElementById("deptBars");
+  deptChart.classList.toggle("is-empty",!darr.length);
+  deptChart.innerHTML=darr.length?darr.map(d=>{
     const height=Math.max(5,Math.round(Math.abs(d[1])/maxAbs*190));
     const safeName=String(d[0]).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
     return '<div class="risk-col" title="'+safeName+' · '+fmt(d[1])+' บาท"><span class="risk-value" style="color:'+scol(d[1])+'">'+fmt(d[1])+'</span><div class="risk-bar '+(d[1]>0?'good':'')+'" style="height:'+height+'px"></div><span class="risk-label">'+safeName+'</span></div>';
-  }).join(""):'<div class="risk-empty">ไม่มีข้อมูล</div>';
+  }).join(""):'<div class="risk-empty">ยังไม่มีข้อมูลสำหรับสร้างกราฟ<br>อัปโหลด CSV Loss เพื่อเริ่มวิเคราะห์</div>';
   const imap={};
   const mo2=fMonth.value,dv2=fDiv.value,dp2=fDept.value;
   const combRows=DATA.filter(d=>mMatch(d.period)&&(dv2=="ALL"||d.div==dv2)&&(dp2=="ALL"||d.dept==dp2)&&(d.type==="DAMAGE"||d.type==="RTC"||d.type==="SHRINKAGE"));
