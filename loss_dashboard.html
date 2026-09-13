@@ -84,9 +84,6 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 .tree-summary strong{font-size:16px;color:#c0504d;font-variant-numeric:tabular-nums}
 .tree-map{width:100%;min-width:500px;border-radius:12px;overflow:hidden;background:#edf1f4}
 .tree-map text{font-family:Tahoma,"Segoe UI",sans-serif;pointer-events:none}
-.sales-lead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:13px 14px;margin:-2px 0 15px;border:1px solid #d9eee8;border-radius:12px;background:linear-gradient(105deg,#f2fbf8,#fbfdfd)}
-.sales-lead-label{font-size:11px;font-weight:800;letter-spacing:.45px;text-transform:uppercase;color:#5a7d76}.sales-lead strong{display:block;margin-top:3px;font-size:20px;color:#087d70;font-variant-numeric:tabular-nums}.sales-lead-copy{max-width:460px;font-size:11.5px;color:#6f8984;line-height:1.5;text-align:right}
-.sales-bars{display:grid;gap:14px}.sales-row{padding:2px 0 13px;border-bottom:1px solid #edf2f1}.sales-row:last-child{padding-bottom:0;border-bottom:0}.sales-row-head,.sales-row-meta{display:flex;justify-content:space-between;gap:12px;align-items:baseline}.sales-row-name{font-size:12.5px;font-weight:800;color:#354c49;min-width:0}.sales-row-value{font-size:14px;font-weight:800;color:#125c53;font-variant-numeric:tabular-nums;white-space:nowrap}.sales-track{height:12px;margin:7px 0 7px;border-radius:999px;background:#e9f0ef;overflow:hidden;box-shadow:inset 0 1px 2px rgba(20,77,68,.06)}.sales-fill{height:100%;min-width:4px;border-radius:999px;background:linear-gradient(90deg,#087d70,#62cdb8);box-shadow:0 2px 6px rgba(13,147,130,.24);transition:width .25s ease}.sales-row-meta{font-size:10.5px;color:#8aa09b;font-variant-numeric:tabular-nums}.sales-delta{font-weight:800}.sales-delta.pos{color:#278567}.sales-delta.neg{color:#c0504d}.sales-delta.neutral{color:#78909c}.sales-rank{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;margin-right:7px;border-radius:6px;background:#e3f4ef;color:#087d70;font-size:10px;vertical-align:1px}.sales-empty{padding:40px 16px;text-align:center;border:1px dashed #cde2dc;border-radius:12px;background:#f8fcfb;color:#75918a;font-size:13px;line-height:1.6}.sales-table-sub{font-size:11px;color:#8aa09b;font-weight:500}
 .tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}.tab{padding:8px 16px;border-radius:22px;border:1.5px solid #dde3e8;background:#fff;font-size:13px;cursor:pointer;font-family:inherit;font-weight:600;color:#546e7a;transition:all .15s;display:flex;align-items:center;gap:6px}
 .tab.active{background:#0d9382;color:#fff;border-color:#0d9382;box-shadow:0 2px 8px rgba(13,147,130,.27)}
 .muted{color:#b0bec5;font-size:13px;text-align:center;padding:24px}
@@ -162,7 +159,6 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
   .tree-summary{align-items:flex-start;flex-wrap:wrap;gap:4px 8px;font-size:10.5px}
   .tree-summary strong{font-size:14px}
   .tree-map{min-width:430px}
-  .sales-lead{display:block;padding:11px 12px;margin-bottom:12px}.sales-lead strong{font-size:17px}.sales-lead-copy{margin-top:5px;text-align:left;font-size:10.5px}.sales-bars{gap:11px}.sales-row{padding-bottom:10px}.sales-row-name{font-size:11px}.sales-row-value{font-size:12px}.sales-track{height:10px;margin:6px 0}.sales-row-meta{font-size:9.5px;gap:6px}.sales-row-meta span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sales-table-sub{display:block;margin-top:2px}
 }
 </style>
 </head>
@@ -177,17 +173,16 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 <input type="file" id="saleIn" accept=".csv,text/csv" style="display:none">
 <span id="upStatus" style="font-size:12px;color:#888"></span>
 </div>
+<div class="pagenav" id="pagenav">
+<div class="pgbtn active" data-pg="dash"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg> แดชบอร์ด</div>
+<div class="pgbtn" data-pg="tree"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="12"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="19" width="7" height="2"/></svg> วิเคราะห์สัดส่วน</div>
+</div>
+<div id="pageDash">
 <div class="controls">
 <div class="ctl"><label>เดือน (Period)</label><select id="fMonth"></select><div class="month-panel" id="monthPanel"><div class="month-panel-head"><span>เลือกเดือนที่ต้องการรวม</span><div class="month-actions"><button type="button" class="month-action" id="monthAll">เลือกทั้งหมด</button><button type="button" class="month-action" id="monthClear">ล้าง</button></div></div><div class="month-checks" id="monthChecks"></div><div class="month-helper" id="monthHelper">เลือกได้หลายเดือน · ระบบจะรวมข้อมูลเฉพาะเดือนที่เลือก</div></div></div>
 <div class="ctl"><label>ฝ่าย (Division)</label><select id="fDiv"></select></div>
 <div class="ctl"><label>แผนก (Department)</label><select id="fDept"></select></div>
 </div>
-<div class="pagenav" id="pagenav">
-<div class="pgbtn active" data-pg="dash"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg> แดชบอร์ด</div>
-<div class="pgbtn" data-pg="tree"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="12"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="19" width="7" height="2"/></svg> วิเคราะห์สัดส่วน</div>
-<div class="pgbtn" data-pg="sales"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> ยอดขาย</div>
-</div>
-<div id="pageDash">
 <div class="tabs" id="tabs">
 <div class="tab active" data-t="ALL">ทั้งหมด</div>
 <div class="tab" data-t="DAMAGE">DAMAGE</div>
@@ -207,17 +202,6 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 <div id="donutLegend" style="flex:1;min-width:240px"></div>
 </div>
 <div id="treeLegend" style="margin-top:14px;font-size:11px;color:#90a4ae"></div>
-</div>
-</div>
-<div id="pageSales" style="display:none">
-<div class="sec">
-<h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0d9a87" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> ยอดขายแยกตามฝ่าย <span class="sales-table-sub">Top 12 · เทียบปีก่อน</span></h2>
-<div id="salesLead" class="sales-lead"></div>
-<div id="salesBars" class="sales-bars"></div>
-</div>
-<div class="sec">
-<h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0d9a87" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> ยอดขายแยกตามแผนก <span class="sales-table-sub">เรียงตามยอดขายปัจจุบัน</span></h2>
-<div style="overflow-x:auto"><table id="salesTbl"><thead><tr><th>แผนก</th><th class="num">ยอดขายปีนี้ (฿)</th><th class="num">ปีก่อน (฿)</th><th class="num">ส่วนต่าง</th><th class="num">เปลี่ยนแปลง</th></tr></thead><tbody></tbody></table></div>
 </div>
 </div>
 </div>
@@ -277,7 +261,7 @@ function buildMonthChecks(months){
   monthChecks.innerHTML=months.map(m=>'<label class="month-check"><input type="checkbox" value="'+m+'" '+(customMonths.includes(m)?'checked':'')+'><span>'+thMonth(m)+'</span></label>').join("")||'<span class="muted" style="grid-column:1/-1;padding:5px">อัปโหลดข้อมูลก่อนเพื่อเลือกเดือน</span>';
   monthChecks.querySelectorAll("input").forEach(input=>input.onchange=()=>{
     customMonths=[...monthChecks.querySelectorAll("input:checked")].map(x=>x.value);
-    updateCustomMonthLabel();buildDivs();fillDept();render();if(curPage==="tree")renderTree();if(curPage==="sales")renderSales();
+    updateCustomMonthLabel();buildDivs();fillDept();render();if(curPage==="tree")renderTree();
   });
   updateCustomMonthLabel();
 }
@@ -380,50 +364,10 @@ function render(){
   document.querySelector("#itemTbl tbody").innerHTML=itemArr.length?itemArr.map((r,i)=>'<tr class="itemRow" data-i="'+i+'" style="cursor:pointer"><td style="font-variant-numeric:tabular-nums;color:#888">'+r.bc+'</td><td>'+r.name+' <span style="color:#2E6CA4;font-size:10px">›</span></td><td class="num">'+r.qty.toLocaleString('th-TH',{maximumFractionDigits:2})+'</td><td class="num '+(r.amt<0?'neg':'pos')+'">'+fmt(r.amt)+'</td></tr>').join(""):'<tr><td colspan=4 class=muted>ไม่มีข้อมูล</td></tr>';
   document.querySelectorAll(".itemRow").forEach(el=>el.onclick=()=>openItemModal(itemArr[+el.dataset.i]));
 }
-function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;");}
-function renderSales(){
-  const dv=fDiv.value,dp=fDept.value;
-  const rows=SALES.filter(r=>mMatch(r.period)&&(dv==="ALL"||r.div===dv)&&(dp==="ALL"||r.dept===dp));
-  const divMap={};
-  rows.forEach(r=>{
-    const k=r.div||"(ไม่ระบุฝ่าย)";
-    if(!divMap[k])divMap[k]={name:k,sale:0,ly:0};
-    divMap[k].sale+=r.samt;divMap[k].ly+=r.samtLY;
-  });
-  const divisions=Object.values(divMap).map(r=>({...r,diff:r.sale-r.ly,pct:r.ly!==0?(r.sale-r.ly)/Math.abs(r.ly)*100:null})).sort((a,b)=>b.sale-a.sale).slice(0,12);
-  const total=divisions.reduce((s,r)=>s+r.sale,0),totalLY=divisions.reduce((s,r)=>s+r.ly,0),totalDiff=total-totalLY;
-  const lead=document.getElementById("salesLead"),bars=document.getElementById("salesBars"),tbody=document.querySelector("#salesTbl tbody");
-  if(!rows.length){
-    lead.innerHTML='<div><div class="sales-lead-label">ยอดขายตามตัวกรองที่เลือก</div><strong>—</strong></div><div class="sales-lead-copy">อัปโหลด CSV ยอดขายจากเครื่องที่ได้รับอนุญาต เพื่อแสดงกราฟและเปรียบเทียบปีก่อน</div>';
-    bars.innerHTML='<div class="sales-empty">ยังไม่มีข้อมูลยอดขายสำหรับสร้างกราฟ<br>ข้อมูลจะอยู่ในหน่วยความจำชั่วคราวและไม่ถูกบันทึกหลังปิดไฟล์</div>';
-    tbody.innerHTML='<tr><td colspan="5" class="muted">ไม่มีข้อมูลยอดขาย</td></tr>';
-    return;
-  }
-  const leadPct=totalLY!==0?(totalDiff/Math.abs(totalLY)*100):null;
-  const leadClass=totalDiff>0?"pos":(totalDiff<0?"neg":"neutral");
-  lead.innerHTML='<div><div class="sales-lead-label">ยอดขายรวมตามตัวกรอง</div><strong>'+fmt(total)+' ฿</strong></div><div class="sales-lead-copy">เทียบปีก่อน '+fmt(totalLY)+' ฿ · <span class="sales-delta '+leadClass+'">'+(totalDiff>0?"▲ ":(totalDiff<0?"▼ ":"– "))+(totalDiff>=0?"+":"")+fmt(totalDiff)+' ฿'+(leadPct!=null?' ('+(leadPct>=0?"+":"")+leadPct.toFixed(1)+'%)':'')+'</span></div>';
-  const max=Math.max(...divisions.map(r=>r.sale),1);
-  bars.innerHTML=divisions.map((r,i)=>{
-    const cls=r.diff>0?"pos":(r.diff<0?"neg":"neutral");
-    const delta=(r.diff>0?"▲ ":(r.diff<0?"▼ ":"– "))+(r.diff>=0?"+":"")+fmt(r.diff)+' ฿'+(r.pct!=null?' ('+(r.pct>=0?"+":"")+r.pct.toFixed(1)+'%)':'');
-    return '<div class="sales-row"><div class="sales-row-head"><div class="sales-row-name"><span class="sales-rank">'+(i+1)+'</span>'+esc(r.name)+'</div><div class="sales-row-value">'+fmt(r.sale)+' ฿</div></div><div class="sales-track" role="img" aria-label="ยอดขาย '+esc(r.name)+' '+fmt(r.sale)+' บาท"><div class="sales-fill" style="width:'+Math.max(2,r.sale/max*100).toFixed(1)+'%"></div></div><div class="sales-row-meta"><span>ปีก่อน: '+fmt(r.ly)+' ฿</span><span class="sales-delta '+cls+'">'+delta+'</span></div></div>';
-  }).join("");
-  const deptMap={};
-  rows.forEach(r=>{
-    const k=r.dept||"(ไม่ระบุแผนก)";
-    if(!deptMap[k])deptMap[k]={name:k,sale:0,ly:0};
-    deptMap[k].sale+=r.samt;deptMap[k].ly+=r.samtLY;
-  });
-  const depts=Object.values(deptMap).map(r=>({...r,diff:r.sale-r.ly,pct:r.ly!==0?(r.sale-r.ly)/Math.abs(r.ly)*100:null})).sort((a,b)=>b.sale-a.sale).slice(0,20);
-  tbody.innerHTML=depts.map(r=>{
-    const cls=r.diff>0?"pos":(r.diff<0?"neg":"");
-    return '<tr><td>'+esc(r.name)+'</td><td class="num" style="color:#087d70;font-weight:700">'+fmt(r.sale)+'</td><td class="num">'+fmt(r.ly)+'</td><td class="num '+cls+'">'+(r.diff>=0?"+":"")+fmt(r.diff)+'</td><td class="num '+cls+'">'+(r.pct!=null?(r.pct>=0?"+":"")+r.pct.toFixed(1)+'%':'–')+'</td></tr>';
-  }).join("");
-}
 function applyCustomMonths(months){
   customMonths=months;
   monthChecks.querySelectorAll("input").forEach(input=>input.checked=customMonths.includes(input.value));
-  updateCustomMonthLabel();buildDivs();fillDept();render();if(curPage==="tree")renderTree();if(curPage==="sales")renderSales();
+  updateCustomMonthLabel();buildDivs();fillDept();render();if(curPage==="tree")renderTree();
 }
 fMonth.onchange=()=>{
   if(fMonth.value==="CUSTOM"){
@@ -431,10 +375,10 @@ fMonth.onchange=()=>{
     monthPanel.classList.add("show");
     applyCustomMonths(customMonths);
   }else monthPanel.classList.remove("show");
-  buildDivs();fillDept();render();if(curPage==="tree")renderTree();if(curPage==="sales")renderSales();
+  buildDivs();fillDept();render();if(curPage==="tree")renderTree();
 };
-fDiv.onchange=()=>{fillDept();render();if(curPage==="tree")renderTree();if(curPage==="sales")renderSales()};
-fDept.onchange=()=>{render();if(curPage==="tree")renderTree();if(curPage==="sales")renderSales()};
+fDiv.onchange=()=>{fillDept();render();if(curPage==="tree")renderTree()};
+fDept.onchange=()=>{render();if(curPage==="tree")renderTree()};
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");curType=t.dataset.t;render()});
 document.getElementById("monthAll").onclick=()=>applyCustomMonths([...monthChecks.querySelectorAll("input")].map(input=>input.value));
 document.getElementById("monthClear").onclick=()=>applyCustomMonths([]);
@@ -525,7 +469,7 @@ document.getElementById("saleIn").onchange=e=>{
       if(!parsed.length){upStatus.textContent="⚠️ ไม่พบข้อมูลในไฟล์ยอดขาย";return;}
       const newMonths=[...new Set(parsed.map(p=>p.period).filter(Boolean))];
       SALES=SALES.filter(d=>!newMonths.includes(d.period)).concat(parsed);
-      buildMonths();buildDivs();fillDept();render();if(curPage==="sales")renderSales();
+      buildMonths();buildDivs();fillDept();render();
       upStatus.textContent="✅ เพิ่มยอดขายแล้ว เดือน "+(newMonths.map(thMonth).join(", ")||"-")+" ("+parsed.length+" รายการ)";
     }catch(err){upStatus.textContent="⚠️ อ่านไฟล์ยอดขายไม่ได้: "+err.message;}
   };
@@ -614,14 +558,12 @@ document.querySelectorAll(".pgbtn").forEach(b=>b.onclick=()=>{
   curPage=b.dataset.pg;
   document.getElementById("pageDash").style.display=curPage==="dash"?"":"none";
   document.getElementById("pageTree").style.display=curPage==="tree"?"":"none";
-  document.getElementById("pageSales").style.display=curPage==="sales"?"":"none";
   document.getElementById("tabs").style.display=curPage==="dash"?"":"none";
   if(curPage==="tree")renderTree();
-  if(curPage==="sales")renderSales();
 });
 
 // ---------- Treemap ----------
-const TCOLORS=["#1F497D","#E8743B","#19A979","#ED4A7B","#9C5FC7","#00B0BE","#F4B400","#6B8E23","#C0504D","#3B6B99","#FF8C42","#13A5A5","#8E44AD","#2E7D5B","#D64550","#4F81BD","#E0A800","#5C6BC0","#26A69A","#EC7063"];
+const TCOLORS=["#0b6b62","#138b7a","#2fa78f","#65baa8","#94cfbe","#1e7084","#4c91a1","#789cb1","#d09661","#c96f74","#8c7aae","#678d76","#b08f52","#5d8a94","#bd7c88","#82ae9b","#a88e6a","#7391b9","#50a69c","#cb8a77"];
 let treePath=[]; // [] = divisions, [div] = depts of div, [div,dept] = items
 function treeLossRows(){
   const mo=fMonth.value;
@@ -679,7 +621,7 @@ function renderTree(){
   // Weighted treemap: each row gets a proportional height; blocks inside it get a proportional width.
   // It keeps labels legible, unlike a 20-slice donut, and each block remains tappable for drill-down.
   // Keep high-level views compact; individual products still need more vertical room.
-  const W=680,H=segs.length<=6?260:(segs.length<=12?300:350),groupSize=treePath.length===0?segs.length:3;
+  const W=680,H=segs.length<=6?300:(segs.length<=12?330:360),groupSize=treePath.length===0?2:3;
   let y=0,rects="";
   for(let start=0;start<segs.length;start+=groupSize){
     const group=segs.slice(start,start+groupSize);
@@ -716,7 +658,7 @@ function renderTree(){
 }
 window.addEventListener("resize",()=>{if(curPage==="tree")renderTree()});
 
-function initRender(){buildMonths();buildDivs();fillDept();render();if(curPage==="tree")renderTree();if(curPage==="sales")renderSales();}
+function initRender(){buildMonths();buildDivs();fillDept();render();if(curPage==="tree")renderTree();}
 
 async function loadFromGitHub(){
   if(!GH_LOSS_URL && !GH_SALE_URL){
