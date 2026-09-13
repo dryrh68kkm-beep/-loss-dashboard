@@ -565,7 +565,11 @@ function renderTree(){
   const top=nodes.slice(0,20);
   const rest=nodes.slice(20);
   let segs=top.map((n,i)=>({name:n.name,amt:n.amt,size:n.size,color:TCOLORS[i%TCOLORS.length],drill:true}));
-  if(rest.length){const rSum=rest.reduce((s,n)=>s+n.size,0);segs.push({name:"อื่นๆ ("+rest.length+" รายการ)",amt:-rSum,size:rSum,color:"#B0BEC5",drill:false});}
+  if(rest.length){
+    const rSum=rest.reduce((s,n)=>s+n.size,0);
+    const rAmt=rest.reduce((s,n)=>s+n.amt,0);
+    segs.push({name:"อื่นๆ ("+rest.length+" รายการ)",amt:rAmt,size:rSum,color:"#dbe5e2",drill:false,isOther:true});
+  }
   const total=segs.reduce((s,n)=>s+n.size,0);
   const totLoss=nodes.reduce((s,n)=>s+n.amt,0);
   document.getElementById("treeSummary").innerHTML='<span>รวม Loss ในระดับนี้</span><strong>'+fmt(totLoss)+' ฿</strong><span>· '+nodes.length+' '+levelName[treePath.length]+' · ขนาดกล่องแสดงสัดส่วนของมูลค่า Loss</span>';
@@ -586,9 +590,11 @@ function renderTree(){
       const label=String(s.name).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
       const value=fmt(s.amt)+' ฿';
       const shortLabel=label.length>22?label.slice(0,21)+'…':label;
+      const textColor=s.isOther?"#48635d":"#fff";
+      const valueColor=s.isOther?"#617a74":"rgba(255,255,255,.9)";
       rects+='<g class="dseg" data-i="'+i+'"><title>'+label+' · '+value+'</title><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+s.color+'" stroke="#fff" stroke-width="3" rx="5"/>';
-      if(w>90&&h>42)rects+='<text x="'+(x+12)+'" y="'+(y+22)+'" font-size="13" font-weight="800" fill="#fff">'+shortLabel+'</text><text x="'+(x+12)+'" y="'+(y+40)+'" font-size="11" fill="rgba(255,255,255,.9)">'+value+'</text>';
-      else if(w>58&&h>25)rects+='<text x="'+(x+8)+'" y="'+(y+17)+'" font-size="10" font-weight="800" fill="#fff">'+(w>110?shortLabel:'…')+'</text>';
+      if(w>90&&h>42)rects+='<text x="'+(x+12)+'" y="'+(y+22)+'" font-size="13" font-weight="800" fill="'+textColor+'">'+shortLabel+'</text><text x="'+(x+12)+'" y="'+(y+40)+'" font-size="11" fill="'+valueColor+'">'+value+'</text>';
+      else if(w>58&&h>25)rects+='<text x="'+(x+8)+'" y="'+(y+17)+'" font-size="10" font-weight="800" fill="'+textColor+'">'+(w>110?shortLabel:'…')+'</text>';
       rects+='</g>';
       x+=w;
     });
@@ -600,7 +606,7 @@ function renderTree(){
   function drill(i){const s=segs[i];if(s&&s.drill&&drillable){treePath.push(s.name);renderTree();}}
   lg.querySelectorAll(".lgrow").forEach(el=>el.onclick=()=>drill(+el.dataset.i));
   svgBox.querySelectorAll(".dseg").forEach(el=>{el.style.cursor=drillable&&segs[+el.dataset.i].drill?"pointer":"default";el.onclick=()=>drill(+el.dataset.i);});
-  document.getElementById("treeLegend").innerHTML='ขนาดวง = สัดส่วนยอด Loss · เดือน: '+(fMonth.value==="ALL"?"ทุกเดือน":(fMonth.value==="H1"?"ม.ค.–มิ.ย.":thMonth(fMonth.value)))+' · RTC เฉพาะยอดลบ · แสดง Top 20'+(rest.length?' + รวมที่เหลือเป็น "อื่นๆ"':'');
+  document.getElementById("treeLegend").innerHTML='ขนาดกล่อง = สัดส่วนยอด Loss · เดือน: '+(fMonth.value==="ALL"?"ทุกเดือน":(fMonth.value==="H1"?"ม.ค.–มิ.ย.":thMonth(fMonth.value)))+' · RTC เฉพาะยอดลบ · แสดง Top 20'+(rest.length?' + รวมที่เหลือเป็น "อื่นๆ"':'');
 }
 window.addEventListener("resize",()=>{if(curPage==="tree")renderTree()});
 
