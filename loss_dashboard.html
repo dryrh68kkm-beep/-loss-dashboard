@@ -10,7 +10,9 @@ body{font-family:Tahoma,"Segoe UI",sans-serif;background:#f3f6f9;color:#263238;l
 header{background:linear-gradient(118deg,#075d58 0%,#087f73 58%,#25b69e 145%);color:#fff;padding:26px 20px 24px;box-shadow:0 3px 16px rgba(7,93,88,.26);position:relative;overflow:hidden;border-bottom:3px solid #7de0cc}
 header::after{content:"";position:absolute;top:-60px;right:-40px;width:220px;height:220px;background:radial-gradient(circle,rgba(196,255,240,.26) 0%,transparent 70%);pointer-events:none}
 header .htop{display:flex;align-items:center;gap:15px;max-width:1100px;margin:0 auto;position:relative;z-index:1}
-header .logo{width:50px;height:50px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+header .logo{width:54px;height:54px;position:relative;isolation:isolate;background:linear-gradient(145deg,rgba(202,255,242,.42),rgba(24,139,121,.28));border:1px solid rgba(220,255,246,.48);border-radius:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -8px 14px rgba(0,65,57,.16),0 8px 17px rgba(0,38,35,.24)}
+header .logo::before{content:"";position:absolute;z-index:-1;inset:5px 6px auto;height:17px;border-radius:11px;background:linear-gradient(180deg,rgba(255,255,255,.36),rgba(255,255,255,0));pointer-events:none}
+header .logo svg{position:relative;filter:drop-shadow(0 2px 2px rgba(0,51,46,.28))}
 header .htext{flex:1}
 header .eyebrow{font-size:10px;font-weight:800;letter-spacing:1.05px;opacity:.72;margin-bottom:4px}
 header h1{font-size:25px;font-weight:800;letter-spacing:.1px;line-height:1.08}
@@ -20,9 +22,16 @@ header .hbadge{display:inline-flex;align-items:center;gap:5px;margin-top:9px;fon
 .wrap{max-width:1100px;margin:0 auto;padding:16px}
 .controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
 .controls label{font-size:11px;color:#78909c;display:block;margin-bottom:5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
-.ctl{flex:1;min-width:150px}
+.ctl{flex:1;min-width:150px;position:relative}
 select{width:100%;padding:11px 12px;border:1.5px solid #dde3e8;border-radius:10px;font-size:14px;background:#fff;font-family:inherit;color:#263238;transition:border-color .15s}
 select:focus{outline:none;border-color:#0d9a87;box-shadow:0 0 0 3px rgba(13,154,135,.13)}
+.month-panel{display:none;position:absolute;z-index:25;top:calc(100% + 7px);left:0;width:min(360px,calc(100vw - 32px));padding:13px;background:#fff;border:1px solid #dcebe7;border-radius:13px;box-shadow:0 12px 28px rgba(28,76,68,.18)}
+.month-panel.show{display:block}
+.month-panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;font-size:12px;font-weight:800;color:#325b54}
+.month-actions{display:flex;gap:6px}.month-action{border:0;background:#e8f6f2;color:#087d70;border-radius:7px;padding:5px 7px;font-size:10.5px;font-family:inherit;font-weight:800;cursor:pointer}.month-action:hover{background:#d9f0ea}
+.month-checks{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding-top:10px;border-top:1px solid #edf3f1}
+.month-check{display:flex;align-items:center;gap:6px;padding:7px 6px;border:1px solid #e5edeb;border-radius:8px;font-size:12px;font-weight:700;color:#49635e;cursor:pointer}.month-check:hover{border-color:#84cfc0;background:#f7fcfa}.month-check input{accent-color:#0d9382;width:15px;height:15px}
+.month-helper{font-size:10.5px;color:#71908a;margin-top:9px}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:18px}
 .card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(38,50,56,.06);position:relative;overflow:hidden}
 .card .ic{position:absolute;top:14px;right:14px;font-size:22px;opacity:.9}
@@ -75,6 +84,9 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 .tree-summary strong{font-size:16px;color:#c0504d;font-variant-numeric:tabular-nums}
 .tree-map{width:100%;min-width:500px;border-radius:12px;overflow:hidden;background:#edf1f4}
 .tree-map text{font-family:Tahoma,"Segoe UI",sans-serif;pointer-events:none}
+.sales-lead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:13px 14px;margin:-2px 0 15px;border:1px solid #d9eee8;border-radius:12px;background:linear-gradient(105deg,#f2fbf8,#fbfdfd)}
+.sales-lead-label{font-size:11px;font-weight:800;letter-spacing:.45px;text-transform:uppercase;color:#5a7d76}.sales-lead strong{display:block;margin-top:3px;font-size:20px;color:#087d70;font-variant-numeric:tabular-nums}.sales-lead-copy{max-width:460px;font-size:11.5px;color:#6f8984;line-height:1.5;text-align:right}
+.sales-bars{display:grid;gap:14px}.sales-row{padding:2px 0 13px;border-bottom:1px solid #edf2f1}.sales-row:last-child{padding-bottom:0;border-bottom:0}.sales-row-head,.sales-row-meta{display:flex;justify-content:space-between;gap:12px;align-items:baseline}.sales-row-name{font-size:12.5px;font-weight:800;color:#354c49;min-width:0}.sales-row-value{font-size:14px;font-weight:800;color:#125c53;font-variant-numeric:tabular-nums;white-space:nowrap}.sales-track{height:12px;margin:7px 0 7px;border-radius:999px;background:#e9f0ef;overflow:hidden;box-shadow:inset 0 1px 2px rgba(20,77,68,.06)}.sales-fill{height:100%;min-width:4px;border-radius:999px;background:linear-gradient(90deg,#087d70,#62cdb8);box-shadow:0 2px 6px rgba(13,147,130,.24);transition:width .25s ease}.sales-row-meta{font-size:10.5px;color:#8aa09b;font-variant-numeric:tabular-nums}.sales-delta{font-weight:800}.sales-delta.pos{color:#278567}.sales-delta.neg{color:#c0504d}.sales-delta.neutral{color:#78909c}.sales-rank{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;margin-right:7px;border-radius:6px;background:#e3f4ef;color:#087d70;font-size:10px;vertical-align:1px}.sales-empty{padding:40px 16px;text-align:center;border:1px dashed #cde2dc;border-radius:12px;background:#f8fcfb;color:#75918a;font-size:13px;line-height:1.6}.sales-table-sub{font-size:11px;color:#8aa09b;font-weight:500}
 .tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}.tab{padding:8px 16px;border-radius:22px;border:1.5px solid #dde3e8;background:#fff;font-size:13px;cursor:pointer;font-family:inherit;font-weight:600;color:#546e7a;transition:all .15s;display:flex;align-items:center;gap:6px}
 .tab.active{background:#0d9382;color:#fff;border-color:#0d9382;box-shadow:0 2px 8px rgba(13,147,130,.27)}
 .muted{color:#b0bec5;font-size:13px;text-align:center;padding:24px}
@@ -105,8 +117,8 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 @media(max-width:599px){
   header{padding:18px 18px 20px;border-radius:0 0 18px 18px;box-shadow:0 3px 12px rgba(31,73,125,.2)}
   header .htop{gap:11px}
-  header .logo{width:42px;height:42px;border-radius:12px}
-  header .logo svg{width:23px;height:23px}
+  header .logo{width:45px;height:45px;border-radius:14px}
+  header .logo svg{width:25px;height:25px}
   header .eyebrow{font-size:8.5px;margin-bottom:3px;letter-spacing:.8px}
   header h1{font-size:20px;line-height:1.1}
   header h1 .hstore{font-size:16px;margin-top:2px}
@@ -126,6 +138,9 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
   .ctl:last-child{grid-column:1 / -1}
   .controls label{font-size:10px;margin-bottom:4px;letter-spacing:.2px}
   select{height:44px;padding:9px 10px;border-radius:11px;font-size:13px}
+  .month-panel{width:calc(200% + 10px);max-width:calc(100vw - 24px);padding:11px}
+  .month-checks{grid-template-columns:repeat(3,1fr);gap:6px}
+  .month-check{font-size:10.5px;padding:6px 4px}
   .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:13px}
   .tab{justify-content:center;padding:9px 3px;border-radius:11px;font-size:11px;white-space:nowrap}
   .cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:13px}
@@ -147,11 +162,12 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
   .tree-summary{align-items:flex-start;flex-wrap:wrap;gap:4px 8px;font-size:10.5px}
   .tree-summary strong{font-size:14px}
   .tree-map{min-width:430px}
+  .sales-lead{display:block;padding:11px 12px;margin-bottom:12px}.sales-lead strong{font-size:17px}.sales-lead-copy{margin-top:5px;text-align:left;font-size:10.5px}.sales-bars{gap:11px}.sales-row{padding-bottom:10px}.sales-row-name{font-size:11px}.sales-row-value{font-size:12px}.sales-track{height:10px;margin:6px 0}.sales-row-meta{font-size:9.5px;gap:6px}.sales-row-meta span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sales-table-sub{display:block;margin-top:2px}
 }
 </style>
 </head>
 <body>
-<header><div class="htop"><div class="logo"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="htext"><div class="eyebrow">BIG C HYPER · SAI NOI</div><h1>Loss Performance <span class="hstore">Big C Sai Noi</span></h1><div class="hsub">Loss Prevention · Performance &amp; Risk Monitoring</div><div class="hbadge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Loss Prevention</div></div></div></header>
+<header><div class="htop"><div class="logo" aria-label="Loss Performance"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true"><defs><linearGradient id="iconStroke" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#ffffff"/><stop offset="1" stop-color="#c9fff1"/></linearGradient></defs><path d="M5.3 17.8V13.2M12 17.8V7.1M18.7 17.8v-7.3" stroke="url(#iconStroke)" stroke-width="3.7" stroke-linecap="round"/><path d="M5.3 17.8V13.2M12 17.8V7.1M18.7 17.8v-7.3" stroke="#ffffff" stroke-opacity=".35" stroke-width=".7" stroke-linecap="round" transform="translate(-.35,-.45)"/></svg></div><div class="htext"><div class="eyebrow">BIG C HYPER · SAI NOI</div><h1>Loss Performance <span class="hstore">Big C Sai Noi</span></h1><div class="hsub">Loss Prevention · Performance &amp; Risk Monitoring</div><div class="hbadge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Loss Prevention</div></div></div></header>
 <div class="wrap">
 <div class="sec import-sec">
 <div class="import-copy"><strong>อัปเดตข้อมูล Dashboard</strong><span>นำเข้าไฟล์ Loss และยอดขายล่าสุด เพื่อคำนวณตัวชี้วัดและกราฟ</span></div>
@@ -161,16 +177,17 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 <input type="file" id="saleIn" accept=".csv,text/csv" style="display:none">
 <span id="upStatus" style="font-size:12px;color:#888"></span>
 </div>
-<div class="pagenav" id="pagenav">
-<div class="pgbtn active" data-pg="dash"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg> แดชบอร์ด</div>
-<div class="pgbtn" data-pg="tree"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="12"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="19" width="7" height="2"/></svg> วิเคราะห์สัดส่วน</div>
-</div>
-<div id="pageDash">
 <div class="controls">
-<div class="ctl"><label>เดือน (Period)</label><select id="fMonth"></select></div>
+<div class="ctl"><label>เดือน (Period)</label><select id="fMonth"></select><div class="month-panel" id="monthPanel"><div class="month-panel-head"><span>เลือกเดือนที่ต้องการรวม</span><div class="month-actions"><button type="button" class="month-action" id="monthAll">เลือกทั้งหมด</button><button type="button" class="month-action" id="monthClear">ล้าง</button></div></div><div class="month-checks" id="monthChecks"></div><div class="month-helper" id="monthHelper">เลือกได้หลายเดือน · ระบบจะรวมข้อมูลเฉพาะเดือนที่เลือก</div></div></div>
 <div class="ctl"><label>ฝ่าย (Division)</label><select id="fDiv"></select></div>
 <div class="ctl"><label>แผนก (Department)</label><select id="fDept"></select></div>
 </div>
+<div class="pagenav" id="pagenav">
+<div class="pgbtn active" data-pg="dash"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg> แดชบอร์ด</div>
+<div class="pgbtn" data-pg="tree"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="12"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="19" width="7" height="2"/></svg> วิเคราะห์สัดส่วน</div>
+<div class="pgbtn" data-pg="sales"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> ยอดขาย</div>
+</div>
+<div id="pageDash">
 <div class="tabs" id="tabs">
 <div class="tab active" data-t="ALL">ทั้งหมด</div>
 <div class="tab" data-t="DAMAGE">DAMAGE</div>
@@ -190,6 +207,17 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 <div id="donutLegend" style="flex:1;min-width:240px"></div>
 </div>
 <div id="treeLegend" style="margin-top:14px;font-size:11px;color:#90a4ae"></div>
+</div>
+</div>
+<div id="pageSales" style="display:none">
+<div class="sec">
+<h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0d9a87" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> ยอดขายแยกตามฝ่าย <span class="sales-table-sub">Top 12 · เทียบปีก่อน</span></h2>
+<div id="salesLead" class="sales-lead"></div>
+<div id="salesBars" class="sales-bars"></div>
+</div>
+<div class="sec">
+<h2><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0d9a87" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> ยอดขายแยกตามแผนก <span class="sales-table-sub">เรียงตามยอดขายปัจจุบัน</span></h2>
+<div style="overflow-x:auto"><table id="salesTbl"><thead><tr><th>แผนก</th><th class="num">ยอดขายปีนี้ (฿)</th><th class="num">ปีก่อน (฿)</th><th class="num">ส่วนต่าง</th><th class="num">เปลี่ยนแปลง</th></tr></thead><tbody></tbody></table></div>
 </div>
 </div>
 </div>
@@ -212,6 +240,7 @@ const GH_SALE_URL = "";
 let curType="ALL";
 let itemSortDir="asc";
 let itemArr=[];
+let customMonths=[];
 const ICONS={
   DAMAGE:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
   SHRINKAGE:'<polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/>',
@@ -222,10 +251,12 @@ const ICONS={
 };
 function icw(key,bg,stroke){return '<div class="icw" style="background:'+bg+'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="'+stroke+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+ICONS[key]+'</svg></div>';}
 const fMonth=document.getElementById("fMonth"),fDiv=document.getElementById("fDiv"),fDept=document.getElementById("fDept");
+const monthPanel=document.getElementById("monthPanel"),monthChecks=document.getElementById("monthChecks"),monthHelper=document.getElementById("monthHelper");
 function mMatch(period){
   const mo=fMonth.value;
   if(mo==="ALL")return true;
   if(mo==="H1"){const mm=String(period).slice(4,6);return mm>="01"&&mm<="06";}
+  if(mo==="CUSTOM")return customMonths.includes(String(period));
   return period===mo;
 }
 function thMonth(p){  const m={"01":"ม.ค.","02":"ก.พ.","03":"มี.ค.","04":"เม.ย.","05":"พ.ค.","06":"มิ.ย.","07":"ก.ค.","08":"ส.ค.","09":"ก.ย.","10":"ต.ค.","11":"พ.ย.","12":"ธ.ค."};
@@ -233,20 +264,35 @@ function thMonth(p){  const m={"01":"ม.ค.","02":"ก.พ.","03":"มี.ค.
   return s.length>=6?(m[s.slice(4,6)]||s):s;
 }
 function buildMonths(){
-  const ms=[...new Set(DATA.map(d=>d.period).filter(Boolean))].sort();
+  const ms=[...new Set([...DATA,...SALES].map(d=>d.period).filter(Boolean))].sort();
+  customMonths=customMonths.filter(m=>ms.includes(m));
   let opts="<option value=ALL>ทุกเดือน</option>";
   opts+='<option value="H1">YTD ครึ่งปีแรก (ม.ค.–มิ.ย.)</option>';
+  opts+='<option value="CUSTOM">กำหนดเอง (เลือกหลายเดือน)</option>';
   opts+=ms.map(m=>'<option value="'+m+'">'+thMonth(m)+'</option>').join("");
   fMonth.innerHTML=opts;
+  buildMonthChecks(ms);
+}
+function buildMonthChecks(months){
+  monthChecks.innerHTML=months.map(m=>'<label class="month-check"><input type="checkbox" value="'+m+'" '+(customMonths.includes(m)?'checked':'')+'><span>'+thMonth(m)+'</span></label>').join("")||'<span class="muted" style="grid-column:1/-1;padding:5px">อัปโหลดข้อมูลก่อนเพื่อเลือกเดือน</span>';
+  monthChecks.querySelectorAll("input").forEach(input=>input.onchange=()=>{
+    customMonths=[...monthChecks.querySelectorAll("input:checked")].map(x=>x.value);
+    updateCustomMonthLabel();buildDivs();fillDept();render();if(curPage==="tree")renderTree();if(curPage==="sales")renderSales();
+  });
+  updateCustomMonthLabel();
+}
+function updateCustomMonthLabel(){
+  const option=fMonth.querySelector('option[value="CUSTOM"]');
+  if(option)option.textContent=customMonths.length?'กำหนดเอง ('+customMonths.length+' เดือน)':'กำหนดเอง (เลือกหลายเดือน)';
+  monthHelper.textContent=customMonths.length?'เลือกแล้ว '+customMonths.map(thMonth).join(" · "):'เลือกได้หลายเดือน · ระบบจะรวมข้อมูลเฉพาะเดือนที่เลือก';
 }
 function buildDivs(){
-  const mo=fMonth.value;
-  const divs=[...new Set(DATA.filter(d=>mMatch(d.period)).map(d=>d.div))].sort();
+  const divs=[...new Set([...DATA,...SALES].filter(d=>mMatch(d.period)).map(d=>d.div))].sort();
   fDiv.innerHTML="<option value=ALL>ทุกฝ่าย</option>"+divs.map(d=>"<option>"+d+"</option>").join("");
 }
 function fillDept(){
-  const mo=fMonth.value,dv=fDiv.value;
-  const ds=[...new Set(DATA.filter(d=>(mMatch(d.period))&&(dv=="ALL"||d.div==dv)).map(d=>d.dept))].sort();
+  const dv=fDiv.value;
+  const ds=[...new Set([...DATA,...SALES].filter(d=>(mMatch(d.period))&&(dv=="ALL"||d.div==dv)).map(d=>d.dept))].sort();
   fDept.innerHTML="<option value=ALL>ทุกแผนก</option>"+ds.map(d=>"<option>"+d+"</option>").join("");
 }
 function fmt(n){return n.toLocaleString("th-TH",{maximumFractionDigits:0})}
@@ -334,10 +380,65 @@ function render(){
   document.querySelector("#itemTbl tbody").innerHTML=itemArr.length?itemArr.map((r,i)=>'<tr class="itemRow" data-i="'+i+'" style="cursor:pointer"><td style="font-variant-numeric:tabular-nums;color:#888">'+r.bc+'</td><td>'+r.name+' <span style="color:#2E6CA4;font-size:10px">›</span></td><td class="num">'+r.qty.toLocaleString('th-TH',{maximumFractionDigits:2})+'</td><td class="num '+(r.amt<0?'neg':'pos')+'">'+fmt(r.amt)+'</td></tr>').join(""):'<tr><td colspan=4 class=muted>ไม่มีข้อมูล</td></tr>';
   document.querySelectorAll(".itemRow").forEach(el=>el.onclick=()=>openItemModal(itemArr[+el.dataset.i]));
 }
-fMonth.onchange=()=>{buildDivs();fillDept();render();if(curPage==="tree")renderTree()};
-fDiv.onchange=()=>{fillDept();render()};
-fDept.onchange=render;
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;");}
+function renderSales(){
+  const dv=fDiv.value,dp=fDept.value;
+  const rows=SALES.filter(r=>mMatch(r.period)&&(dv==="ALL"||r.div===dv)&&(dp==="ALL"||r.dept===dp));
+  const divMap={};
+  rows.forEach(r=>{
+    const k=r.div||"(ไม่ระบุฝ่าย)";
+    if(!divMap[k])divMap[k]={name:k,sale:0,ly:0};
+    divMap[k].sale+=r.samt;divMap[k].ly+=r.samtLY;
+  });
+  const divisions=Object.values(divMap).map(r=>({...r,diff:r.sale-r.ly,pct:r.ly!==0?(r.sale-r.ly)/Math.abs(r.ly)*100:null})).sort((a,b)=>b.sale-a.sale).slice(0,12);
+  const total=divisions.reduce((s,r)=>s+r.sale,0),totalLY=divisions.reduce((s,r)=>s+r.ly,0),totalDiff=total-totalLY;
+  const lead=document.getElementById("salesLead"),bars=document.getElementById("salesBars"),tbody=document.querySelector("#salesTbl tbody");
+  if(!rows.length){
+    lead.innerHTML='<div><div class="sales-lead-label">ยอดขายตามตัวกรองที่เลือก</div><strong>—</strong></div><div class="sales-lead-copy">อัปโหลด CSV ยอดขายจากเครื่องที่ได้รับอนุญาต เพื่อแสดงกราฟและเปรียบเทียบปีก่อน</div>';
+    bars.innerHTML='<div class="sales-empty">ยังไม่มีข้อมูลยอดขายสำหรับสร้างกราฟ<br>ข้อมูลจะอยู่ในหน่วยความจำชั่วคราวและไม่ถูกบันทึกหลังปิดไฟล์</div>';
+    tbody.innerHTML='<tr><td colspan="5" class="muted">ไม่มีข้อมูลยอดขาย</td></tr>';
+    return;
+  }
+  const leadPct=totalLY!==0?(totalDiff/Math.abs(totalLY)*100):null;
+  const leadClass=totalDiff>0?"pos":(totalDiff<0?"neg":"neutral");
+  lead.innerHTML='<div><div class="sales-lead-label">ยอดขายรวมตามตัวกรอง</div><strong>'+fmt(total)+' ฿</strong></div><div class="sales-lead-copy">เทียบปีก่อน '+fmt(totalLY)+' ฿ · <span class="sales-delta '+leadClass+'">'+(totalDiff>0?"▲ ":(totalDiff<0?"▼ ":"– "))+(totalDiff>=0?"+":"")+fmt(totalDiff)+' ฿'+(leadPct!=null?' ('+(leadPct>=0?"+":"")+leadPct.toFixed(1)+'%)':'')+'</span></div>';
+  const max=Math.max(...divisions.map(r=>r.sale),1);
+  bars.innerHTML=divisions.map((r,i)=>{
+    const cls=r.diff>0?"pos":(r.diff<0?"neg":"neutral");
+    const delta=(r.diff>0?"▲ ":(r.diff<0?"▼ ":"– "))+(r.diff>=0?"+":"")+fmt(r.diff)+' ฿'+(r.pct!=null?' ('+(r.pct>=0?"+":"")+r.pct.toFixed(1)+'%)':'');
+    return '<div class="sales-row"><div class="sales-row-head"><div class="sales-row-name"><span class="sales-rank">'+(i+1)+'</span>'+esc(r.name)+'</div><div class="sales-row-value">'+fmt(r.sale)+' ฿</div></div><div class="sales-track" role="img" aria-label="ยอดขาย '+esc(r.name)+' '+fmt(r.sale)+' บาท"><div class="sales-fill" style="width:'+Math.max(2,r.sale/max*100).toFixed(1)+'%"></div></div><div class="sales-row-meta"><span>ปีก่อน: '+fmt(r.ly)+' ฿</span><span class="sales-delta '+cls+'">'+delta+'</span></div></div>';
+  }).join("");
+  const deptMap={};
+  rows.forEach(r=>{
+    const k=r.dept||"(ไม่ระบุแผนก)";
+    if(!deptMap[k])deptMap[k]={name:k,sale:0,ly:0};
+    deptMap[k].sale+=r.samt;deptMap[k].ly+=r.samtLY;
+  });
+  const depts=Object.values(deptMap).map(r=>({...r,diff:r.sale-r.ly,pct:r.ly!==0?(r.sale-r.ly)/Math.abs(r.ly)*100:null})).sort((a,b)=>b.sale-a.sale).slice(0,20);
+  tbody.innerHTML=depts.map(r=>{
+    const cls=r.diff>0?"pos":(r.diff<0?"neg":"");
+    return '<tr><td>'+esc(r.name)+'</td><td class="num" style="color:#087d70;font-weight:700">'+fmt(r.sale)+'</td><td class="num">'+fmt(r.ly)+'</td><td class="num '+cls+'">'+(r.diff>=0?"+":"")+fmt(r.diff)+'</td><td class="num '+cls+'">'+(r.pct!=null?(r.pct>=0?"+":"")+r.pct.toFixed(1)+'%':'–')+'</td></tr>';
+  }).join("");
+}
+function applyCustomMonths(months){
+  customMonths=months;
+  monthChecks.querySelectorAll("input").forEach(input=>input.checked=customMonths.includes(input.value));
+  updateCustomMonthLabel();buildDivs();fillDept();render();if(curPage==="tree")renderTree();if(curPage==="sales")renderSales();
+}
+fMonth.onchange=()=>{
+  if(fMonth.value==="CUSTOM"){
+    if(!customMonths.length)customMonths=[...monthChecks.querySelectorAll("input")].map(input=>input.value);
+    monthPanel.classList.add("show");
+    applyCustomMonths(customMonths);
+  }else monthPanel.classList.remove("show");
+  buildDivs();fillDept();render();if(curPage==="tree")renderTree();if(curPage==="sales")renderSales();
+};
+fDiv.onchange=()=>{fillDept();render();if(curPage==="tree")renderTree();if(curPage==="sales")renderSales()};
+fDept.onchange=()=>{render();if(curPage==="tree")renderTree();if(curPage==="sales")renderSales()};
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");curType=t.dataset.t;render()});
+document.getElementById("monthAll").onclick=()=>applyCustomMonths([...monthChecks.querySelectorAll("input")].map(input=>input.value));
+document.getElementById("monthClear").onclick=()=>applyCustomMonths([]);
+document.addEventListener("click",e=>{if(!e.target.closest(".ctl")||!e.target.closest(".ctl").contains(fMonth))monthPanel.classList.remove("show")});
 
 function norm(s){return String(s==null?"":s).trim()}
 function parseCSV(text){
@@ -424,7 +525,7 @@ document.getElementById("saleIn").onchange=e=>{
       if(!parsed.length){upStatus.textContent="⚠️ ไม่พบข้อมูลในไฟล์ยอดขาย";return;}
       const newMonths=[...new Set(parsed.map(p=>p.period).filter(Boolean))];
       SALES=SALES.filter(d=>!newMonths.includes(d.period)).concat(parsed);
-      render();
+      buildMonths();buildDivs();fillDept();render();if(curPage==="sales")renderSales();
       upStatus.textContent="✅ เพิ่มยอดขายแล้ว เดือน "+(newMonths.map(thMonth).join(", ")||"-")+" ("+parsed.length+" รายการ)";
     }catch(err){upStatus.textContent="⚠️ อ่านไฟล์ยอดขายไม่ได้: "+err.message;}
   };
@@ -513,8 +614,10 @@ document.querySelectorAll(".pgbtn").forEach(b=>b.onclick=()=>{
   curPage=b.dataset.pg;
   document.getElementById("pageDash").style.display=curPage==="dash"?"":"none";
   document.getElementById("pageTree").style.display=curPage==="tree"?"":"none";
+  document.getElementById("pageSales").style.display=curPage==="sales"?"":"none";
   document.getElementById("tabs").style.display=curPage==="dash"?"":"none";
   if(curPage==="tree")renderTree();
+  if(curPage==="sales")renderSales();
 });
 
 // ---------- Treemap ----------
@@ -575,7 +678,8 @@ function renderTree(){
   document.getElementById("treeSummary").innerHTML='<span>รวม Loss ในระดับนี้</span><strong>'+fmt(totLoss)+' ฿</strong><span>· '+nodes.length+' '+levelName[treePath.length]+' · ขนาดกล่องแสดงสัดส่วนของมูลค่า Loss</span>';
   // Weighted treemap: each row gets a proportional height; blocks inside it get a proportional width.
   // It keeps labels legible, unlike a 20-slice donut, and each block remains tappable for drill-down.
-  const W=680,H=350,groupSize=3;
+  // Keep high-level views compact; individual products still need more vertical room.
+  const W=680,H=segs.length<=6?260:(segs.length<=12?300:350),groupSize=treePath.length===0?segs.length:3;
   let y=0,rects="";
   for(let start=0;start<segs.length;start+=groupSize){
     const group=segs.slice(start,start+groupSize);
@@ -589,11 +693,13 @@ function renderTree(){
       const i=start+offset;
       const label=String(s.name).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
       const value=fmt(s.amt)+' ฿';
+      const share=(s.size/total*100).toFixed(1)+'%';
       const shortLabel=label.length>22?label.slice(0,21)+'…':label;
       const textColor=s.isOther?"#48635d":"#fff";
       const valueColor=s.isOther?"#617a74":"rgba(255,255,255,.9)";
       rects+='<g class="dseg" data-i="'+i+'"><title>'+label+' · '+value+'</title><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+s.color+'" stroke="#fff" stroke-width="3" rx="5"/>';
-      if(w>90&&h>42)rects+='<text x="'+(x+12)+'" y="'+(y+22)+'" font-size="13" font-weight="800" fill="'+textColor+'">'+shortLabel+'</text><text x="'+(x+12)+'" y="'+(y+40)+'" font-size="11" fill="'+valueColor+'">'+value+'</text>';
+      if(w>90&&h>64)rects+='<text x="'+(x+12)+'" y="'+(y+22)+'" font-size="13" font-weight="800" fill="'+textColor+'">'+shortLabel+'</text><text x="'+(x+12)+'" y="'+(y+40)+'" font-size="11" fill="'+valueColor+'">'+value+'</text><text x="'+(x+12)+'" y="'+(y+56)+'" font-size="11" fill="'+valueColor+'">'+share+'</text>';
+      else if(w>90&&h>42)rects+='<text x="'+(x+12)+'" y="'+(y+22)+'" font-size="13" font-weight="800" fill="'+textColor+'">'+shortLabel+'</text><text x="'+(x+12)+'" y="'+(y+40)+'" font-size="11" fill="'+valueColor+'">'+value+'</text>';
       else if(w>58&&h>25)rects+='<text x="'+(x+8)+'" y="'+(y+17)+'" font-size="10" font-weight="800" fill="'+textColor+'">'+(w>110?shortLabel:'…')+'</text>';
       rects+='</g>';
       x+=w;
@@ -610,7 +716,7 @@ function renderTree(){
 }
 window.addEventListener("resize",()=>{if(curPage==="tree")renderTree()});
 
-function initRender(){buildMonths();buildDivs();fillDept();render();if(curPage==="tree")renderTree();}
+function initRender(){buildMonths();buildDivs();fillDept();render();if(curPage==="tree")renderTree();if(curPage==="sales")renderSales();}
 
 async function loadFromGitHub(){
   if(!GH_LOSS_URL && !GH_SALE_URL){
