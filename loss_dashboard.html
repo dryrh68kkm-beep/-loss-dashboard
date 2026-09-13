@@ -619,7 +619,8 @@ function renderTree(){
   document.getElementById("treeSummary").innerHTML='<span>รวม Loss ในระดับนี้</span><strong>'+fmt(totLoss)+' ฿</strong><span>· '+nodes.length+' '+levelName[treePath.length]+' · ขนาดกล่องแสดงสัดส่วนของมูลค่า Loss</span>';
   // Weighted treemap: each row gets a proportional height; blocks inside it get a proportional width.
   // It keeps labels legible, unlike a 20-slice donut, and each block remains tappable for drill-down.
-  const W=680,H=350,groupSize=3;
+  // Keep high-level views compact; individual products still need more vertical room.
+  const W=680,H=segs.length<=6?260:(segs.length<=12?300:350),groupSize=treePath.length===0?segs.length:3;
   let y=0,rects="";
   for(let start=0;start<segs.length;start+=groupSize){
     const group=segs.slice(start,start+groupSize);
@@ -633,11 +634,13 @@ function renderTree(){
       const i=start+offset;
       const label=String(s.name).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
       const value=fmt(s.amt)+' ฿';
+      const share=(s.size/total*100).toFixed(1)+'%';
       const shortLabel=label.length>22?label.slice(0,21)+'…':label;
       const textColor=s.isOther?"#48635d":"#fff";
       const valueColor=s.isOther?"#617a74":"rgba(255,255,255,.9)";
       rects+='<g class="dseg" data-i="'+i+'"><title>'+label+' · '+value+'</title><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+s.color+'" stroke="#fff" stroke-width="3" rx="5"/>';
-      if(w>90&&h>42)rects+='<text x="'+(x+12)+'" y="'+(y+22)+'" font-size="13" font-weight="800" fill="'+textColor+'">'+shortLabel+'</text><text x="'+(x+12)+'" y="'+(y+40)+'" font-size="11" fill="'+valueColor+'">'+value+'</text>';
+      if(w>90&&h>64)rects+='<text x="'+(x+12)+'" y="'+(y+22)+'" font-size="13" font-weight="800" fill="'+textColor+'">'+shortLabel+'</text><text x="'+(x+12)+'" y="'+(y+40)+'" font-size="11" fill="'+valueColor+'">'+value+'</text><text x="'+(x+12)+'" y="'+(y+56)+'" font-size="11" fill="'+valueColor+'">'+share+'</text>';
+      else if(w>90&&h>42)rects+='<text x="'+(x+12)+'" y="'+(y+22)+'" font-size="13" font-weight="800" fill="'+textColor+'">'+shortLabel+'</text><text x="'+(x+12)+'" y="'+(y+40)+'" font-size="11" fill="'+valueColor+'">'+value+'</text>';
       else if(w>58&&h>25)rects+='<text x="'+(x+8)+'" y="'+(y+17)+'" font-size="10" font-weight="800" fill="'+textColor+'">'+(w>110?shortLabel:'…')+'</text>';
       rects+='</g>';
       x+=w;
