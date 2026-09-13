@@ -20,9 +20,16 @@ header .hbadge{display:inline-flex;align-items:center;gap:5px;margin-top:9px;fon
 .wrap{max-width:1100px;margin:0 auto;padding:16px}
 .controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
 .controls label{font-size:11px;color:#78909c;display:block;margin-bottom:5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
-.ctl{flex:1;min-width:150px}
+.ctl{flex:1;min-width:150px;position:relative}
 select{width:100%;padding:11px 12px;border:1.5px solid #dde3e8;border-radius:10px;font-size:14px;background:#fff;font-family:inherit;color:#263238;transition:border-color .15s}
 select:focus{outline:none;border-color:#0d9a87;box-shadow:0 0 0 3px rgba(13,154,135,.13)}
+.month-panel{display:none;position:absolute;z-index:25;top:calc(100% + 7px);left:0;width:min(360px,calc(100vw - 32px));padding:13px;background:#fff;border:1px solid #dcebe7;border-radius:13px;box-shadow:0 12px 28px rgba(28,76,68,.18)}
+.month-panel.show{display:block}
+.month-panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;font-size:12px;font-weight:800;color:#325b54}
+.month-actions{display:flex;gap:6px}.month-action{border:0;background:#e8f6f2;color:#087d70;border-radius:7px;padding:5px 7px;font-size:10.5px;font-family:inherit;font-weight:800;cursor:pointer}.month-action:hover{background:#d9f0ea}
+.month-checks{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding-top:10px;border-top:1px solid #edf3f1}
+.month-check{display:flex;align-items:center;gap:6px;padding:7px 6px;border:1px solid #e5edeb;border-radius:8px;font-size:12px;font-weight:700;color:#49635e;cursor:pointer}.month-check:hover{border-color:#84cfc0;background:#f7fcfa}.month-check input{accent-color:#0d9382;width:15px;height:15px}
+.month-helper{font-size:10.5px;color:#71908a;margin-top:9px}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:18px}
 .card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(38,50,56,.06);position:relative;overflow:hidden}
 .card .ic{position:absolute;top:14px;right:14px;font-size:22px;opacity:.9}
@@ -126,6 +133,9 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
   .ctl:last-child{grid-column:1 / -1}
   .controls label{font-size:10px;margin-bottom:4px;letter-spacing:.2px}
   select{height:44px;padding:9px 10px;border-radius:11px;font-size:13px}
+  .month-panel{width:calc(200% + 10px);max-width:calc(100vw - 24px);padding:11px}
+  .month-checks{grid-template-columns:repeat(3,1fr);gap:6px}
+  .month-check{font-size:10.5px;padding:6px 4px}
   .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:13px}
   .tab{justify-content:center;padding:9px 3px;border-radius:11px;font-size:11px;white-space:nowrap}
   .cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:13px}
@@ -167,7 +177,7 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 </div>
 <div id="pageDash">
 <div class="controls">
-<div class="ctl"><label>เดือน (Period)</label><select id="fMonth"></select></div>
+<div class="ctl"><label>เดือน (Period)</label><select id="fMonth"></select><div class="month-panel" id="monthPanel"><div class="month-panel-head"><span>เลือกเดือนที่ต้องการรวม</span><div class="month-actions"><button type="button" class="month-action" id="monthAll">เลือกทั้งหมด</button><button type="button" class="month-action" id="monthClear">ล้าง</button></div></div><div class="month-checks" id="monthChecks"></div><div class="month-helper" id="monthHelper">เลือกได้หลายเดือน · ระบบจะรวมข้อมูลเฉพาะเดือนที่เลือก</div></div></div>
 <div class="ctl"><label>ฝ่าย (Division)</label><select id="fDiv"></select></div>
 <div class="ctl"><label>แผนก (Department)</label><select id="fDept"></select></div>
 </div>
@@ -212,6 +222,7 @@ const GH_SALE_URL = "";
 let curType="ALL";
 let itemSortDir="asc";
 let itemArr=[];
+let customMonths=[];
 const ICONS={
   DAMAGE:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
   SHRINKAGE:'<polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/>',
@@ -222,10 +233,12 @@ const ICONS={
 };
 function icw(key,bg,stroke){return '<div class="icw" style="background:'+bg+'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="'+stroke+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+ICONS[key]+'</svg></div>';}
 const fMonth=document.getElementById("fMonth"),fDiv=document.getElementById("fDiv"),fDept=document.getElementById("fDept");
+const monthPanel=document.getElementById("monthPanel"),monthChecks=document.getElementById("monthChecks"),monthHelper=document.getElementById("monthHelper");
 function mMatch(period){
   const mo=fMonth.value;
   if(mo==="ALL")return true;
   if(mo==="H1"){const mm=String(period).slice(4,6);return mm>="01"&&mm<="06";}
+  if(mo==="CUSTOM")return customMonths.includes(String(period));
   return period===mo;
 }
 function thMonth(p){  const m={"01":"ม.ค.","02":"ก.พ.","03":"มี.ค.","04":"เม.ย.","05":"พ.ค.","06":"มิ.ย.","07":"ก.ค.","08":"ส.ค.","09":"ก.ย.","10":"ต.ค.","11":"พ.ย.","12":"ธ.ค."};
@@ -234,10 +247,26 @@ function thMonth(p){  const m={"01":"ม.ค.","02":"ก.พ.","03":"มี.ค.
 }
 function buildMonths(){
   const ms=[...new Set(DATA.map(d=>d.period).filter(Boolean))].sort();
+  customMonths=customMonths.filter(m=>ms.includes(m));
   let opts="<option value=ALL>ทุกเดือน</option>";
   opts+='<option value="H1">YTD ครึ่งปีแรก (ม.ค.–มิ.ย.)</option>';
+  opts+='<option value="CUSTOM">กำหนดเอง (เลือกหลายเดือน)</option>';
   opts+=ms.map(m=>'<option value="'+m+'">'+thMonth(m)+'</option>').join("");
   fMonth.innerHTML=opts;
+  buildMonthChecks(ms);
+}
+function buildMonthChecks(months){
+  monthChecks.innerHTML=months.map(m=>'<label class="month-check"><input type="checkbox" value="'+m+'" '+(customMonths.includes(m)?'checked':'')+'><span>'+thMonth(m)+'</span></label>').join("")||'<span class="muted" style="grid-column:1/-1;padding:5px">อัปโหลดข้อมูลก่อนเพื่อเลือกเดือน</span>';
+  monthChecks.querySelectorAll("input").forEach(input=>input.onchange=()=>{
+    customMonths=[...monthChecks.querySelectorAll("input:checked")].map(x=>x.value);
+    updateCustomMonthLabel();buildDivs();fillDept();render();if(curPage==="tree")renderTree();
+  });
+  updateCustomMonthLabel();
+}
+function updateCustomMonthLabel(){
+  const option=fMonth.querySelector('option[value="CUSTOM"]');
+  if(option)option.textContent=customMonths.length?'กำหนดเอง ('+customMonths.length+' เดือน)':'กำหนดเอง (เลือกหลายเดือน)';
+  monthHelper.textContent=customMonths.length?'เลือกแล้ว '+customMonths.map(thMonth).join(" · "):'เลือกได้หลายเดือน · ระบบจะรวมข้อมูลเฉพาะเดือนที่เลือก';
 }
 function buildDivs(){
   const mo=fMonth.value;
@@ -334,10 +363,25 @@ function render(){
   document.querySelector("#itemTbl tbody").innerHTML=itemArr.length?itemArr.map((r,i)=>'<tr class="itemRow" data-i="'+i+'" style="cursor:pointer"><td style="font-variant-numeric:tabular-nums;color:#888">'+r.bc+'</td><td>'+r.name+' <span style="color:#2E6CA4;font-size:10px">›</span></td><td class="num">'+r.qty.toLocaleString('th-TH',{maximumFractionDigits:2})+'</td><td class="num '+(r.amt<0?'neg':'pos')+'">'+fmt(r.amt)+'</td></tr>').join(""):'<tr><td colspan=4 class=muted>ไม่มีข้อมูล</td></tr>';
   document.querySelectorAll(".itemRow").forEach(el=>el.onclick=()=>openItemModal(itemArr[+el.dataset.i]));
 }
-fMonth.onchange=()=>{buildDivs();fillDept();render();if(curPage==="tree")renderTree()};
+function applyCustomMonths(months){
+  customMonths=months;
+  monthChecks.querySelectorAll("input").forEach(input=>input.checked=customMonths.includes(input.value));
+  updateCustomMonthLabel();buildDivs();fillDept();render();if(curPage==="tree")renderTree();
+}
+fMonth.onchange=()=>{
+  if(fMonth.value==="CUSTOM"){
+    if(!customMonths.length)customMonths=[...monthChecks.querySelectorAll("input")].map(input=>input.value);
+    monthPanel.classList.add("show");
+    applyCustomMonths(customMonths);
+  }else monthPanel.classList.remove("show");
+  buildDivs();fillDept();render();if(curPage==="tree")renderTree();
+};
 fDiv.onchange=()=>{fillDept();render()};
 fDept.onchange=render;
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");curType=t.dataset.t;render()});
+document.getElementById("monthAll").onclick=()=>applyCustomMonths([...monthChecks.querySelectorAll("input")].map(input=>input.value));
+document.getElementById("monthClear").onclick=()=>applyCustomMonths([]);
+document.addEventListener("click",e=>{if(!e.target.closest(".ctl")||!e.target.closest(".ctl").contains(fMonth))monthPanel.classList.remove("show")});
 
 function norm(s){return String(s==null?"":s).trim()}
 function parseCSV(text){
