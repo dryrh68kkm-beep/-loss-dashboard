@@ -1370,22 +1370,26 @@ document.querySelectorAll("#introToggle .itbtn").forEach(b=>b.onclick=()=>{
 document.getElementById("introStart").onclick=()=>{
   const introScreen=document.getElementById("introScreen");
   const mainApp=document.getElementById("mainApp");
-  const introContent=document.querySelector(".intro-content");
-  const doorL=document.getElementById("doorL"), doorR=document.getElementById("doorR");
-  const introBgEl=document.getElementById("introBg");
-  const bgUrl=introBgEl.style.backgroundImage;
-  doorL.style.backgroundImage=bgUrl;
-  doorR.style.backgroundImage=bgUrl;
   mainApp.style.display="";
   mainApp.classList.add("entering");
-  if(introContent)introContent.style.opacity="0";
-  introBgEl.style.display="none";
-  doorL.style.display="block";
-  doorR.style.display="block";
-  setTimeout(()=>{
-    doorL.classList.add("opening");
-    doorR.classList.add("opening");
-  },260);
+  try{
+    const introContent=document.querySelector(".intro-content");
+    const doorL=document.getElementById("doorL"), doorR=document.getElementById("doorR");
+    const introBgEl=document.getElementById("introBg");
+    if(introContent)introContent.style.opacity="0";
+    if(doorL&&doorR&&introBgEl){
+      const bgUrl=introBgEl.style.backgroundImage;
+      doorL.style.backgroundImage=bgUrl;
+      doorR.style.backgroundImage=bgUrl;
+      introBgEl.style.display="none";
+      doorL.style.display="block";
+      doorR.style.display="block";
+      setTimeout(()=>{
+        doorL.classList.add("opening");
+        doorR.classList.add("opening");
+      },260);
+    }
+  }catch(err){}
   setTimeout(()=>{
     introScreen.style.display="none";
     mainApp.classList.remove("entering");
