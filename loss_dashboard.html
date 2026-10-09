@@ -119,20 +119,27 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .itbtn{padding:8px 18px;border-radius:9px;font-size:13px;font-weight:700;color:rgba(255,255,255,.75);cursor:pointer;transition:all .15s;border:none;background:transparent;font-family:inherit}
 .itbtn.active{background:#fff;color:#087d70;box-shadow:0 1px 4px rgba(0,0,0,.2)}
 .intro-period{font-size:11.5px;color:rgba(255,255,255,.65);margin-top:8px}
-.diagram{position:relative;margin-top:18px}
-.diagram-grid{position:relative;display:grid;grid-template-columns:1fr 128px 1fr;align-items:center;column-gap:34px;z-index:1}
+.diagram{position:relative;margin-top:14px;min-height:250px}
 .diagram-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:visible}
-.diagram-img-wrap{position:relative;border-radius:16px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.25)}
-.diagram-img{width:100%;height:150px;background-size:cover;background-position:center;display:block}
-.diagram-img-wrap .dot{position:absolute;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.22),0 0 8px rgba(255,255,255,.55);transform:translate(-50%,-50%)}
-.diagram-col{display:flex;flex-direction:column;gap:9px}
-.dnode{position:relative;background:rgba(255,255,255,.1);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:9px 12px}
-.dnode .dot-anchor{position:absolute;top:50%;width:7px;height:7px;border-radius:50%;background:#fff;transform:translateY(-50%);box-shadow:0 0 0 3px rgba(255,255,255,.18)}
-.diagram-col.left .dnode .dot-anchor{right:-4px}
-.diagram-col.right .dnode .dot-anchor{left:-4px}
-.dlbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.3px}
-.dval{font-size:16px;font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums;letter-spacing:-.2px}
-.dnode.big .dval{font-size:19px}
+.diagram .dot{position:absolute;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.22),0 0 8px rgba(255,255,255,.55);transform:translate(-50%,-50%);z-index:1}
+.dnode{position:absolute;z-index:1;width:132px;background:rgba(10,22,19,.5);backdrop-filter:blur(7px);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:8px 11px;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.dnode .dot-anchor{position:absolute;top:50%;left:50%;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.7);transform:translate(-50%,-50%)}
+.dlbl{font-size:9.5px;font-weight:700;color:rgba(255,255,255,.72);text-transform:uppercase;letter-spacing:.3px}
+.dval{font-size:15px;font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums;letter-spacing:-.2px;color:#fff}
+.dnode.big{width:150px}
+.dnode.big .dval{font-size:18px}
+.dnode[data-node="sales"]{top:0%;left:0%}
+.dnode[data-node="loss"]{top:4%;left:74%}
+.dnode[data-node="damage"]{top:36%;left:2%}
+.dnode[data-node="shrink"]{top:30%;left:76%}
+.dnode[data-node="rtc"]{top:74%;left:10%}
+.dnode[data-node="pct"]{top:70%;left:68%}
+.dot[data-dot="sales"]{top:18%;left:36%}
+.dot[data-dot="loss"]{top:10%;left:60%}
+.dot[data-dot="damage"]{top:48%;left:30%}
+.dot[data-dot="shrink"]{top:42%;left:64%}
+.dot[data-dot="rtc"]{top:82%;left:38%}
+.dot[data-dot="pct"]{top:78%;left:58%}
 .intro-start{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:22px;padding:15px;background:#0d9382;color:#fff;border:none;border-radius:13px;font-size:15.5px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(13,147,130,.4);transition:transform .1s}
 .intro-start:active{transform:scale(.98)}
 .intro-upload{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
@@ -140,13 +147,21 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .intro-upload .upbtn:nth-child(2){background:rgba(255,255,255,.14)}
 #introUpStatus{display:block;width:100%;font-size:10.5px;color:rgba(255,255,255,.75);margin-top:7px;text-align:center;min-height:13px}
 @media(max-width:560px){
-  .diagram-grid{grid-template-columns:1fr 1fr;grid-template-areas:"img img" "left right";column-gap:9px;row-gap:22px}
-  .diagram-img-wrap{grid-area:img}
-  .diagram-img{height:130px}
-  .diagram-col.left{grid-area:left}
-  .diagram-col.right{grid-area:right}
-  .diagram-col.left .dnode .dot-anchor,.diagram-col.right .dnode .dot-anchor{top:-13px;left:50%;right:auto;transform:translateX(-50%)}
-  .dnode:not(.big) .dot-anchor,.dot:not([data-dot="sales"]):not([data-dot="loss"]){display:none}
+  .diagram{min-height:420px}
+  .dnode{width:118px;padding:7px 9px}
+  .dnode.big{width:132px}
+  .dnode[data-node="sales"]{top:0%;left:2%}
+  .dnode[data-node="loss"]{top:6%;left:50%}
+  .dnode[data-node="damage"]{top:30%;left:20%}
+  .dnode[data-node="shrink"]{top:36%;left:58%}
+  .dnode[data-node="rtc"]{top:62%;left:0%}
+  .dnode[data-node="pct"]{top:68%;left:46%}
+  .dot[data-dot="sales"]{top:16%;left:34%}
+  .dot[data-dot="loss"]{top:20%;left:60%}
+  .dot[data-dot="damage"]{top:46%;left:40%}
+  .dot[data-dot="shrink"]{top:50%;left:66%}
+  .dot[data-dot="rtc"]{top:76%;left:30%}
+  .dot[data-dot="pct"]{top:80%;left:56%}
 }
 @media(max-width:420px){
   .intro-content h1{font-size:21px}
@@ -224,27 +239,18 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 </div>
 <div class="diagram" id="introStats">
 <svg class="diagram-lines" id="diagramLines"></svg>
-<div class="diagram-grid" id="diagramGrid">
-<div class="diagram-col left">
+<span class="dot" data-dot="sales"></span>
+<span class="dot" data-dot="damage"></span>
+<span class="dot" data-dot="rtc"></span>
+<span class="dot" data-dot="loss"></span>
+<span class="dot" data-dot="shrink"></span>
+<span class="dot" data-dot="pct"></span>
 <div class="dnode big" data-node="sales"><span class="dot-anchor"></span><div class="dlbl">ยอดขาย (Sales)</div><div class="dval" id="iv-sales">0</div></div>
 <div class="dnode" data-node="damage"><span class="dot-anchor"></span><div class="dlbl">Damage</div><div class="dval" id="iv-damage">0</div></div>
 <div class="dnode" data-node="rtc"><span class="dot-anchor"></span><div class="dlbl">RTC</div><div class="dval" id="iv-rtc">0</div></div>
-</div>
-<div class="diagram-img-wrap" id="diagramImgWrap">
-<div class="diagram-img" id="diagramImg"></div>
-<span class="dot" data-dot="sales" style="top:20%;left:10%"></span>
-<span class="dot" data-dot="damage" style="top:50%;left:7%"></span>
-<span class="dot" data-dot="rtc" style="top:80%;left:16%"></span>
-<span class="dot" data-dot="loss" style="top:20%;left:90%"></span>
-<span class="dot" data-dot="shrink" style="top:50%;left:93%"></span>
-<span class="dot" data-dot="pct" style="top:80%;left:84%"></span>
-</div>
-<div class="diagram-col right">
 <div class="dnode big" data-node="loss"><span class="dot-anchor"></span><div class="dlbl">รวม Loss</div><div class="dval" id="iv-loss">0</div></div>
 <div class="dnode" data-node="shrink"><span class="dot-anchor"></span><div class="dlbl">Shrinkage</div><div class="dval" id="iv-shrink">0</div></div>
 <div class="dnode" data-node="pct"><span class="dot-anchor"></span><div class="dlbl">% Loss / ยอดขาย</div><div class="dval" id="iv-pct">-</div></div>
-</div>
-</div>
 </div>
 <button type="button" class="intro-start" id="introStart">เริ่มต้นใช้งาน <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
 </div>
@@ -1278,7 +1284,7 @@ function renderIntro(){
 }
 function drawDiagramLines(){
   const svg=document.getElementById("diagramLines");
-  const grid=document.getElementById("diagramGrid");
+  const grid=document.getElementById("introStats");
   if(!svg||!grid)return;
   const gr=grid.getBoundingClientRect();
   if(!gr.width||!gr.height)return;
@@ -1314,8 +1320,6 @@ document.getElementById("introStart").onclick=()=>{
   document.getElementById("introScreen").style.display="none";
   document.getElementById("mainApp").style.display="";
 };
-const introBgEl=document.getElementById("introBg"),diagramImgEl=document.getElementById("diagramImg");
-if(introBgEl&&diagramImgEl)diagramImgEl.style.backgroundImage=introBgEl.style.backgroundImage;
 let diagLineTimer=null;
 window.addEventListener("resize",()=>{clearTimeout(diagLineTimer);diagLineTimer=setTimeout(drawDiagramLines,120);});
 renderIntro();
