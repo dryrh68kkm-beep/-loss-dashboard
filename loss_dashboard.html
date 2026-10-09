@@ -119,6 +119,11 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .itbtn{padding:8px 18px;border-radius:9px;font-size:13px;font-weight:700;color:rgba(255,255,255,.75);cursor:pointer;transition:all .15s;border:none;background:transparent;font-family:inherit}
 .itbtn.active{background:#fff;color:#087d70;box-shadow:0 1px 4px rgba(0,0,0,.2)}
 .intro-period{font-size:11.5px;color:rgba(255,255,255,.65);margin-top:8px}
+.intro-custom-box{margin-top:9px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:10px 12px}
+.intro-custom-box label{display:inline-flex;align-items:center;gap:5px;margin:3px 10px 3px 0;font-size:12px;color:rgba(255,255,255,.85);cursor:pointer}
+.intro-custom-box input{accent-color:#0d9382}
+.intro-custom-actions{margin-top:4px;display:flex;gap:10px}
+.intro-custom-actions a{font-size:11px;color:#6ee7d4;cursor:pointer;text-decoration:underline}
 .diagram{position:relative;margin-top:14px;min-height:250px}
 .diagram-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:visible}
 .diagram .dot{position:absolute;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.22),0 0 8px rgba(255,255,255,.55);transform:translate(-50%,-50%);z-index:1}
@@ -180,6 +185,8 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
   .dval{font-size:14px}
   .dnode.big .dval{font-size:17px}
   .intro-upload .upbtn{font-size:11px;padding:9px 6px}
+  .intro-toggle{width:100%}
+  .itbtn{padding:8px 4px;font-size:11.5px;flex:1;text-align:center}
 }
 /* Mobile-first refinements: keep the overview visible before the user starts scrolling. */
 @media(max-width:599px){
@@ -242,8 +249,10 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 <div class="intro-toggle" id="introToggle">
 <button type="button" class="itbtn active" data-span="month">รายเดือน</button>
 <button type="button" class="itbtn" data-span="year">รายปี</button>
+<button type="button" class="itbtn" data-span="custom">เลือกเอง</button>
 </div>
 <div class="intro-period" id="introPeriod"></div>
+<div class="intro-custom-box" id="introCustomBox" style="display:none"></div>
 <div class="intro-upload">
 <label for="adjIn" class="upbtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> อัปโหลดไฟล์ ADJ</label>
 <label for="saleIn" class="upbtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> อัปโหลดยอดขาย</label>
@@ -1248,6 +1257,7 @@ if(!DATA.length){setUpStatus("👋 เริ่มต้น: กดปุ่ม 
 
 // ---------- Intro / splash screen ----------
 let introSpan="month";
+let introCustomMonths=new Set();
 function animateValue(el,target,fmtFn,duration){
   duration=duration||1100;
   const start=0,t0=performance.now();
@@ -1267,6 +1277,8 @@ function computeIntroStats(span){
   let scope;
   if(span==="month"){
     scope=periods.length?[periods[periods.length-1]]:(salePeriods.length?[salePeriods[salePeriods.length-1]]:[]);
+  }else if(span==="custom"){
+    scope=[...new Set([...periods,...salePeriods])].filter(p=>introCustomMonths.has(p));
   }else{
     scope=[...new Set([...periods,...salePeriods])];
   }
@@ -1291,10 +1303,28 @@ function renderIntro(){
   if(st.pct!=null)animateValue(pctEl,st.pct,v=>v.toFixed(2)+"%");
   else pctEl.textContent="-";
   const periodEl=document.getElementById("introPeriod");
-  if(!st.scope.length)periodEl.textContent="ยังไม่มีข้อมูล — อัปโหลด CSV หลังเข้าสู่ Dashboard";
+  if(introSpan==="custom"&&!st.scope.length)periodEl.textContent="ติ๊กเลือกเดือนที่ต้องการด้านล่าง";
+  else if(!st.scope.length)periodEl.textContent="ยังไม่มีข้อมูล — อัปโหลด CSV หลังเข้าสู่ Dashboard";
   else if(introSpan==="month")periodEl.textContent="เดือน "+st.scope.map(thMonth).join(", ");
+  else if(introSpan==="custom")periodEl.textContent="เลือกเอง · "+st.scope.map(thMonth).join(", ");
   else periodEl.textContent="สะสมทั้งปี · "+st.scope.map(thMonth).join(", ");
+  renderIntroCustomBox();
   requestAnimationFrame(()=>requestAnimationFrame(drawDiagramLines));
+}
+function renderIntroCustomBox(){
+  const box=document.getElementById("introCustomBox");
+  const ms=[...new Set([...DATA.map(d=>d.period),...SALES.map(d=>d.period)].filter(Boolean))].sort();
+  if(introSpan!=="custom"||!ms.length){box.style.display="none";return;}
+  box.style.display="block";
+  box.innerHTML=ms.map(m=>'<label><input type="checkbox" class="icmChk" value="'+m+'"'+(introCustomMonths.has(m)?" checked":"")+'> '+thMonth(m)+'</label>').join("")+
+    '<div class="intro-custom-actions"><a id="icmAll">เลือกทั้งหมด</a><a id="icmNone">ไม่เลือกเลย</a></div>';
+  box.querySelectorAll(".icmChk").forEach(chk=>chk.onchange=()=>{
+    if(chk.checked)introCustomMonths.add(chk.value); else introCustomMonths.delete(chk.value);
+    renderIntro();
+  });
+  const allBtn=document.getElementById("icmAll"),noneBtn=document.getElementById("icmNone");
+  if(allBtn)allBtn.onclick=()=>{ms.forEach(m=>introCustomMonths.add(m));renderIntro();};
+  if(noneBtn)noneBtn.onclick=()=>{introCustomMonths.clear();renderIntro();};
 }
 function drawDiagramLines(){
   const svg=document.getElementById("diagramLines");
@@ -1328,6 +1358,10 @@ document.querySelectorAll("#introToggle .itbtn").forEach(b=>b.onclick=()=>{
   document.querySelectorAll("#introToggle .itbtn").forEach(x=>x.classList.remove("active"));
   b.classList.add("active");
   introSpan=b.dataset.span;
+  if(introSpan==="custom"&&introCustomMonths.size===0){
+    const ms=[...new Set([...DATA.map(d=>d.period),...SALES.map(d=>d.period)].filter(Boolean))];
+    ms.forEach(m=>introCustomMonths.add(m));
+  }
   renderIntro();
 });
 document.getElementById("introStart").onclick=()=>{
