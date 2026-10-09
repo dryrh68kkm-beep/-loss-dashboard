@@ -163,15 +163,15 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .intro-start:active{transform:scale(.98)}
 .intro-content{transition:opacity .25s ease}
 .intro-footer{position:absolute;left:50%;bottom:max(16px,2vh);transform:translateX(-50%);width:100%;max-width:620px;z-index:5;padding:0 20px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px}
-.door{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:50;display:none;background-size:cover;background-position:center;transition:left .9s cubic-bezier(.76,0,.24,1);box-shadow:0 0 60px rgba(0,0,0,.6)}
+.door{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:50;display:none;background-size:cover;background-position:center;transition:transform .9s cubic-bezier(.76,0,.24,1);will-change:transform;box-shadow:0 0 60px rgba(0,0,0,.6)}
 .door-l{clip-path:inset(0 50% 0 0)}
 .door-r{clip-path:inset(0 0 0 50%)}
 .door-shade{position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(180deg,rgba(7,30,27,.35) 0%,rgba(7,30,27,.55) 45%,rgba(5,20,18,.94) 100%)}
 .door-handle{position:absolute;top:50%;width:5px;height:64px;background:rgba(255,255,255,.45);border-radius:3px;transform:translateY(-50%);box-shadow:0 0 8px rgba(0,0,0,.4)}
 .door-l .door-handle{left:calc(50% - 11px)}
 .door-r .door-handle{left:calc(50% + 6px)}
-.door.opening.door-l{left:-50vw}
-.door.opening.door-r{left:50vw}
+.door.opening.door-l{transform:translateX(-50vw)}
+.door.opening.door-r{transform:translateX(50vw)}
 @keyframes mainZoomIn{from{opacity:.35;transform:scale(1.05)}to{opacity:1;transform:scale(1)}}
 #mainApp.entering{animation:mainZoomIn .9s cubic-bezier(.22,1,.36,1) both}
 .intro-upload{display:flex;gap:8px;flex-wrap:wrap}
