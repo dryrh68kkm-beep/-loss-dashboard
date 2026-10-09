@@ -568,7 +568,7 @@ function typeTargetCardHtml(t,dv,dp,mo,actual){
   if(val==null)return "";
   const ytd=isMultiMonth();
   const lbl=t+" · เป้าหมาย (Budget"+(ytd?" YTD":"")+")";
-  return '<div class="card clickable" data-ttype="'+t+'">'+icw(t,'#edf2f4','#526a77')+'<div class="lbl">'+lbl+'</div><div class="val" style="color:'+scol(val)+'">'+fmtK(val)+' ฿</div><div style="font-size:10px;color:#90a4ae;font-weight:700;margin-top:6px">เทียบเป้าหมาย (Budget)</div>'+targetLineHtml(actual,val,ytd)+'<div class="tap">แตะดูรายแผนก ›</div></div>';
+  return '<div class="card clickable" data-ttype="'+t+'">'+icw(t,'#edf2f4','#526a77')+'<div class="lbl">'+lbl+'</div><div class="val" data-val="'+val+'" data-unit="moneyK" style="color:'+scol(val)+'">0 ฿</div><div style="font-size:10px;color:#90a4ae;font-weight:700;margin-top:6px">เทียบเป้าหมาย (Budget)</div>'+targetLineHtml(actual,val,ytd)+'<div class="tap">แตะดูรายแผนก ›</div></div>';
 }
 const ICONS={
   DAMAGE:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
@@ -680,16 +680,16 @@ function render(){
       // การ์ดสรุปรวมของประเภทนี้ (พร้อม LY) วางไว้ข้างหน้า
       if(t==="RTC"){
         const gR=yoy(a,aLY,true);
-        cardsH+='<div class="card">'+icw('RTC',icBg[t],icSt[t])+'<div class="lbl">RTC · รวม</div><div class="val" style="color:'+scol(a)+'">'+fmt(a)+' ฿</div>'+gR.html+'</div>';
+        cardsH+='<div class="card">'+icw('RTC',icBg[t],icSt[t])+'<div class="lbl">RTC · รวม</div><div class="val" data-val="'+a+'" data-unit="money" style="color:'+scol(a)+'">0 ฿</div>'+gR.html+'</div>';
         cardsH+=typeTargetCardHtml("RTC",dv,dp,mo,a);
         const rtcRows=scope.filter(r=>r.type==="RTC");
         const pos=rtcRows.filter(r=>r.amt>0).reduce((s,r)=>s+r.amt,0);
         const neg=rtcRows.filter(r=>r.amt<0).reduce((s,r)=>s+r.amt,0);
-        cardsH+='<div class="card clickable" data-code="RTC" data-dir="neg">'+icw('RTC',icBg[t],icSt[t])+'<div class="lbl">RTC · ยอดลบรวม</div><div class="val" style="color:'+scol(neg)+'">'+fmt(neg)+' ฿</div><div class="tap">แตะดู Top 10 ›</div></div>';
-        cardsH+='<div class="card clickable" data-code="RTC" data-dir="pos">'+icw('RTC',icBg[t],icSt[t])+'<div class="lbl">RTC · ยอดบวกรวม</div><div class="val" style="color:'+scol(pos)+'">'+fmt(pos)+' ฿</div><div class="tap">แตะดู Top 10 ›</div></div>';
+        cardsH+='<div class="card clickable" data-code="RTC" data-dir="neg">'+icw('RTC',icBg[t],icSt[t])+'<div class="lbl">RTC · ยอดลบรวม</div><div class="val" data-val="'+neg+'" data-unit="money" style="color:'+scol(neg)+'">0 ฿</div><div class="tap">แตะดู Top 10 ›</div></div>';
+        cardsH+='<div class="card clickable" data-code="RTC" data-dir="pos">'+icw('RTC',icBg[t],icSt[t])+'<div class="lbl">RTC · ยอดบวกรวม</div><div class="val" data-val="'+pos+'" data-unit="money" style="color:'+scol(pos)+'">0 ฿</div><div class="tap">แตะดู Top 10 ›</div></div>';
       }else{
         const gS=yoy(a,aLY,true);
-        cardsH+='<div class="card">'+icw(t,icBg[t],icSt[t])+'<div class="lbl">'+t+' · รวม</div><div class="val" style="color:'+scol(a)+'">'+fmt(a)+' ฿</div>'+gS.html+'</div>';
+        cardsH+='<div class="card">'+icw(t,icBg[t],icSt[t])+'<div class="lbl">'+t+' · รวม</div><div class="val" data-val="'+a+'" data-unit="money" style="color:'+scol(a)+'">0 ฿</div>'+gS.html+'</div>';
         cardsH+=typeTargetCardHtml(t,dv,dp,mo,a);
         const codes=codeMap[t]||[];
         // aggregate by code within this type
@@ -698,16 +698,16 @@ function render(){
         codes.forEach(c=>{
           const key=String(c).replace(/^0+/,"")||c;
           const v=cAgg[key]||0;
-          cardsH+='<div class="card clickable" data-code="'+key+'" data-type="'+t+'">'+icw(t,icBg[t],icSt[t])+'<div class="lbl">'+t+' · code '+c+'</div><div class="val" style="color:'+scol(v)+'">'+fmt(v)+' ฿</div><div class="tap">แตะดู Top 10 ›</div></div>';
+          cardsH+='<div class="card clickable" data-code="'+key+'" data-type="'+t+'">'+icw(t,icBg[t],icSt[t])+'<div class="lbl">'+t+' · code '+c+'</div><div class="val" data-val="'+v+'" data-unit="money" style="color:'+scol(v)+'">0 ฿</div><div class="tap">แตะดู Top 10 ›</div></div>';
         });
         // code อื่นๆ ที่ไม่อยู่ในรายการ (ถ้ามี)
         const known=codes.map(c=>String(c).replace(/^0+/,""));
         const others=Object.keys(cAgg).filter(k=>!known.includes(k));
-        if(others.length){const ov=others.reduce((s,k)=>s+cAgg[k],0);cardsH+='<div class="card">'+icw(t,icBg[t],icSt[t])+'<div class="lbl">'+t+' · code อื่นๆ</div><div class="val" style="color:'+scol(ov)+'">'+fmt(ov)+' ฿</div></div>';}
+        if(others.length){const ov=others.reduce((s,k)=>s+cAgg[k],0);cardsH+='<div class="card">'+icw(t,icBg[t],icSt[t])+'<div class="lbl">'+t+' · code อื่นๆ</div><div class="val" data-val="'+ov+'" data-unit="money" style="color:'+scol(ov)+'">0 ฿</div></div>';}
       }
     }else if(curType==="ALL"){
       const g=yoy(a,aLY,true);
-      cardsH+='<div class="card clickable" data-card="'+t+'">'+icw(t,icBg[t],icSt[t])+'<div class="lbl">'+t+'</div><div class="val" style="color:'+scol(a)+'">'+fmt(a)+' ฿</div>'+g.html+'<div class="tap">แตะดูรายการ ›</div></div>';
+      cardsH+='<div class="card clickable" data-card="'+t+'">'+icw(t,icBg[t],icSt[t])+'<div class="lbl">'+t+'</div><div class="val" data-val="'+a+'" data-unit="money" style="color:'+scol(a)+'">0 ฿</div>'+g.html+'<div class="tap">แตะดูรายการ ›</div></div>';
     }
     // ถ้าเลือกประเภทอื่นอยู่ (curType!==t และ !==ALL) ไม่สร้างการ์ดของประเภทนี้
   });
@@ -734,18 +734,19 @@ function render(){
     const parrowT=ppT>0?"▲":(ppT<0?"▼":"–");
     tgtPctHtml='<div class="yoyline" style="color:'+pcolT+'">'+parrowT+' '+(ppT>=0?"+":"")+ppT.toFixed(2)+"%"+'</div><div class="lyline">Target: '+tgtPct.toFixed(2)+"%"+'</div>';
   }
-  let pctCard='<div class="card">'+icw('PCT','#e6f6f2','#0d9382')+'<div class="lbl">% Loss / ยอดขาย</div><div class="val" style="color:'+(lossPct!=null?scol(lossPct):"#0d9382")+'">'+(lossPct!=null?lossPct.toFixed(2)+'%':'-')+'</div>'+pctHtml+tgtPctHtml+'</div>';
+  let pctCard='<div class="card">'+icw('PCT','#e6f6f2','#0d9382')+'<div class="lbl">% Loss / ยอดขาย</div><div class="val"'+(lossPct!=null?' data-val="'+lossPct+'" data-unit="pct"':'')+' style="color:'+(lossPct!=null?scol(lossPct):"#0d9382")+'">'+(lossPct!=null?'0%':'-')+'</div>'+pctHtml+tgtPctHtml+'</div>';
   const gTot=yoy(totA,totALY,true);
   if(curType==="ALL"){
     const tgtVal=computeTargetTotal(TARGET_PCT,dv,dp);
     let tgtCard="";
     if(tgtVal!=null){
       const tgtLbl="เป้าหมาย Loss (Budget"+multiMonthSuffix()+")";
-      tgtCard='<div class="card clickable" data-ttype="ALL">'+icw('TOTAL','#edf2f4','#526a77')+'<div class="lbl">'+tgtLbl+'</div><div class="val" style="color:'+scol(tgtVal)+'">'+fmtK(tgtVal)+' ฿</div><div style="font-size:10px;color:#90a4ae;font-weight:700;margin-top:6px">เทียบเป้าหมาย (Budget)</div>'+targetLineHtml(totA,tgtVal,isMultiMonth())+'<div class="tap">แตะดูรายแผนก ›</div></div>';
+      tgtCard='<div class="card clickable" data-ttype="ALL">'+icw('TOTAL','#edf2f4','#526a77')+'<div class="lbl">'+tgtLbl+'</div><div class="val" data-val="'+tgtVal+'" data-unit="moneyK" style="color:'+scol(tgtVal)+'">0 ฿</div><div style="font-size:10px;color:#90a4ae;font-weight:700;margin-top:6px">เทียบเป้าหมาย (Budget)</div>'+targetLineHtml(totA,tgtVal,isMultiMonth())+'<div class="tap">แตะดูรายแผนก ›</div></div>';
     }
-    cardsH=cardsH+'<div class="card">'+icw('TOTAL','#e6f6f2','#0d9382')+'<div class="lbl">รวมยอด Loss</div><div class="val" style="color:'+scol(totA)+'">'+fmt(totA)+' ฿</div><div style="font-size:10px;color:#90a4ae;font-weight:700;margin-top:6px">เทียบปีก่อน (LY)</div>'+gTot.html+'</div>'+tgtCard+pctCard;
+    cardsH=cardsH+'<div class="card">'+icw('TOTAL','#e6f6f2','#0d9382')+'<div class="lbl">รวมยอด Loss</div><div class="val" data-val="'+totA+'" data-unit="money" style="color:'+scol(totA)+'">0 ฿</div><div style="font-size:10px;color:#90a4ae;font-weight:700;margin-top:6px">เทียบปีก่อน (LY)</div>'+gTot.html+'</div>'+tgtCard+pctCard;
   }
   document.getElementById("cards").innerHTML=cardsH;
+  animateCardVals(document.getElementById("cards"));
   document.getElementById("codeTop").innerHTML="";
   document.querySelectorAll(".card.clickable").forEach(c=>c.onclick=()=>{
     if(c.dataset.ttype)openTargetModal(c.dataset.ttype);
@@ -785,7 +786,8 @@ function renderSalePage(){
   const totSale=saleRows.reduce((s,r)=>s+r.samt,0);
   const totSaleLY=saleRows.reduce((s,r)=>s+r.samtLY,0);
   const g=yoy(totSale,totSaleLY,false);
-  document.getElementById("saleCards").innerHTML='<div class="card q clickable" data-card="SALES">'+icw('SALES','#e7f4ee','#2E7D5B')+'<div class="lbl">ยอดขายรวม</div><div class="val" style="color:'+scol(totSale)+'">'+fmt(totSale)+' ฿</div>'+g.html+'<div class="tap">แตะดูแยกฝ่าย ›</div></div>';
+  document.getElementById("saleCards").innerHTML='<div class="card q clickable" data-card="SALES">'+icw('SALES','#e7f4ee','#2E7D5B')+'<div class="lbl">ยอดขายรวม</div><div class="val" data-val="'+totSale+'" data-unit="money" style="color:'+scol(totSale)+'">0 ฿</div>'+g.html+'<div class="tap">แตะดูแยกฝ่าย ›</div></div>';
+  animateCardVals(document.getElementById("saleCards"));
   document.querySelectorAll("#saleCards .card.clickable").forEach(c=>c.onclick=()=>openSalesModal(fMonth.value,dv,dp));
   renderSaleDeptBars(saleRows);
   const itemDiv=document.getElementById("saleItemDiv").value;
@@ -1331,6 +1333,17 @@ function animateValue(el,target,fmtFn,duration){
     else el.textContent=fmtFn(target);
   }
   requestAnimationFrame(step);
+}
+function animateCardVals(root){
+  if(!root)return;
+  root.querySelectorAll(".val[data-val]").forEach(el=>{
+    const raw=parseFloat(el.dataset.val);
+    if(isNaN(raw))return;
+    const unit=el.dataset.unit;
+    if(unit==="pct")animateValue(el,raw,v=>v.toFixed(2)+"%");
+    else if(unit==="moneyK")animateValue(el,raw,v=>fmtK(v)+" ฿");
+    else animateValue(el,raw,v=>fmt(v)+" ฿");
+  });
 }
 function computeIntroStats(span){
   const periods=[...new Set(DATA.map(d=>d.period).filter(Boolean))].sort();
