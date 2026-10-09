@@ -126,7 +126,8 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .intro-reveal-hint a{color:#6ee7d4;cursor:pointer;text-decoration:underline;font-weight:700}
 .dnode{cursor:pointer;transition:opacity .25s ease,transform .15s ease}
 .dnode:active{transform:scale(.97)}
-.dnode.off{opacity:.22}
+.dnode.off{opacity:.8}
+.dnode.off .dval{filter:blur(7px);user-select:none}
 .dot{cursor:pointer;transition:opacity .2s ease}
 .dot.off{opacity:.3}
 .intro-custom-box{margin-top:7px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:8px 10px}
@@ -288,23 +289,23 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 <button type="button" class="itbtn" data-span="custom">เลือกเอง</button>
 </div>
 <div class="intro-period" id="introPeriod"></div>
-<div class="intro-reveal-hint" id="introRevealHint">แตะจุด/การ์ดเพื่อเปิด-ปิดทีละรายการ · <a id="introOpenAll">เปิดทั้งหมด</a></div>
+<div class="intro-reveal-hint" id="introRevealHint">แตะจุด/การ์ดเพื่อดูตัวเลขทีละรายการ · <a id="introOpenAll">เปิดทั้งหมด</a></div>
 <div class="intro-custom-box" id="introCustomBox" style="display:none"></div>
 </div>
 <div class="diagram" id="introStats">
 <svg class="diagram-lines" id="diagramLines"></svg>
-<span class="dot" data-dot="sales"></span>
-<span class="dot" data-dot="damage"></span>
-<span class="dot" data-dot="rtc"></span>
-<span class="dot" data-dot="loss"></span>
-<span class="dot" data-dot="shrink"></span>
-<span class="dot" data-dot="pct"></span>
-<div class="dnode big" data-node="sales"><span class="dot-anchor"></span><div class="dlbl">ยอดขาย (Sales)</div><div class="dval" id="iv-sales">0</div></div>
-<div class="dnode" data-node="damage"><span class="dot-anchor"></span><div class="dlbl">Damage</div><div class="dval" id="iv-damage">0</div></div>
-<div class="dnode" data-node="rtc"><span class="dot-anchor"></span><div class="dlbl">RTC</div><div class="dval" id="iv-rtc">0</div></div>
-<div class="dnode big" data-node="loss"><span class="dot-anchor"></span><div class="dlbl">รวม Loss</div><div class="dval" id="iv-loss">0</div></div>
-<div class="dnode" data-node="shrink"><span class="dot-anchor"></span><div class="dlbl">Shrinkage</div><div class="dval" id="iv-shrink">0</div></div>
-<div class="dnode" data-node="pct"><span class="dot-anchor"></span><div class="dlbl">% Loss / ยอดขาย</div><div class="dval" id="iv-pct">-</div></div>
+<span class="dot off" data-dot="sales"></span>
+<span class="dot off" data-dot="damage"></span>
+<span class="dot off" data-dot="rtc"></span>
+<span class="dot off" data-dot="loss"></span>
+<span class="dot off" data-dot="shrink"></span>
+<span class="dot off" data-dot="pct"></span>
+<div class="dnode big off" data-node="sales"><span class="dot-anchor"></span><div class="dlbl">ยอดขาย (Sales)</div><div class="dval" id="iv-sales">0</div></div>
+<div class="dnode off" data-node="damage"><span class="dot-anchor"></span><div class="dlbl">Damage</div><div class="dval" id="iv-damage">0</div></div>
+<div class="dnode off" data-node="rtc"><span class="dot-anchor"></span><div class="dlbl">RTC</div><div class="dval" id="iv-rtc">0</div></div>
+<div class="dnode big off" data-node="loss"><span class="dot-anchor"></span><div class="dlbl">รวม Loss</div><div class="dval" id="iv-loss">0</div></div>
+<div class="dnode off" data-node="shrink"><span class="dot-anchor"></span><div class="dlbl">Shrinkage</div><div class="dval" id="iv-shrink">0</div></div>
+<div class="dnode off" data-node="pct"><span class="dot-anchor"></span><div class="dlbl">% Loss / ยอดขาย</div><div class="dval" id="iv-pct">-</div></div>
 </div>
 <div class="intro-footer">
 <div class="intro-upload">
