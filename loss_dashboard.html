@@ -1298,6 +1298,7 @@ if(!DATA.length){setUpStatus("👋 เริ่มต้น: กดปุ่ม 
 
 // ---------- Intro / splash screen ----------
 let introSpan="month";
+let lastIntroStats=null;
 let introCustomMonths=new Set();
 function animateValue(el,target,fmtFn,duration){
   duration=duration||1100;
@@ -1333,16 +1334,32 @@ function computeIntroStats(span){
   const pct=sales!==0?(totalLoss/sales*100):null;
   return {sales,totalLoss,damage,shrink,rtc,pct,scope};
 }
+const INTRO_CARD_MAP={
+  sales:{el:"iv-sales",get:st=>st.sales,fmt:v=>fmt(v)+" ฿"},
+  loss:{el:"iv-loss",get:st=>st.totalLoss,fmt:v=>fmt(v)+" ฿"},
+  damage:{el:"iv-damage",get:st=>st.damage,fmt:v=>fmt(v)+" ฿"},
+  shrink:{el:"iv-shrink",get:st=>st.shrink,fmt:v=>fmt(v)+" ฿"},
+  rtc:{el:"iv-rtc",get:st=>st.rtc,fmt:v=>fmt(v)+" ฿"},
+  pct:{el:"iv-pct",get:st=>st.pct,fmt:v=>v.toFixed(2)+"%",nullVal:"-"}
+};
+function animateIntroCard(key,animate){
+  const cfg=INTRO_CARD_MAP[key];
+  if(!cfg||!lastIntroStats)return;
+  const el=document.getElementById(cfg.el);
+  if(!el)return;
+  const val=cfg.get(lastIntroStats);
+  if(val==null){el.textContent=cfg.nullVal!=null?cfg.nullVal:"-";return;}
+  if(animate)animateValue(el,val,cfg.fmt);
+  else el.textContent=cfg.fmt(val);
+}
 function renderIntro(){
   const st=computeIntroStats(introSpan);
-  animateValue(document.getElementById("iv-sales"),st.sales,v=>fmt(v)+" ฿");
-  animateValue(document.getElementById("iv-loss"),st.totalLoss,v=>fmt(v)+" ฿");
-  animateValue(document.getElementById("iv-damage"),st.damage,v=>fmt(v)+" ฿");
-  animateValue(document.getElementById("iv-shrink"),st.shrink,v=>fmt(v)+" ฿");
-  animateValue(document.getElementById("iv-rtc"),st.rtc,v=>fmt(v)+" ฿");
-  const pctEl=document.getElementById("iv-pct");
-  if(st.pct!=null)animateValue(pctEl,st.pct,v=>v.toFixed(2)+"%");
-  else pctEl.textContent="-";
+  lastIntroStats=st;
+  Object.keys(INTRO_CARD_MAP).forEach(key=>{
+    const node=document.querySelector('.dnode[data-node="'+key+'"]');
+    const isOpen=node&&!node.classList.contains("off");
+    animateIntroCard(key,isOpen);
+  });
   const periodEl=document.getElementById("introPeriod");
   if(introSpan==="custom"&&!st.scope.length)periodEl.textContent="ติ๊กเลือกเดือนที่ต้องการด้านล่าง";
   else if(!st.scope.length)periodEl.textContent="ยังไม่มีข้อมูล — อัปโหลด CSV หลังเข้าสู่ Dashboard";
@@ -1418,7 +1435,9 @@ function toggleIntroCard(key){
   const dot=document.querySelector('.dot[data-dot="'+key+'"]');
   if(!node)return;
   node.classList.toggle("off");
-  if(dot)dot.classList.toggle("off",node.classList.contains("off"));
+  const nowOpen=!node.classList.contains("off");
+  if(dot)dot.classList.toggle("off",!nowOpen);
+  if(nowOpen)animateIntroCard(key,true);
   requestAnimationFrame(()=>requestAnimationFrame(drawDiagramLines));
 }
 document.querySelectorAll(".dnode").forEach(node=>{
@@ -1429,7 +1448,7 @@ document.querySelectorAll(".dot").forEach(dot=>{
 });
 const introOpenAllEl=document.getElementById("introOpenAll");
 if(introOpenAllEl)introOpenAllEl.onclick=()=>{
-  document.querySelectorAll(".dnode.off").forEach(n=>n.classList.remove("off"));
+  document.querySelectorAll(".dnode.off").forEach(n=>{n.classList.remove("off");animateIntroCard(n.dataset.node,true);});
   document.querySelectorAll(".dot.off").forEach(d=>d.classList.remove("off"));
   requestAnimationFrame(()=>requestAnimationFrame(drawDiagramLines));
 };
