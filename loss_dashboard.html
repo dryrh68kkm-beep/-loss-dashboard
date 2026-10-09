@@ -127,10 +127,15 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .istat.full .ival{font-size:28px}
 .intro-start{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:22px;padding:15px;background:#0d9382;color:#fff;border:none;border-radius:13px;font-size:15.5px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(13,147,130,.4);transition:transform .1s}
 .intro-start:active{transform:scale(.98)}
+.intro-upload{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.intro-upload .upbtn{flex:1;justify-content:center;font-size:12.5px;padding:10px 10px;background:rgba(255,255,255,.14);box-shadow:none;border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(2px)}
+.intro-upload .upbtn:nth-child(2){background:rgba(255,255,255,.14)}
+#introUpStatus{display:block;width:100%;font-size:10.5px;color:rgba(255,255,255,.75);margin-top:7px;text-align:center;min-height:13px}
 @media(max-width:420px){
   .intro-content h1{font-size:21px}
   .istat .ival{font-size:17px}
   .istat.full .ival{font-size:23px}
+  .intro-upload .upbtn{font-size:11px;padding:9px 6px}
 }
 /* Mobile-first refinements: keep the overview visible before the user starts scrolling. */
 @media(max-width:599px){
@@ -195,6 +200,11 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 <button type="button" class="itbtn" data-span="year">รายปี</button>
 </div>
 <div class="intro-period" id="introPeriod"></div>
+<div class="intro-upload">
+<label for="adjIn" class="upbtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> อัปโหลดไฟล์ ADJ</label>
+<label for="saleIn" class="upbtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> อัปโหลดยอดขาย</label>
+<span id="introUpStatus"></span>
+</div>
 <div class="intro-stats" id="introStats">
 <div class="istat full"><div class="ilbl">ยอดขาย (Sales)</div><div class="ival" id="iv-sales">0</div></div>
 <div class="istat full"><div class="ilbl">รวม Loss</div><div class="ival" id="iv-loss">0</div></div>
@@ -824,6 +834,11 @@ function parseRows(rows){
   return out;
 }
 const upStatus=document.getElementById("upStatus");
+function setUpStatus(msg){
+  upStatus.textContent=msg;
+  const introEl=document.getElementById("introUpStatus");
+  if(introEl)introEl.textContent=msg;
+}
 
 function parseSaleRows(rows){
   if(!rows.length)return null;
@@ -856,7 +871,7 @@ function parseSaleRows(rows){
 // อัปโหลดไฟล์ ADJ — คำนวณ Loss
 document.getElementById("adjIn").onchange=e=>{
   const f=e.target.files[0];if(!f)return;
-  upStatus.textContent="⏳ กำลังอ่านไฟล์ ADJ และคำนวณ...";
+  setUpStatus("⏳ กำลังอ่านไฟล์ ADJ และคำนวณ...");
   const rd=new FileReader();
   rd.onload=ev=>{
     try{
@@ -871,27 +886,27 @@ document.getElementById("adjIn").onchange=e=>{
       buildMonths();buildDivs();fillDept();render();
       if(curPage==="tree")renderTree();
       renderIntro();
-      upStatus.textContent="✅ อัปโหลด ADJ สำเร็จ — "+(msg.join(" · ")||"ไม่พบข้อมูล")+" · (ยอดขายอัปโหลดแยกที่ปุ่ม \"ยอดขายแยก\")";
-    }catch(err){upStatus.textContent="⚠️ อ่านไฟล์ ADJ ไม่ได้: "+err.message;}
+      setUpStatus("✅ อัปโหลด ADJ สำเร็จ — "+(msg.join(" · ")||"ไม่พบข้อมูล")+" · (ยอดขายอัปโหลดแยกที่ปุ่ม \"ยอดขายแยก\")");
+    }catch(err){setUpStatus("⚠️ อ่านไฟล์ ADJ ไม่ได้: "+err.message);}
   };
   rd.readAsText(f,"UTF-8");
 };
 document.getElementById("saleIn").onchange=e=>{
   const f=e.target.files[0];if(!f)return;
-  upStatus.textContent="กำลังอ่านไฟล์ยอดขาย...";
+  setUpStatus("กำลังอ่านไฟล์ยอดขาย...");
   const rd=new FileReader();
   rd.onload=ev=>{
     try{
       const parsed=parseSaleRows(parseCSV(ev.target.result));
-      if(parsed===null){upStatus.textContent="⚠️ ไม่พบคอลัมน์ยอดขาย (DIVISION_NAME, DEPT_GROUP_NAME, SALE_AMT)";return;}
-      if(!parsed.length){upStatus.textContent="⚠️ ไม่พบข้อมูลในไฟล์ยอดขาย";return;}
+      if(parsed===null){setUpStatus("⚠️ ไม่พบคอลัมน์ยอดขาย (DIVISION_NAME, DEPT_GROUP_NAME, SALE_AMT)");return;}
+      if(!parsed.length){setUpStatus("⚠️ ไม่พบข้อมูลในไฟล์ยอดขาย");return;}
       const newMonths=[...new Set(parsed.map(p=>p.period).filter(Boolean))];
       SALES=SALES.filter(d=>!newMonths.includes(d.period)).concat(parsed);
       buildSaleItemDeptOptions();
       render();
       renderIntro();
-      upStatus.textContent="✅ เพิ่มยอดขายแล้ว เดือน "+(newMonths.map(thMonth).join(", ")||"-")+" ("+parsed.length+" รายการ)";
-    }catch(err){upStatus.textContent="⚠️ อ่านไฟล์ยอดขายไม่ได้: "+err.message;}
+      setUpStatus("✅ เพิ่มยอดขายแล้ว เดือน "+(newMonths.map(thMonth).join(", ")||"-")+" ("+parsed.length+" รายการ)");
+    }catch(err){setUpStatus("⚠️ อ่านไฟล์ยอดขายไม่ได้: "+err.message);}
   };
   rd.readAsText(f,"UTF-8");
 };
@@ -1176,7 +1191,7 @@ window.addEventListener("resize",()=>{if(curPage==="tree")renderTree()});
 
 function initRender(){buildMonths();buildDivs();fillDept();buildSaleItemDeptOptions();render();if(curPage==="tree")renderTree();}
 initRender();
-if(!DATA.length){document.getElementById("upStatus").textContent="👋 เริ่มต้น: กดปุ่ม \"อัปโหลดไฟล์ ADJ (Loss + GP)\" แล้วตามด้วย \"ยอดขายแยก\" (ถ้าต้องการดู % Loss)";}
+if(!DATA.length){setUpStatus("👋 เริ่มต้น: กดปุ่ม \"อัปโหลดไฟล์ ADJ (Loss + GP)\" แล้วตามด้วย \"ยอดขายแยก\" (ถ้าต้องการดู % Loss)");}
 
 // ---------- Intro / splash screen ----------
 let introSpan="month";
