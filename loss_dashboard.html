@@ -121,6 +121,13 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .itbtn{padding:8px 18px;border-radius:9px;font-size:13px;font-weight:700;color:rgba(255,255,255,.75);cursor:pointer;transition:all .15s;border:none;background:transparent;font-family:inherit}
 .itbtn.active{background:#fff;color:#087d70;box-shadow:0 1px 4px rgba(0,0,0,.2)}
 .intro-period{font-size:11.5px;color:rgba(255,255,255,.65);margin-top:8px}
+.intro-reveal-hint{font-size:11px;color:rgba(255,255,255,.55);margin-top:4px}
+.intro-reveal-hint a{color:#6ee7d4;cursor:pointer;text-decoration:underline;font-weight:700}
+.dnode{cursor:pointer;transition:opacity .25s ease,transform .15s ease}
+.dnode:active{transform:scale(.97)}
+.dnode.off{opacity:.22}
+.dot{cursor:pointer;transition:opacity .2s ease}
+.dot.off{opacity:.3}
 .intro-custom-box{margin-top:9px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:10px 12px}
 .intro-custom-box label{display:inline-flex;align-items:center;gap:5px;margin:3px 10px 3px 0;font-size:12px;color:rgba(255,255,255,.85);cursor:pointer}
 .intro-custom-box input{accent-color:#0d9382}
@@ -276,6 +283,7 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 <button type="button" class="itbtn" data-span="custom">เลือกเอง</button>
 </div>
 <div class="intro-period" id="introPeriod"></div>
+<div class="intro-reveal-hint" id="introRevealHint">แตะจุด/การ์ดเพื่อเปิด-ปิดทีละรายการ · <a id="introOpenAll">เปิดทั้งหมด</a></div>
 <div class="intro-custom-box" id="introCustomBox" style="display:none"></div>
 <div class="intro-upload">
 <label for="adjIn" class="upbtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> อัปโหลดไฟล์ ADJ</label>
@@ -1359,6 +1367,7 @@ function drawDiagramLines(){
   svg.setAttribute("viewBox","0 0 "+gr.width+" "+gr.height);
   svg.innerHTML="";
   document.querySelectorAll(".dnode").forEach(node=>{
+    if(node.classList.contains("off"))return;
     const key=node.dataset.node;
     const dot=document.querySelector('.dot[data-dot="'+key+'"]');
     const anchor=node.querySelector(".dot-anchor");
@@ -1388,6 +1397,26 @@ document.querySelectorAll("#introToggle .itbtn").forEach(b=>b.onclick=()=>{
   }
   renderIntro();
 });
+function toggleIntroCard(key){
+  const node=document.querySelector('.dnode[data-node="'+key+'"]');
+  const dot=document.querySelector('.dot[data-dot="'+key+'"]');
+  if(!node)return;
+  node.classList.toggle("off");
+  if(dot)dot.classList.toggle("off",node.classList.contains("off"));
+  requestAnimationFrame(()=>requestAnimationFrame(drawDiagramLines));
+}
+document.querySelectorAll(".dnode").forEach(node=>{
+  node.addEventListener("click",()=>toggleIntroCard(node.dataset.node));
+});
+document.querySelectorAll(".dot").forEach(dot=>{
+  dot.addEventListener("click",()=>toggleIntroCard(dot.dataset.dot));
+});
+const introOpenAllEl=document.getElementById("introOpenAll");
+if(introOpenAllEl)introOpenAllEl.onclick=()=>{
+  document.querySelectorAll(".dnode.off").forEach(n=>n.classList.remove("off"));
+  document.querySelectorAll(".dot.off").forEach(d=>d.classList.remove("off"));
+  requestAnimationFrame(()=>requestAnimationFrame(drawDiagramLines));
+};
 document.getElementById("introStart").onclick=()=>{
   const introScreen=document.getElementById("introScreen");
   const mainApp=document.getElementById("mainApp");
