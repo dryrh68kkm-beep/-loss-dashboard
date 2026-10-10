@@ -44,7 +44,8 @@ select:focus{outline:none;border-color:#0d9a87;box-shadow:0 0 0 3px rgba(13,154,
 .risk-col{min-width:54px;flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;position:relative;cursor:default}
 .risk-col::after{content:"";width:100%;height:1px;background:#dfe7ee;position:absolute;bottom:0}
 .risk-value{font-size:10px;font-weight:800;color:#455a64;white-space:nowrap;margin-bottom:6px;font-variant-numeric:tabular-nums}
-.risk-bar{width:min(34px,68%);min-height:5px;border-radius:7px 7px 2px 2px;background:linear-gradient(180deg,#e87572,#c0504d);box-shadow:0 3px 8px rgba(192,80,77,.22);transition:height .25s ease,filter .15s;position:relative;z-index:1}
+@keyframes barGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.risk-bar{width:min(34px,68%);min-height:5px;border-radius:7px 7px 2px 2px;background:linear-gradient(180deg,#e87572,#c0504d);box-shadow:0 3px 8px rgba(192,80,77,.22);transition:height .25s ease,filter .15s,transform .15s;position:relative;z-index:1;transform-origin:bottom;animation:barGrow .5s cubic-bezier(.22,1,.36,1) backwards}
 .risk-bar.good{background:linear-gradient(180deg,#55aa88,#2e7d5b);box-shadow:0 3px 8px rgba(46,125,91,.22)}
 .risk-col:hover .risk-bar{filter:brightness(.92);transform:translateY(-2px)}
 .risk-label{font-size:10.5px;font-weight:700;color:#607d8b;text-align:center;line-height:1.18;width:100%;height:33px;display:flex;align-items:flex-start;justify-content:center;padding:7px 2px 0;overflow:hidden;word-break:break-word}
@@ -54,7 +55,8 @@ select:focus{outline:none;border-color:#0d9a87;box-shadow:0 0 0 3px rgba(13,154,
 .bar-row .br-top .nm{font-weight:600;color:#455a64;display:flex;align-items:center;gap:6px}
 .bar-row .br-top .amt{color:#263945;font-weight:700;font-variant-numeric:tabular-nums}
 .bar-bg{background:#eceff1;border-radius:8px;height:9px;overflow:hidden}
-.bar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#263945,#526a77)}
+.bar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#263945,#526a77);transform-origin:left;animation:barGrowX .5s cubic-bezier(.22,1,.36,1) backwards}
+@keyframes barGrowX{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 table{width:100%;border-collapse:collapse;font-size:12.5px}
 th,td{text-align:left;padding:10px 8px;border-bottom:1px solid #eef1f4}
 th{color:#90a4ae;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.3px}
@@ -760,10 +762,10 @@ function render(){
   const maxAbs=Math.max(...darr.map(d=>Math.abs(d[1])),1);
   const deptChart=document.getElementById("deptBars");
   deptChart.classList.toggle("is-empty",!darr.length);
-  deptChart.innerHTML=darr.length?darr.map(d=>{
+  deptChart.innerHTML=darr.length?darr.map((d,i)=>{
     const height=Math.max(5,Math.round(Math.abs(d[1])/maxAbs*190));
     const safeName=String(d[0]).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-    return '<div class="risk-col" title="'+safeName+' · '+fmt(d[1])+' บาท"><span class="risk-value" style="color:'+scol(d[1])+'">'+fmt(d[1])+'</span><div class="risk-bar '+(d[1]>0?'good':'')+'" style="height:'+height+'px"></div><span class="risk-label">'+safeName+'</span></div>';
+    return '<div class="risk-col" title="'+safeName+' · '+fmt(d[1])+' บาท"><span class="risk-value" style="color:'+scol(d[1])+'">'+fmt(d[1])+'</span><div class="risk-bar '+(d[1]>0?'good':'')+'" style="height:'+height+'px;animation-delay:'+(i*35)+'ms"></div><span class="risk-label">'+safeName+'</span></div>';
   }).join(""):'<div class="risk-empty">ยังไม่มีข้อมูลสำหรับสร้างกราฟ<br>อัปโหลด CSV Loss เพื่อเริ่มวิเคราะห์</div>';
   const imap={};
   const mo2=fMonth.value,dv2=fDiv.value,dp2=fDept.value;
@@ -844,13 +846,13 @@ function renderSaleDeptBars(saleRows){
   });
   const darr=Object.entries(dmap).sort((a,b)=>b[1].ty-a[1].ty).slice(0,12);
   const maxAbs=Math.max(...darr.map(d=>Math.max(Math.abs(d[1].ty),Math.abs(d[1].ly))),1);
-  document.getElementById("saleDeptBars").innerHTML=darr.length?darr.map(d=>{
+  document.getElementById("saleDeptBars").innerHTML=darr.length?darr.map((d,i)=>{
     const ty=d[1].ty,ly=d[1].ly,diff=ty-ly;
     const pct=ly!==0?(diff/Math.abs(ly)*100):(ty!==0?null:0);
     const pctTxt=pct==null?"n/a":(pct>=0?"+":"")+pct.toFixed(1)+"%";
     const dCol=diff===0?"#90a4ae":(diff>=0?"#2E7D5B":"#C0504D");
     return '<div class="bar-row" data-k="'+d[0]+'" style="'+(drillable?'cursor:pointer':'')+'"><div class="br-top"><span class="nm">'+d[0]+(drillable?' <span style="color:#2E6CA4;font-size:10px">›</span>':'')+'</span><span class="amt" style="color:#2E7D5B;font-size:16px;font-weight:800">'+fmt(ty)+' ฿</span></div>'
-      +'<div class="bar-bg"><div class="bar-fill" style="width:'+(Math.abs(ty)/maxAbs*100)+'%;background:linear-gradient(90deg,#2E7D5B,#4F81BD)"></div></div>'
+      +'<div class="bar-bg"><div class="bar-fill" style="width:'+(Math.abs(ty)/maxAbs*100)+'%;background:linear-gradient(90deg,#2E7D5B,#4F81BD);animation-delay:'+(i*35)+'ms"></div></div>'
       +'<div style="display:flex;justify-content:space-between;margin-top:3px"><span class="lyline">ปีก่อน: '+fmt(ly)+' ฿</span><span class="lyline" style="color:'+dCol+';font-weight:700">'+(diff>=0?"+":"")+fmt(diff)+' ('+pctTxt+')</span></div></div>';
   }).join(""):'<div class=muted>ไม่มีข้อมูล</div>';
   if(drillable){
