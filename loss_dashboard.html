@@ -128,6 +128,9 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .itbtn.active{background:#fff;color:#087d70;box-shadow:0 1px 4px rgba(0,0,0,.2)}
 .intro-period{font-size:9.5px;color:rgba(255,255,255,.65);margin-top:6px}
 .intro-reveal-hint{font-size:9px;color:rgba(255,255,255,.5);margin-top:3px}
+.intro-openall-btn{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:7;display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:22px;background:rgba(13,147,130,.88);backdrop-filter:blur(6px);color:#fff;border:1px solid rgba(255,255,255,.32);font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.3);transition:transform .15s ease,box-shadow .15s ease}
+.intro-openall-btn:hover{transform:translateX(-50%) translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.4);background:rgba(15,166,147,.92)}
+.intro-openall-btn:active{transform:translateX(-50%) scale(.96)}
 .intro-reveal-hint a{color:#6ee7d4;cursor:pointer;text-decoration:underline;font-weight:700}
 .dnode{cursor:pointer;transition:opacity .25s ease,transform .15s ease,box-shadow .15s ease,border-color .15s ease}
 .dnode:hover{transform:translateY(-3px) scale(1.035);box-shadow:0 10px 26px rgba(0,0,0,.4);border-color:rgba(255,255,255,.4)}
@@ -144,11 +147,11 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .diagram{position:relative;width:100%;max-width:640px;min-height:250px}
 .diagram-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:visible}
 .diagram .dot{position:absolute;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.22),0 0 8px rgba(255,255,255,.55);transform:translate(-50%,-50%);z-index:1}
-.dnode{position:absolute;z-index:1;width:132px;background:rgba(10,22,19,.5);backdrop-filter:blur(7px);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:8px 11px;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.dnode{position:absolute;z-index:1;min-width:132px;width:max-content;max-width:min(60vw,320px);background:rgba(10,22,19,.5);backdrop-filter:blur(7px);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:8px 11px;box-shadow:0 4px 14px rgba(0,0,0,.3)}
 .dnode .dot-anchor{position:absolute;top:50%;left:50%;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.7);transform:translate(-50%,-50%)}
 .dlbl{font-size:9.5px;font-weight:700;color:rgba(255,255,255,.72);text-transform:uppercase;letter-spacing:.3px}
-.dval{font-size:15px;font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums;letter-spacing:-.2px;color:#fff}
-.dnode.big{width:150px}
+.dval{font-size:15px;font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums;letter-spacing:-.2px;color:#fff;white-space:nowrap}
+.dnode.big{min-width:150px}
 .dnode.big .dval{font-size:18px}
 .dnode[data-node="sales"]{top:0%;left:0%}
 .dnode[data-node="loss"]{top:36%;left:2%}
@@ -183,8 +186,8 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 #introUpStatus{display:block;width:100%;font-size:10.5px;color:rgba(255,255,255,.75);margin-top:7px;text-align:center;min-height:13px}
 @media(max-width:560px){
   .diagram{min-height:420px}
-  .dnode{width:118px;padding:7px 9px}
-  .dnode.big{width:132px}
+  .dnode{min-width:118px;padding:7px 9px}
+  .dnode.big{min-width:132px}
   .dnode[data-node="sales"]{top:0%;left:0%}
   .dnode[data-node="loss"]{top:34%;left:2%}
   .dnode[data-node="pct"]{top:68%;left:6%}
@@ -200,24 +203,24 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 }
 @media(min-width:900px){
   .diagram{max-width:1020px;min-height:320px}
-  .dnode{width:170px;padding:12px 15px}
-  .dnode.big{width:200px}
+  .dnode{min-width:170px;padding:12px 15px}
+  .dnode.big{min-width:200px}
   .dlbl{font-size:12px}
   .dval{font-size:22px;margin-top:5px}
   .dnode.big .dval{font-size:27px}
 }
 @media(min-width:1300px){
   .diagram{max-width:1320px;min-height:380px}
-  .dnode{width:210px;padding:14px 17px}
-  .dnode.big{width:250px}
+  .dnode{min-width:210px;padding:14px 17px}
+  .dnode.big{min-width:250px}
   .dlbl{font-size:13px}
   .dval{font-size:27px}
   .dnode.big .dval{font-size:33px}
 }
 @media(min-width:1650px){
   .diagram{max-width:1560px;min-height:420px}
-  .dnode{width:235px}
-  .dnode.big{width:280px}
+  .dnode{min-width:235px}
+  .dnode.big{min-width:280px}
   .dval{font-size:30px}
   .dnode.big .dval{font-size:37px}
 }
@@ -295,8 +298,9 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 <button type="button" class="itbtn" data-span="custom">เลือกเอง</button>
 </div>
 <div class="intro-period" id="introPeriod"></div>
-<div class="intro-reveal-hint" id="introRevealHint">แตะจุด/การ์ดเพื่อดูตัวเลขทีละรายการ · <a id="introOpenAll">เปิดทั้งหมด</a></div>
+<div class="intro-reveal-hint" id="introRevealHint">แตะจุด/การ์ดเพื่อดูตัวเลขทีละรายการ</div>
 </div>
+<button type="button" class="intro-openall-btn" id="introOpenAll"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> เปิดทั้งหมด</button>
 <div class="intro-custom-box" id="introCustomBox" style="display:none"></div>
 <div class="diagram" id="introStats">
 <svg class="diagram-lines" id="diagramLines"></svg>
@@ -1425,6 +1429,16 @@ function adjustIntroLayout(){
   const content=document.querySelector(".intro-content");
   if(!corner||!content)return;
   let bottom=corner.offsetTop+corner.offsetHeight;
+  const openAllBtn=document.getElementById("introOpenAll");
+  if(openAllBtn){
+    const narrowBtn=window.innerWidth<560;
+    if(narrowBtn){
+      openAllBtn.style.top=(corner.offsetTop+corner.offsetHeight+10)+"px";
+    }else{
+      openAllBtn.style.top="16px";
+    }
+    bottom=Math.max(bottom,openAllBtn.offsetTop+openAllBtn.offsetHeight);
+  }
   const box=document.getElementById("introCustomBox");
   if(box&&box.style.display!=="none"){
     const wide=window.innerWidth>=760;
