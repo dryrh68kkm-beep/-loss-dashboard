@@ -86,7 +86,8 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}.tab{padding:8px 16px;border-radius:22px;border:1.5px solid #dde3e8;background:#fff;font-size:13px;cursor:pointer;font-family:inherit;font-weight:600;color:#546e7a;transition:all .15s;display:flex;align-items:center;gap:6px}
 .tab.active{background:#0d9382;color:#fff;border-color:#0d9382;box-shadow:0 2px 8px rgba(13,147,130,.27)}
 .muted{color:#b0bec5;font-size:13px;text-align:center;padding:24px}
-.upbtn{display:inline-flex;align-items:center;gap:7px;padding:11px 18px;background:#087d70;color:#fff;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:transform .1s,box-shadow .15s;box-shadow:0 2px 8px rgba(8,125,112,.22)}
+.upbtn{display:inline-flex;align-items:center;gap:7px;padding:11px 18px;background:#087d70;color:#fff;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:transform .1s,box-shadow .15s,outline .1s;box-shadow:0 2px 8px rgba(8,125,112,.22)}
+.upbtn.dragover{outline:3px dashed #fff;outline-offset:2px;transform:scale(1.04);box-shadow:0 4px 16px rgba(8,125,112,.4)}
 .upbtn:active{transform:scale(.97)}
 .import-sec{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 16px}
 .import-copy{flex:1;min-width:220px;padding-left:4px}
@@ -328,9 +329,9 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 <div class="sec import-sec">
 <div class="import-copy"><strong>อัปเดตข้อมูล Dashboard</strong><span>นำเข้าไฟล์ Loss และยอดขายล่าสุด เพื่อคำนวณตัวชี้วัดและกราฟ</span></div>
 <label for="adjIn" class="upbtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> อัปโหลดไฟล์ ADJ (Loss + GP)</label>
-<input type="file" id="adjIn" accept=".csv,text/csv" style="display:none">
+<input type="file" id="adjIn" accept=".csv,.txt,text/csv,text/plain" style="display:none">
 <label for="saleIn" class="upbtn" style="background:#159a77"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> ยอดขายแยก</label>
-<input type="file" id="saleIn" accept=".csv,text/csv" style="display:none">
+<input type="file" id="saleIn" accept=".csv,.txt,text/csv,text/plain" style="display:none">
 <span id="upStatus"></span>
 </div>
 <div class="pagenav" id="pagenav">
@@ -977,8 +978,8 @@ function parseSaleRows(rows){
   return out;
 }
 // อัปโหลดไฟล์ ADJ — คำนวณ Loss
-document.getElementById("adjIn").onchange=e=>{
-  const f=e.target.files[0];if(!f)return;
+function handleAdjFile(f){
+  if(!f)return;
   setUpStatus("⏳ กำลังอ่านไฟล์ ADJ และคำนวณ...");
   const rd=new FileReader();
   rd.onload=ev=>{
@@ -998,9 +999,9 @@ document.getElementById("adjIn").onchange=e=>{
     }catch(err){setUpStatus("⚠️ อ่านไฟล์ ADJ ไม่ได้: "+err.message);}
   };
   rd.readAsText(f,"UTF-8");
-};
-document.getElementById("saleIn").onchange=e=>{
-  const f=e.target.files[0];if(!f)return;
+}
+function handleSaleFile(f){
+  if(!f)return;
   setUpStatus("กำลังอ่านไฟล์ยอดขาย...");
   const rd=new FileReader();
   rd.onload=ev=>{
@@ -1017,7 +1018,23 @@ document.getElementById("saleIn").onchange=e=>{
     }catch(err){setUpStatus("⚠️ อ่านไฟล์ยอดขายไม่ได้: "+err.message);}
   };
   rd.readAsText(f,"UTF-8");
-};
+}
+document.getElementById("adjIn").onchange=e=>handleAdjFile(e.target.files[0]);
+document.getElementById("saleIn").onchange=e=>handleSaleFile(e.target.files[0]);
+function wireDropTarget(label,handler){
+  label.addEventListener("dragover",e=>{e.preventDefault();e.stopPropagation();label.classList.add("dragover");});
+  label.addEventListener("dragleave",e=>{e.preventDefault();e.stopPropagation();label.classList.remove("dragover");});
+  label.addEventListener("drop",e=>{
+    e.preventDefault();e.stopPropagation();
+    label.classList.remove("dragover");
+    const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];
+    if(f)handler(f);
+  });
+}
+document.querySelectorAll('label.upbtn[for="adjIn"]').forEach(l=>wireDropTarget(l,handleAdjFile));
+document.querySelectorAll('label.upbtn[for="saleIn"]').forEach(l=>wireDropTarget(l,handleSaleFile));
+window.addEventListener("dragover",e=>e.preventDefault());
+window.addEventListener("drop",e=>e.preventDefault());
 
 const overlay=document.getElementById("overlay");
 function openModal(type){
