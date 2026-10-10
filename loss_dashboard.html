@@ -25,7 +25,8 @@ select{width:100%;padding:11px 12px;border:1.5px solid #dde3e8;border-radius:10p
 select:focus{outline:none;border-color:#0d9a87;box-shadow:0 0 0 3px rgba(13,154,135,.13)}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:12px;margin-bottom:18px}
 @keyframes cardPop{from{opacity:0;transform:scale(.94) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(38,50,56,.06);position:relative;overflow:visible;transition:transform .15s ease,box-shadow .15s ease;animation:cardPop .38s cubic-bezier(.34,1.3,.64,1)}
+.card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(38,50,56,.06);position:relative;overflow:visible;transition:transform .15s ease,box-shadow .15s ease}
+.card.pop-in{animation:cardPop .38s cubic-bezier(.34,1.3,.64,1)}
 .card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(38,50,56,.14)}
 .card .ic{position:absolute;top:14px;right:14px;font-size:22px;opacity:.9}
 .card .icw{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center}
@@ -45,7 +46,8 @@ select:focus{outline:none;border-color:#0d9a87;box-shadow:0 0 0 3px rgba(13,154,
 .risk-col::after{content:"";width:100%;height:1px;background:#dfe7ee;position:absolute;bottom:0}
 .risk-value{font-size:10px;font-weight:800;color:#455a64;white-space:nowrap;margin-bottom:6px;font-variant-numeric:tabular-nums}
 @keyframes barGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
-.risk-bar{width:min(34px,68%);min-height:5px;border-radius:7px 7px 2px 2px;background:linear-gradient(180deg,#e87572,#c0504d);box-shadow:0 3px 8px rgba(192,80,77,.22);transition:height .25s ease,filter .15s,transform .15s;position:relative;z-index:1;transform-origin:bottom;animation:barGrow .5s cubic-bezier(.22,1,.36,1) backwards}
+.risk-bar{width:min(34px,68%);min-height:5px;border-radius:7px 7px 2px 2px;background:linear-gradient(180deg,#e87572,#c0504d);box-shadow:0 3px 8px rgba(192,80,77,.22);transition:height .25s ease,filter .15s,transform .15s;position:relative;z-index:1;transform-origin:bottom}
+.risk-bar.pop-in{animation:barGrow .5s cubic-bezier(.22,1,.36,1) backwards}
 .risk-bar.good{background:linear-gradient(180deg,#55aa88,#2e7d5b);box-shadow:0 3px 8px rgba(46,125,91,.22)}
 .risk-col:hover .risk-bar{filter:brightness(.92);transform:translateY(-2px)}
 .risk-label{font-size:10.5px;font-weight:700;color:#607d8b;text-align:center;line-height:1.18;width:100%;height:33px;display:flex;align-items:flex-start;justify-content:center;padding:7px 2px 0;overflow:hidden;word-break:break-word}
@@ -55,7 +57,8 @@ select:focus{outline:none;border-color:#0d9a87;box-shadow:0 0 0 3px rgba(13,154,
 .bar-row .br-top .nm{font-weight:600;color:#455a64;display:flex;align-items:center;gap:6px}
 .bar-row .br-top .amt{color:#263945;font-weight:700;font-variant-numeric:tabular-nums}
 .bar-bg{background:#eceff1;border-radius:8px;height:9px;overflow:hidden}
-.bar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#263945,#526a77);transform-origin:left;animation:barGrowX .5s cubic-bezier(.22,1,.36,1) backwards}
+.bar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#263945,#526a77);transform-origin:left}
+.bar-fill.pop-in{animation:barGrowX .5s cubic-bezier(.22,1,.36,1) backwards}
 @keyframes barGrowX{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 table{width:100%;border-collapse:collapse;font-size:12.5px}
 th,td{text-align:left;padding:10px 8px;border-bottom:1px solid #eef1f4}
@@ -754,6 +757,7 @@ function render(){
   }
   document.getElementById("cards").innerHTML=cardsH;
   animateCardVals(document.getElementById("cards"));
+  popIn(document.getElementById("cards"),".card");
   document.getElementById("codeTop").innerHTML="";
   document.querySelectorAll(".card.clickable").forEach(c=>c.onclick=()=>{
     if(c.dataset.ttype)openTargetModal(c.dataset.ttype);
@@ -769,8 +773,9 @@ function render(){
   deptChart.innerHTML=darr.length?darr.map((d,i)=>{
     const height=Math.max(5,Math.round(Math.abs(d[1])/maxAbs*190));
     const safeName=String(d[0]).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-    return '<div class="risk-col" title="'+safeName+' · '+fmt(d[1])+' บาท"><span class="risk-value" style="color:'+scol(d[1])+'">'+fmt(d[1])+'</span><div class="risk-bar '+(d[1]>0?'good':'')+'" style="height:'+height+'px;animation-delay:'+(i*35)+'ms"></div><span class="risk-label">'+safeName+'</span></div>';
+    return '<div class="risk-col" title="'+safeName+' · '+fmt(d[1])+' บาท"><span class="risk-value" style="color:'+scol(d[1])+'">'+fmt(d[1])+'</span><div class="risk-bar pop-in '+(d[1]>0?'good':'')+'" style="height:'+height+'px;animation-delay:'+(i*35)+'ms"></div><span class="risk-label">'+safeName+'</span></div>';
   }).join(""):'<div class="risk-empty">ยังไม่มีข้อมูลสำหรับสร้างกราฟ<br>อัปโหลด CSV Loss เพื่อเริ่มวิเคราะห์</div>';
+  schedulePopInCleanup(deptChart,".risk-bar.pop-in");
   const imap={};
   const mo2=fMonth.value,dv2=fDiv.value,dp2=fDept.value;
   const combRows=DATA.filter(d=>mMatch(d.period)&&(dv2=="ALL"||d.div==dv2)&&(dp2=="ALL"||d.dept==dp2)&&(d.type==="DAMAGE"||d.type==="RTC"||d.type==="SHRINKAGE"));
@@ -795,6 +800,7 @@ function renderSalePage(){
   const g=yoy(totSale,totSaleLY,false);
   document.getElementById("saleCards").innerHTML='<div class="card q clickable" data-card="SALES">'+icw('SALES','#e7f4ee','#2E7D5B')+'<div class="lbl">ยอดขายรวม</div><div class="val" data-val="'+totSale+'" data-unit="money" style="color:'+scol(totSale)+'">0 ฿</div>'+g.html+'<div class="tap">แตะดูแยกฝ่าย ›</div></div>';
   animateCardVals(document.getElementById("saleCards"));
+  popIn(document.getElementById("saleCards"),".card");
   document.querySelectorAll("#saleCards .card.clickable").forEach(c=>c.onclick=()=>openSalesModal(fMonth.value,dv,dp));
   renderSaleDeptBars(saleRows);
   const itemDiv=document.getElementById("saleItemDiv").value;
@@ -856,9 +862,10 @@ function renderSaleDeptBars(saleRows){
     const pctTxt=pct==null?"n/a":(pct>=0?"+":"")+pct.toFixed(1)+"%";
     const dCol=diff===0?"#90a4ae":(diff>=0?"#2E7D5B":"#C0504D");
     return '<div class="bar-row" data-k="'+d[0]+'" style="'+(drillable?'cursor:pointer':'')+'"><div class="br-top"><span class="nm">'+d[0]+(drillable?' <span style="color:#2E6CA4;font-size:10px">›</span>':'')+'</span><span class="amt" style="color:#2E7D5B;font-size:16px;font-weight:800">'+fmt(ty)+' ฿</span></div>'
-      +'<div class="bar-bg"><div class="bar-fill" style="width:'+(Math.abs(ty)/maxAbs*100)+'%;background:linear-gradient(90deg,#2E7D5B,#4F81BD);animation-delay:'+(i*35)+'ms"></div></div>'
+      +'<div class="bar-bg"><div class="bar-fill pop-in" style="width:'+(Math.abs(ty)/maxAbs*100)+'%;background:linear-gradient(90deg,#2E7D5B,#4F81BD);animation-delay:'+(i*35)+'ms"></div></div>'
       +'<div style="display:flex;justify-content:space-between;margin-top:3px"><span class="lyline">ปีก่อน: '+fmt(ly)+' ฿</span><span class="lyline" style="color:'+dCol+';font-weight:700">'+(diff>=0?"+":"")+fmt(diff)+' ('+pctTxt+')</span></div></div>';
   }).join(""):'<div class=muted>ไม่มีข้อมูล</div>';
+  schedulePopInCleanup(document.getElementById("saleDeptBars"),".bar-fill.pop-in");
   if(drillable){
     document.querySelectorAll("#saleDeptBars .bar-row").forEach(el=>el.onclick=()=>{saleBarPath=[el.dataset.k];renderSaleDeptBars(saleRows);});
   }
@@ -1367,6 +1374,19 @@ function animateCardVals(root){
     else if(unit==="moneyK")animateValue(el,raw,v=>fmtK(v)+" ฿");
     else animateValue(el,raw,v=>fmt(v)+" ฿");
   });
+}
+// เพิ่มคลาส pop-in ให้เล่นอนิเมชั่นทางเดียว แล้วลบออกทันทีที่เล่นจบ
+// ป้องกันไม่ให้อนิเมชั่นเล่นซ้ำตอนสลับหน้า (display:none -> block รีสตาร์ท CSS animation เสมอถ้าคลาสยังติดอยู่)
+function schedulePopInCleanup(root,selector){
+  if(!root)return;
+  const els=root.querySelectorAll(selector);
+  if(!els.length)return;
+  setTimeout(()=>els.forEach(e=>e.classList.remove("pop-in")),650);
+}
+function popIn(root,selector){
+  if(!root)return;
+  root.querySelectorAll(selector).forEach(e=>e.classList.add("pop-in"));
+  schedulePopInCleanup(root,selector);
 }
 function computeIntroStats(span){
   const periods=[...new Set(DATA.map(d=>d.period).filter(Boolean))].sort();
