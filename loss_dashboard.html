@@ -1135,8 +1135,8 @@ function openTargetModal(ttype){
     const diffLYPct=r.ly!==0?(diffLY/Math.abs(r.ly)*100):null;
     const arrLY=diffLY>0?"▲":(diffLY<0?"▼":"–");
     const diffLYTxt=arrLY+" "+(diffLY>=0?"+":"")+fmt(diffLY)+(diffLYPct!=null?" ("+(diffLYPct>=0?"+":"")+diffLYPct.toFixed(1)+"%)":"");
-    const colLY=r.ly>r.ty?"#C0504D":(r.ly<r.ty?"#2E7D5B":"#90a4ae");
-    return '<tr><td>'+r.div+'</td><td class="num '+(r.ty<0?'neg':'pos')+'">'+fmt(r.ty)+'</td><td class="num">'+(r.tgt!=null?fmt(r.tgt):'-')+'</td><td class="num" style="color:'+colT+';font-weight:700;white-space:nowrap">'+diffTTxt+'</td><td class="num" style="color:'+colLY+'">'+fmt(r.ly)+'</td><td class="num '+(diffLY<0?'neg':'pos')+'">'+diffLYTxt+'</td></tr>';
+    const colLY=r.ly>r.ty?"#2E7D5B":(r.ly<r.ty?"#C0504D":"#90a4ae");
+    return '<tr><td>'+r.div+'</td><td class="num '+(r.ty<0?'neg':'pos')+'">'+fmt(r.ty)+'</td><td class="num">'+(r.tgt!=null?fmt(r.tgt):'-')+'</td><td class="num" style="color:'+colT+';font-weight:700;white-space:nowrap">'+diffTTxt+'</td><td class="num" style="color:'+colLY+'">'+fmt(r.ly)+'</td><td class="num" style="color:'+colLY+'">'+diffLYTxt+'</td></tr>';
   }).join("");
   overlay.classList.add("show");
 }
