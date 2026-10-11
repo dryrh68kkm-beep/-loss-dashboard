@@ -217,10 +217,12 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .door.opening.door-l{transform:translateX(-50vw)}
 .door.opening.door-r{transform:translateX(50vw)}
 @keyframes mainZoomIn{from{opacity:.3;transform:scale(1.22)}to{opacity:1;transform:scale(1)}}
-#mainApp.entering{animation:mainZoomIn 1.5s cubic-bezier(.22,1,.36,1) both}
+#mainApp.entering{animation:mainZoomIn 1.3s cubic-bezier(.22,1,.36,1) both}
 .intro.closing{transition:opacity .5s ease-out;opacity:0;pointer-events:none}
 @keyframes dnodeFlyIn{0%{opacity:0;transform:translate(var(--fx,0),var(--fy,0)) scale(.85)}100%{opacity:1;transform:translate(0,0) scale(1)}}
 .dnode.fly-in{animation:dnodeFlyIn .68s cubic-bezier(.22,1,.36,1) both}
+@keyframes dnodeOpenOut{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--fx,0),var(--fy,0)) scale(.9)}}
+.dnode.open-out{animation:dnodeOpenOut .5s cubic-bezier(.4,0,.2,1) both}
 .intro-upload{display:flex;gap:8px;flex-wrap:wrap}
 .intro-upload .upbtn{flex:1;justify-content:center;font-size:12.5px;padding:10px 10px;background:rgba(255,255,255,.14);box-shadow:none;border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(2px)}
 .intro-upload .upbtn:nth-child(2){background:rgba(255,255,255,.14)}
@@ -1600,34 +1602,48 @@ document.getElementById("introStart").onclick=()=>{
   const introScreen=document.getElementById("introScreen");
   const mainApp=document.getElementById("mainApp");
   mainApp.style.display="";
-  mainApp.classList.add("entering");
+  // Stage 1 (0-500ms): KPI cards fly apart first, door and dashboard untouched.
   try{
-    const doorL=document.getElementById("doorL"), doorR=document.getElementById("doorR");
-    const introBgEl=document.getElementById("introBg");
-    if(doorL&&doorR&&introBgEl){
-      const bgUrl=introBgEl.style.backgroundImage;
-      doorL.style.backgroundImage=bgUrl;
-      doorR.style.backgroundImage=bgUrl;
-      introBgEl.style.display="none";
-      doorL.style.display="block";
-      doorR.style.display="block";
-      setTimeout(()=>{
-        doorL.classList.add("opening");
-        doorR.classList.add("opening");
-      },350);
-    }
+    const diagram=document.querySelector(".diagram");
+    document.querySelectorAll(".dnode").forEach((n,i)=>{
+      setNodeFlyOffset(n,diagram);
+      n.style.animationDelay=(i*20)+"ms";
+      n.classList.add("open-out");
+    });
   }catch(err){}
+  // Stage 2 (500-1500ms): doors slide open at full opacity, dashboard zoom starts in sync.
   setTimeout(()=>{
-    try{document.getElementById("introScreen").classList.add("closing");}catch(err){}
-  },1000);
+    mainApp.classList.add("entering");
+    try{
+      const doorL=document.getElementById("doorL"), doorR=document.getElementById("doorR");
+      const introBgEl=document.getElementById("introBg");
+      if(doorL&&doorR&&introBgEl){
+        const bgUrl=introBgEl.style.backgroundImage;
+        doorL.style.backgroundImage=bgUrl;
+        doorR.style.backgroundImage=bgUrl;
+        introBgEl.style.display="none";
+        doorL.style.display="block";
+        doorR.style.display="block";
+        requestAnimationFrame(()=>{
+          doorL.classList.add("opening");
+          doorR.classList.add("opening");
+        });
+      }
+    }catch(err){}
+  },500);
+  // Stage 3 (~1250ms): cross-fade the remaining intro away as the dashboard zoom continues.
+  setTimeout(()=>{
+    try{introScreen.classList.add("closing");}catch(err){}
+  },1250);
   setTimeout(()=>{
     introScreen.style.display="none";
     introScreen.classList.remove("closing");
     mainApp.classList.remove("entering");
+    document.querySelectorAll(".dnode.open-out").forEach(n=>{n.classList.remove("open-out");n.style.animationDelay="";n.style.removeProperty("--fx");n.style.removeProperty("--fy");});
     const doorL=document.getElementById("doorL"), doorR=document.getElementById("doorR");
     if(doorL){doorL.style.display="none";doorL.classList.remove("opening");}
     if(doorR){doorR.style.display="none";doorR.classList.remove("opening");}
-  },1550);
+  },1800);
 };
 const ICON_EXPAND='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m11-5v3a2 2 0 0 1-2 2h-3"/></svg>';
 const ICON_COLLAPSE='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v3a2 2 0 0 1-2 2H4m16-5v3a2 2 0 0 0 2 2h3M4 16h3a2 2 0 0 1 2 2v3m10-5h3a2 2 0 0 0-2 2v3"/></svg>';
