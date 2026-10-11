@@ -304,7 +304,8 @@ function yoy(ty,ly,isLoss){
   const diff=ty-ly;
   let pct = ly!==0 ? (diff/Math.abs(ly)*100) : (ty!==0?null:0);
   // For loss (negative), improvement = loss went up toward 0 => diff>0 => good(green). For sales, growth = diff>0 => good(green).
-  const good = diff>=0;
+  // Loss rows are always green vs LY (including LY higher than TY); sales still go red when below LY.
+  const good = isLoss ? true : diff>=0;
   const arrow = diff>0?"▲":(diff<0?"▼":"–");
   const col = diff===0?"#90a4ae":(good?"#2E7D5B":"#C0504D");
   const pctTxt = pct==null?"n/a":(pct>=0?"+":"")+pct.toFixed(1)+"%";
@@ -345,7 +346,7 @@ function render(){
   if(lossPct!=null){
     const ppDiff = lossPctLY!=null?(lossPct-lossPctLY):null;
     // loss% is negative; moving toward 0 (ppDiff>0) is improvement = green
-    const pcol=ppDiff==null?"#90a4ae":(ppDiff>=0?"#2E7D5B":"#C0504D");
+    const pcol=ppDiff==null?"#90a4ae":"#2E7D5B";
     const parrow=ppDiff==null?"":(ppDiff>0?"▲":(ppDiff<0?"▼":"–"));
     pctHtml='<div class="yoyline" style="color:'+pcol+'">'+parrow+' '+(ppDiff!=null?((ppDiff>=0?"+":"")+ppDiff.toFixed(2)+"%"):"n/a")+'</div><div class="lyline">ปีก่อน: '+(lossPctLY!=null?lossPctLY.toFixed(2)+"%":"n/a")+'</div>';
   }
