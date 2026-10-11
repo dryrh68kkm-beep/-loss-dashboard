@@ -207,13 +207,13 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .intro-start{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;background:#0d9382;color:#fff;border:none;border-radius:13px;font-size:15.5px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(13,147,130,.4);transition:transform .1s}
 .intro-start:active{transform:scale(.98)}
 .intro-footer{position:absolute;left:50%;bottom:max(16px,2vh);transform:translateX(-50%);width:100%;max-width:620px;z-index:5;padding:0 20px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px}
-@keyframes mainZoomIn{from{opacity:.35;transform:scale(1.05)}to{opacity:1;transform:scale(1)}}
-#mainApp.entering{animation:mainZoomIn .9s cubic-bezier(.22,1,.36,1) both}
+@keyframes mainZoomIn{from{opacity:.3;transform:scale(1.22)}to{opacity:1;transform:scale(1)}}
+#mainApp.entering{animation:mainZoomIn .95s cubic-bezier(.22,1,.36,1) both}
 .intro.closing{transition:opacity .9s cubic-bezier(.22,1,.36,1);opacity:0;pointer-events:none}
-@keyframes dnodeFlyIn{0%{opacity:0;transform:scale(.8) translateY(24px)}100%{opacity:1;transform:scale(1) translateY(0)}}
-.dnode.fly-in{animation:dnodeFlyIn .6s cubic-bezier(.22,1,.36,1) both}
-@keyframes dnodeOpenOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.4)}}
-.dnode.open-out{animation:dnodeOpenOut .7s cubic-bezier(.4,0,.2,1) both}
+@keyframes dnodeFlyIn{0%{opacity:0;transform:translate(var(--fx,0),var(--fy,0)) scale(.85)}100%{opacity:1;transform:translate(0,0) scale(1)}}
+.dnode.fly-in{animation:dnodeFlyIn .68s cubic-bezier(.22,1,.36,1) both}
+@keyframes dnodeOpenOut{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--fx,0),var(--fy,0)) scale(.9)}}
+.dnode.open-out{animation:dnodeOpenOut .75s cubic-bezier(.4,0,.2,1) both}
 .intro-upload{display:flex;gap:8px;flex-wrap:wrap}
 .intro-upload .upbtn{flex:1;justify-content:center;font-size:12.5px;padding:10px 10px;background:rgba(255,255,255,.14);box-shadow:none;border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(2px)}
 .intro-upload .upbtn:nth-child(2){background:rgba(255,255,255,.14)}
@@ -1593,8 +1593,10 @@ document.getElementById("introStart").onclick=()=>{
   mainApp.style.display="";
   mainApp.classList.add("entering");
   try{
+    const diagram=document.querySelector(".diagram");
     const dnodes=[...document.querySelectorAll(".dnode")];
     dnodes.forEach((n,i)=>{
+      setNodeFlyOffset(n,diagram);
       n.style.animationDelay=(i*25)+"ms";
       n.classList.add("open-out");
     });
@@ -1604,8 +1606,8 @@ document.getElementById("introStart").onclick=()=>{
     introScreen.style.display="none";
     introScreen.classList.remove("closing");
     mainApp.classList.remove("entering");
-    document.querySelectorAll(".dnode.open-out").forEach(n=>{n.classList.remove("open-out");n.style.animationDelay="";});
-  },920);
+    document.querySelectorAll(".dnode.open-out").forEach(n=>{n.classList.remove("open-out");n.style.animationDelay="";n.style.removeProperty("--fx");n.style.removeProperty("--fy");});
+  },950);
 };
 const ICON_EXPAND='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m11-5v3a2 2 0 0 1-2 2h-3"/></svg>';
 const ICON_COLLAPSE='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v3a2 2 0 0 1-2 2H4m16-5v3a2 2 0 0 0 2 2h3M4 16h3a2 2 0 0 1 2 2v3m10-5h3a2 2 0 0 0-2 2v3"/></svg>';
@@ -1623,15 +1625,29 @@ if(fsBtn){
 let diagLineTimer=null;
 window.addEventListener("resize",()=>{clearTimeout(diagLineTimer);diagLineTimer=setTimeout(()=>{adjustIntroLayout();drawDiagramLines();},120);});
 renderIntro();
+function setNodeFlyOffset(n,diagram){
+  if(!diagram)return;
+  const OFFX=560,OFFY=340;
+  const dRect=diagram.getBoundingClientRect();
+  const r=n.getBoundingClientRect();
+  const cx=(r.left+r.right)/2, cy=(r.top+r.bottom)/2;
+  const fracX=dRect.width?(cx-dRect.left)/dRect.width:.5;
+  const fracY=dRect.height?(cy-dRect.top)/dRect.height:.5;
+  n.style.setProperty("--fx",((fracX<0.5?-1:1)*OFFX)+"px");
+  n.style.setProperty("--fy",((fracY<0.5?-1:1)*OFFY)+"px");
+}
 function playIntroEntrance(){
+  const diagram=document.querySelector(".diagram");
   const nodes=[...document.querySelectorAll(".dnode")];
+  if(!diagram||!nodes.length)return;
   nodes.forEach((n,i)=>{
+    setNodeFlyOffset(n,diagram);
     n.style.animationDelay=(i*70)+"ms";
     n.classList.add("fly-in");
   });
   setTimeout(()=>{
-    nodes.forEach(n=>{n.classList.remove("fly-in");n.style.animationDelay="";});
-  },900);
+    nodes.forEach(n=>{n.classList.remove("fly-in");n.style.animationDelay="";n.style.removeProperty("--fx");n.style.removeProperty("--fy");});
+  },1000);
 }
 requestAnimationFrame(()=>requestAnimationFrame(playIntroEntrance));
 
