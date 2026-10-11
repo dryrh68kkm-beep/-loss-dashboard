@@ -1624,9 +1624,12 @@ document.getElementById("introStart").onclick=()=>{
         introBgEl.style.display="none";
         doorL.style.display="block";
         doorR.style.display="block";
+        void doorL.offsetWidth;
         requestAnimationFrame(()=>{
-          doorL.classList.add("opening");
-          doorR.classList.add("opening");
+          requestAnimationFrame(()=>{
+            doorL.classList.add("opening");
+            doorR.classList.add("opening");
+          });
         });
       }
     }catch(err){}
